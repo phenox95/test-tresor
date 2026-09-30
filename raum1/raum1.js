@@ -9,6 +9,7 @@ TRESOR.room({
   imageAlt: 'Ein holzgetäfelter Saal bei Nacht: links ein Pult mit aufgeschlagenem Buch, in der Mitte das Prüfpult mit grüner Lampe, rechts ein Pult mit verschnalltem Buch. Dahinter ein Tonbandgerät, ein Giraffenskelett und ein Archivregal.',
   size: [1024, 681],
   flashlight: false,
+  unlockMode: 'auto',   /* 'auto' = ohne Code (Haken für das Do Now), 'code' = Lehrkraft nennt den Code */
 
   caseText: function (T) {
     var t = 'Dr. Johanna Wendt ist verschwunden. Der Händler Viktor Hallmann will den „Berolinavis“ versteigern und erklärt öffentlich, wie das Tier entstanden sein soll.\n\nIm Streitsaal prüft ihr diese Erklärung. Ob der Fund selbst echt ist, wisst ihr noch nicht.';
@@ -20,8 +21,8 @@ TRESOR.room({
 
   missions: [
     { id: 'm1.1', title: 'Mission 1.1 · Die Behauptung', unlock: 'c1ca4d4ef8363a8ece79e862b9aaac8fca28c1589aa2e7ad4da0ce6a10ab8859',
-      intro: { from: 'kemal', text: 'Ich habe euch in den Streitsaal gelassen. Gestern Abend hat Hallmann hier vor Sammlern gesprochen. Die Saalanlage hat alles aufgezeichnet.\n\nHört zu, aber glaubt nicht alles, was ihr hört.',
-        next: { from: 'wendt', text: '… wenn ihr das hört, … [Rauschen] … Hallmann versteigert den Berolinavis. Ich habe einen Verdacht. Aber ein Verdacht ist keine Erkenntnis.\n\nPrüft zuerst, was er wirklich behauptet. Und trennt sauber, was er sieht und was er daraus macht. [Rauschen] … Vertraut Kemal.\n\n– J. W.' } },
+      intro: { from: 'kemal', audio: 'audio/kemal-intro.mp3', text: 'Ich habe euch in den Streitsaal gelassen. Gestern Abend hat Hallmann hier vor Sammlern gesprochen. Die Saalanlage hat alles aufgezeichnet.\n\nHört zu, aber glaubt nicht alles, was ihr hört.',
+        next: { from: 'wendt', audio: 'audio/wendt-nachricht.mp3', text: '… wenn ihr das hört, … [Rauschen] … Hallmann versteigert den Berolinavis. Ich habe einen Verdacht. Aber ein Verdacht ist keine Erkenntnis.\n\nPrüft zuerst, was er wirklich behauptet. Und trennt sauber, was er sieht und was er daraus macht. [Rauschen] … Vertraut Kemal.\n\n– J. W.' } },
       requires: ['r1-1-typen', 'r1-1-frage', 'r1-1-these', 'r1-1-fragetext'],
       doneTitle: 'Mission 1.1 abgeschlossen',
       doneText: 'Ihr habt geklärt, was Hallmann behauptet, und daraus eine Frage gemacht, die man prüfen kann.\n\nSchreibt jetzt euren Merksatz ins Logbuch, bevor ihr weitermacht.' },
@@ -51,7 +52,7 @@ TRESOR.room({
       { if: { unlocked: 'm1.2', notSolved: 'r1-2-kette' }, action: { type: 'puzzle', puzzle: 'r1-2-kette' } },
       { if: { unlocked: 'm1.2', solved: ['r1-2-modell', 'r1-2-kette'], notSolved: 'r1-2-vorhersage' }, action: { type: 'puzzle', puzzle: 'r1-2-vorhersage' } },
       { if: { unlocked: 'm1.2' }, action: { type: 'doc', doc: 'lamarck' } },
-      { action: { type: 'text', text: 'Das Pult ist noch nicht zugänglich.' } } ] },
+      { action: { type: 'text', text: 'Dieses Pult ist noch verschlossen. Die nächste Mission startet ihr über das Menü oder mit dem Knopf am Ende der Mission.' } } ] },
 
     { id: 'pruefpult', label: 'Prüfpult in der Mitte', rect: [36, 57, 28.5, 34], states: [
       { if: { unlocked: 'm1.1', notSolved: 'r1-1-typen' }, action: { type: 'puzzle', puzzle: 'r1-1-typen' } },
@@ -76,7 +77,7 @@ TRESOR.room({
   ],
 
   docs: {
-    'transkript': { title: 'Aufzeichnung der Saalanlage', style: 'paper',
+    'transkript': { title: 'Aufzeichnung der Saalanlage', style: 'paper', audio: 'audio/hallmann-vortrag.mp3',
       text: 'Gestern Abend, Vortrag vor Sammlern. Sprecher: Viktor Hallmann.\n\nT1: „Der Berolinavis ist das bedeutendste Fossil des Jahrhunderts. Ich garantiere es.“\nT2: „Er trägt Federn an den Armen und einen langen Knochenschwanz.“\nT3: „Weil seine Vorfahren fliegen wollten, streckten sie die Arme immer wieder aus.“\nT4: „Durch dieses Training wuchsen ihnen Federn.“\nT5: „Ihre Jungen erbten die Federn, denn was ein Tier sich erarbeitet, wird weitergegeben.“\nT6: „Die Krallen an seinen Armen sind stark abgenutzt.“\nT7: „Diese Tiere haben ihre Arme also ständig benutzt.“\nT8: „Das Museum hat den Fund geprüft und bestätigt.“' },
     'lamarck': { title: 'Auszüge nach Lamarck (vereinfacht)', style: 'paper',
       text: 'Vereinfachte Fassung, sinngemäß, kein Originalzitat.\n\nL1: Ändert sich die Umwelt, ändern sich die Bedürfnisse der Tiere. Aus neuen Bedürfnissen entstehen neue Gewohnheiten.\nL2: Organe, die oft gebraucht werden, werden stärker und größer. Organe, die nicht gebraucht werden, bilden sich zurück.\nL3: Was ein Lebewesen im Lauf seines Lebens erwirbt, gibt es an seine Nachkommen weiter.' },
@@ -118,7 +119,7 @@ TRESOR.room({
       rescueTask: 'Erklärt in eigenen Worten den Unterschied zwischen einer Beobachtung und einer Deutung an einem Beispiel aus dem Transkript.',
       onSolve: { text: 'Die Aufzeichnung erscheint auf dem Prüfpult, geordnet nach Typ. Die Deutungen sind mit Messing umrandet. Das Prüfpult summt leise.', then: 'r1-1-frage' } },
 
-    'r1-1-frage': { id: 'r1-1-frage', type: 'pick', count: 2, title: 'Die richtigen Fragen',
+    'r1-1-frage': { id: 'r1-1-frage', type: 'pick', count: 2, title: 'Die richtigen Fragen', ref: { title: 'Zum Nachschlagen: Aufzeichnung', docs: ['transkript'] },
       prompt: 'Hallmann erklärt in T3 bis T5, wie die Federn entstanden sein sollen. Wählt die zwei Fragen aus, mit denen ihr diese Erklärung überprüfen könnt.',
       cards: [
         { id: 'f1', tag: 'F1', label: 'Ist Hallmann ein ehrlicher Mensch?' },
@@ -136,18 +137,22 @@ TRESOR.room({
       rescueTask: 'Schreibt in eigenen Worten, warum „Wie alt ist der Berolinavis?“ eine gute Frage ist, aber nicht zu Hallmanns Erklärung passt.',
       onSolve: { then: 'r1-1-these' } },
 
-    'r1-1-these': { id: 'r1-1-these', type: 'freetext', minLength: 40, title: 'Die These',
+    'r1-1-these': { id: 'r1-1-these', type: 'freetext', minLength: 40, title: 'Die These', ref: { title: 'Zum Nachschlagen: Aufzeichnung', docs: ['transkript'] },
       prompt: 'Vervollständigt den Satz: „Hallmann behauptet, dass …“\n\nNennt seine zentrale Erklärung in einem Satz.',
       placeholder: 'Hallmann behauptet, dass …',
       onSolve: { then: 'r1-1-fragetext' } },
 
     'r1-1-fragetext': { id: 'r1-1-fragetext', type: 'freetext', minLength: 40, title: 'Eure Untersuchungsfrage',
+      ref: { title: 'Zum Nachschlagen: Aufzeichnung, eure These und die geprüften Fragen', docs: ['transkript'], answers: ['r1-1-these'],
+        text: 'Diese zwei Fragen passen zu Hallmanns Erklärung:\nF2 · Werden Veränderungen, die ein Tier durch häufigen Gebrauch erwirbt, an seine Jungen weitergegeben?\nF5 · Stimmen Beobachtungen und Versuche mit Hallmanns Erklärung überein?' },
       prompt: 'Formuliert jetzt eure eigene Untersuchungsfrage zu Hallmanns Erklärung. Sie muss sich mit Beobachtungen oder Versuchen prüfen lassen.',
       placeholder: 'Unsere Untersuchungsfrage: …',
       onSolve: { items: [{ id: 'untersuchungsfrage', label: 'Untersuchungsfrage', text: 'Eure eigene Frage steht unter „Meine Antworten“ im Archiv.' }],
         message: { from: 'wendt', text: 'Gut. Eine Frage ist der Anfang jeder Untersuchung.\n\nJetzt braucht ihr das Modell dahinter.\n\n– J. W.' } } },
 
     'r1-1-quelle': { id: 'r1-1-quelle', type: 'freetext', minLength: 60, title: 'Zwei Aussagen im Vergleich (Bonus)',
+      ref: { title: 'Zum Nachschlagen: Aufzeichnung und Wendts Nachricht', docs: ['transkript'],
+        text: 'Dr. Wendts Nachricht (Auszug): „Hallmann versteigert den Berolinavis. Ich habe einen Verdacht. Aber ein Verdacht ist keine Erkenntnis. Prüft zuerst, was er wirklich behauptet.“' },
       prompt: 'Vergleicht T8 („Das Museum hat den Fund geprüft und bestätigt“) mit Dr. Wendts Nachricht. Beide sind nur Aussagen.\n\nNennt zwei Möglichkeiten, wie ihr herausfinden könntet, wer von beiden die Wahrheit sagt.',
       placeholder: 'Wir könnten …',
       onSolve: { message: { from: 'kemal', text: 'Gute Frage. Ich schaue im Archiv nach dem Gutachten.' } } },
@@ -210,6 +215,8 @@ TRESOR.room({
         message: { from: 'kemal', text: 'Im Archiv liegen zwei Versuche. Vielleicht kann man eure Vorhersagen damit prüfen.\n\nDie Mappe steht im Regal rechts oben.' } } },
 
     'r1-2-versuch': { id: 'r1-2-versuch', type: 'freetext', minLength: 80, title: 'Einen Versuch planen (Bonus)',
+      ref: { title: 'Zum Nachschlagen: Lamarcks Modell und die Vorhersage V1', docs: ['lamarck'],
+        text: 'V1: Wenn Tiere ein Organ stark trainieren, dann müssten ihre Jungen schon bei der Geburt ein kräftigeres Organ haben.' },
       prompt: 'Skizziert einen Versuch, mit dem ihr V1 prüfen könntet: Welche Gruppen vergleicht ihr, was messt ihr, wie viele Generationen braucht ihr?',
       placeholder: 'Wir würden zwei Gruppen vergleichen …' },
 
@@ -320,11 +327,13 @@ TRESOR.room({
         message2: { from: 'kemal', text: 'Hallmann verschickt gerade eine neue Broschüre: „Er wollte fliegen, also wuchsen ihm Federn.“\n\nIhr wisst jetzt, woran das scheitert.' } } },
 
     'r1-3-modellkritik': { id: 'r1-3-modellkritik', type: 'freetext', minLength: 80, title: 'Was Darwins Modell nicht erklärt (Bonus)',
+      ref: { title: 'Zum Nachschlagen: Darwins Erklärung', docs: ['darwin'] },
       prompt: 'Darwins Erklärung setzt Variabilität voraus. Nennt eine Frage, die Darwins Modell nicht beantwortet, und begründet, warum sie wichtig ist.',
       placeholder: 'Eine offene Frage ist …',
       onSolve: { message: { from: 'kemal', text: 'Genau mit dieser Frage hat Dr. Wendt im Labor weitergearbeitet.' } } },
 
     'r1-3-population': { id: 'r1-3-population', type: 'freetext', minLength: 80, title: 'Die Population in zwei Modellen (Bonus)',
+      ref: { title: 'Zum Nachschlagen: beide Modelle', docs: ['lamarck', 'darwin'] },
       prompt: 'Vergleicht, wie sich eine Population im Modell von Lamarck und im Modell von Darwin verändert. Beschreibt den Unterschied in einem Satz.',
       placeholder: 'Nach Lamarck …, nach Darwin …',
       onSolve: { message: { from: 'kemal', text: 'Merkt euch diesen Unterschied. Im Labor seht ihr ihn in Zahlen.' } } }

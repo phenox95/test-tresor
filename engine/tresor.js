@@ -1,6 +1,6 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
-   Version 1.2 (Raum 1: Textkarten, Lückensatz, Einspruch, Notfall auf Papier) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
+   Version 1.3 (Raum 1: Textkarten, Lückensatz, Einspruch, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
@@ -96,13 +96,40 @@
       return node;
     });
   }
+  function audioPlayer(src, label) {
+    if (!src) return null;
+    var a = el('audio', { controls: 'controls', preload: 'metadata', src: src, 'aria-label': label || 'Aufnahme anhören' });
+    var box = el('div', { class: 'audio-box' }, [el('span', { class: 'audio-label', text: 'Aufnahme anhören (am besten mit Kopfhörern)' }), a]);
+    var name = String(src).split('/').pop().replace(/\.[a-z0-9]+$/i, '');
+    a.addEventListener('error', function () { box.style.display = 'none'; });   // Datei fehlt: nur Text anzeigen
+    a.addEventListener('play', function () {
+      [].forEach.call(document.querySelectorAll('audio'), function (o) { if (o !== a) { try { o.pause(); } catch (e) {} } });
+      if (S && !S.seen['audio-' + name]) { S.seen['audio-' + name] = true; logEvent('audio ' + name); }
+    });
+    return box;
+  }
+  function refBlock(p) {
+    var r = p.ref; if (!r) return null;
+    var kids = [];
+    if (r.text) kids.push(el('div', { class: 'ref-item' }, paras(r.text)));
+    (r.docs || []).forEach(function (id) {
+      var dc = ROOM.docs[id]; if (!dc) return;
+      kids.push(el('div', { class: 'ref-item' }, [el('strong', { text: dc.title })].concat(docBody(dc))));
+    });
+    (r.answers || []).forEach(function (k) {
+      var a = S.answers[k]; if (!a) return;
+      kids.push(el('div', { class: 'ref-item' }, [el('strong', { text: 'Eure Antwort: ' + a.title }), el('div', { class: 'ref-own' }, paras(a.text))]));
+    });
+    if (!kids.length) return null;
+    return el('details', { class: 'ref', open: p.type === 'freetext' ? 'open' : null }, [el('summary', { text: r.title || 'Zum Nachschlagen' })].concat(kids));
+  }
   function tableEl(t) {
     var head = el('tr', {}, t.head.map(function (h) { return el('th', { text: h }); }));
     var rows = t.rows.map(function (r) { return el('tr', {}, r.map(function (c) { return el('td', { text: c }); })); });
     return el('div', { class: 'tbl-wrap' }, [el('table', { class: 'data' }, [el('thead', {}, [head]), el('tbody', {}, rows)])]);
   }
   function docBody(dc) {
-    return [el('div', { class: 'doc-text' }, paras(dc.text)), dc.table ? tableEl(dc.table) : null];
+    return [audioPlayer(dc.audio, 'Aufnahme: ' + dc.title), el('div', { class: 'doc-text' }, paras(dc.text)), dc.table ? tableEl(dc.table) : null];
   }
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 
@@ -194,17 +221,17 @@
     var card = el('div', { class: 'dlg-card ' + (opts.cls || ''), role: 'dialog', 'aria-modal': 'true' },
       [opts.closable === false ? null : closeBtn, opts.title ? el('h2', { text: opts.title }) : null].concat(opts.body || []));
     var wrap = el('div', { class: 'dlg' }, [card]);
-    function close() { wrap.remove(); dialogStack = dialogStack.filter(function (d) { return d !== api; }); if (opts.onClose) opts.onClose(); }
+    function close() { [].forEach.call(wrap.querySelectorAll('audio'), function (a) { try { a.pause(); } catch (e) {} }); wrap.remove(); dialogStack = dialogStack.filter(function (d) { return d !== api; }); if (opts.onClose) opts.onClose(); }
     closeBtn.addEventListener('click', close);
     if (opts.closable !== false) wrap.addEventListener('click', function (ev) { if (ev.target === wrap) close(); });
     document.body.appendChild(wrap);
-    var api = { close: close, card: card, wrap: wrap };
+    var api = { close: close, card: card, wrap: wrap, closable: opts.closable !== false };
     dialogStack.push(api);
     setTimeout(function () { var f = card.querySelector('input,textarea,button:not(.dlg-close)'); if (f && opts.focus !== false) f.focus({ preventScroll: true }); }, 50);
     return api;
   }
   function closeAll() { dialogStack.slice().forEach(function (d) { d.close(); }); }
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && dialogStack.length) dialogStack[dialogStack.length - 1].close(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && dialogStack.length) { var top = dialogStack[dialogStack.length - 1]; if (top.closable) top.close(); } });
 
   var toastTimer;
   function toast(text, ms) {
@@ -212,17 +239,17 @@
     t.textContent = text; t.classList.add('show');
     clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, ms || 3800);
   }
-  function figureBlock(from, text) {
+  function figureBlock(from, text, audio) {
     var f = FIGURES[from] || { name: from, role: '', img: null };
     return el('div', { class: 'msg' }, [
       f.img ? el('img', { class: 'msg-face', src: BASE + f.img, alt: '' }) : null,
-      el('div', { class: 'msg-body' }, [el('div', { class: 'msg-from' }, [el('strong', { text: f.name }), f.role ? ' · ' + f.role : '']), el('div', { class: 'msg-text' }, paras(text))])
+      el('div', { class: 'msg-body' }, [el('div', { class: 'msg-from' }, [el('strong', { text: f.name }), f.role ? ' · ' + f.role : '']), el('div', { class: 'msg-text' }, paras(text)), audioPlayer(audio, 'Aufnahme von ' + f.name)])
     ]);
   }
-  function message(from, text, then, record) {
-    if (record !== false) addUnique(S.docs, { id: 'msg-' + sha256(from + text).slice(0, 10), kind: 'message', from: from, text: text }, 'id');
+  function message(from, text, then, record, audio) {
+    if (record !== false) addUnique(S.docs, { id: 'msg-' + sha256(from + text).slice(0, 10), kind: 'message', from: from, text: text, audio: audio }, 'id');
     persist();
-    var d = openDialog({ cls: 'dlg-message', body: [figureBlock(from, text), el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Weiter', onclick: function () { d.close(); } })])],
+    var d = openDialog({ cls: 'dlg-message', body: [figureBlock(from, text, audio), el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Weiter', onclick: function () { d.close(); } })])],
       onClose: then });
     return d;
   }
@@ -247,8 +274,8 @@
     } else if (tab === 'docs') {
       if (!S.docs.length) content.appendChild(empty('Noch keine Dokumente.'));
       S.docs.slice().reverse().forEach(function (dc) {
-        if (dc.kind === 'message') content.appendChild(figureBlock(dc.from, dc.text));
-        else content.appendChild(el('div', { class: 'akte-item' }, [el('strong', { text: dc.title }), el('div', {}, paras(dc.text)), dc.table ? tableEl(dc.table) : null]));
+        if (dc.kind === 'message') content.appendChild(figureBlock(dc.from, dc.text, dc.audio));
+        else content.appendChild(el('div', { class: 'akte-item' }, [el('strong', { text: dc.title }), audioPlayer(dc.audio, 'Aufnahme: ' + dc.title), el('div', {}, paras(dc.text)), dc.table ? tableEl(dc.table) : null]));
       });
     } else if (tab === 'archiv') {
       content.appendChild(el('h3', { text: 'Merksätze' }));
@@ -267,10 +294,13 @@
 
   /* ---------------- Menü ---------------- */
   function openMenu(extra) {
+    var nxt = nextLocked();
+    var codeBtn = nxt ? el('button', { class: 'btn', text: (unlockMode() === 'auto' ? String(nxt.title).split(' · ')[0] + ' starten' : 'Code für ' + String(nxt.title).split(' · ')[0] + ' eingeben'), onclick: function () { d.close(); lockScreen(nxt, true); } }) : null;
     var d = openDialog({ title: 'Menü', body: [
       el('p', { class: 'muted', text: 'Team: ' + S.team.join(', ') }),
       el('div', { class: 'stack' }, [
         el('button', { class: 'btn', text: 'Spielstand sichern', onclick: function () { saveFile(); toast('Die Datei liegt jetzt im Download-Ordner. Ladet sie in WebWeaver hoch.', 6000); } }),
+        codeBtn,
         extra || null,
         el('button', { class: 'btn ghost', text: 'Beenden und iPad freigeben', onclick: function () { d.close(); endGame(); } })
       ]),
@@ -363,6 +393,7 @@
     logEvent('öffnet ' + p.id);
     var fb = el('div', { class: 'feedback', role: 'status' });
     var body = [el('div', { class: 'prompt' }, paras(p.prompt))];
+    var refEl = refBlock(p); if (refEl) body.push(refEl);
     var d;
     function attempt(ans) {
       if (check(p.id, ans, p.hash)) { d.close(); solve(p, {}); }
@@ -478,17 +509,27 @@
     }
     if (p.type === 'einspruch') {
       var konterBox = el('div', { class: 'konter', 'aria-live': 'polite' });
-      var gSt = optGroup(p.statements, 'one', function () { fb.textContent = ''; });
-      var gEv = optGroup(p.evidence.map(function (e) { return { id: e.id, label: e.title }; }), 'many', function () { fb.textContent = ''; }, 2);
-      var gA = optGroup(p.slotA.options, 'one', function () { fb.textContent = ''; });
-      var gB = optGroup(p.slotB.options, 'one', function () { fb.textContent = ''; });
+      var sum = el('p', { class: 'einspruch-sum', 'aria-live': 'polite' });
+      var gSt, gEv, gA, gB;
+      function upd() {
+        fb.textContent = '';
+        if (!gSt || !gEv || !gA || !gB) return;
+        var st = gSt.get(), ev = gEv.get(), a = gA.get(), b = gB.get();
+        sum.textContent = 'Euer Einspruch: Aussage ' + (st || 'fehlt noch') + ' · Belege ' + (ev.length ? ev.slice().sort().join(' + ') : 'fehlen noch') +
+          ' · Begründung 1 ' + (a ? 'gewählt' : 'fehlt noch') + ' · Begründung 2 ' + (b ? 'gewählt' : 'fehlt noch');
+      }
+      gSt = optGroup(p.statements, 'one', upd);
+      gEv = optGroup(p.evidence.map(function (e) { return { id: e.id, label: e.title }; }), 'many', upd, 2);
+      gA = optGroup(p.slotA.options, 'one', upd);
+      gB = optGroup(p.slotB.options, 'one', upd);
+      upd();
       var mappe = el('div', { class: 'mappe' }, p.evidence.map(function (e) {
         return el('details', { class: 'evi' }, [el('summary', { text: e.title })].concat(docBody(e)));
       }));
       body.push(el('h3', { text: '1 · Welche Aussage greift ihr an?' }), gSt.el,
         el('h3', { text: '2 · Belegmappe lesen und höchstens zwei Belege vorlegen' }), mappe, gEv.el,
         el('h3', { text: '3 · ' + p.slotA.label }), gA.el,
-        el('h3', { text: '4 · ' + p.slotB.label }), gB.el, konterBox,
+        el('h3', { text: '4 · ' + p.slotB.label }), gB.el, sum, konterBox,
         el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Einspruch!', onclick: function () {
           var st = gSt.get(), evs = gEv.get(), a = gA.get(), b = gB.get();
           if (!st || !evs.length || !a || !b) { wrong(fb, 'Wählt eine Aussage, mindestens einen Beleg und beide Begründungen.'); return; }
@@ -503,19 +544,23 @@
           konterBox.appendChild(figureBlock(kk.from, kk.text));
           fb.className = 'feedback no'; fb.textContent = kk.status || 'Der Einspruch reicht noch nicht.';
           persist();
+          try { konterBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
         } })]));
     }
     if (p.type === 'freetext') {
       var ta = el('textarea', { rows: 5, placeholder: p.placeholder || 'Schreibt hier …' });
       if (S.answers[p.id]) ta.value = S.answers[p.id].text;
+      else if (S.vars.draft && S.vars.draft[p.id]) ta.value = S.vars.draft[p.id];
+      ta.addEventListener('input', function () { S.vars.draft = S.vars.draft || {}; S.vars.draft[p.id] = ta.value; persist(); });
       body.push(ta, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Ins Logbuch eintragen', onclick: function () {
         if (ta.value.trim().length < (p.minLength || 40)) { wrong(fb, 'Das ist noch etwas knapp. Schreibt ganze Sätze.'); return; }
         S.answers[p.id] = { title: p.title, text: ta.value.trim() }; d.close(); solve(p, {});
       } })]));
     }
     body.push(fb);
+    body.push(el('div', { class: 'row' }, [el('button', { class: 'btn ghost small', type: 'button', text: 'Forscherakte öffnen (nachschlagen)', onclick: function () { openAkte(); } })]));
     if (p.hints && p.hints.length) body.push(hintArea(p, function () { rescueDialog(p, d); }));
-    d = openDialog({ cls: 'dlg-puzzle', title: p.title, body: body, focus: p.type === 'code' || p.type === 'freetext' });
+    d = openDialog({ cls: 'dlg-puzzle' + (refEl && p.type === 'freetext' ? ' has-ref' : ''), title: p.title, body: body, focus: p.type === 'code' || p.type === 'freetext' });
   }
 
   function solve(p, how) {
@@ -528,13 +573,13 @@
       if (eff.then && ROOM.puzzles[eff.then]) openPuzzle(ROOM.puzzles[eff.then]);
       else if (ROOM) checkMission();
     }
-    if (eff.message) message(eff.message.from, eff.message.text, function () { if (eff.message2) message(eff.message2.from, eff.message2.text, next); else next(); });
+    if (eff.message) message(eff.message.from, eff.message.text, function () { if (eff.message2) message(eff.message2.from, eff.message2.text, next, true, eff.message2.audio); else next(); }, true, eff.message.audio);
     else if (eff.text) { var dd = openDialog({ cls: 'dlg-world', body: paras(eff.text).concat([el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Weiter', onclick: function () { dd.close(); } })])]), onClose: next }); }
     else next();
   }
   function applyEffects(eff, silent) {
     (eff.items || []).forEach(function (it) { if (addUnique(S.items, it, 'id') && !silent) toast('Neues Fundstück: ' + it.label); });
-    (eff.docs || []).forEach(function (id) { var dc = ROOM.docs[id]; if (dc) addUnique(S.docs, { id: id, kind: 'doc', title: dc.title, text: dc.text, table: dc.table }, 'id'); });
+    (eff.docs || []).forEach(function (id) { var dc = ROOM.docs[id]; if (dc) addUnique(S.docs, { id: id, kind: 'doc', title: dc.title, text: dc.text, table: dc.table, audio: dc.audio }, 'id'); });
     if (eff.evidence) addUnique(S.evidence, eff.evidence, 'id');
     if (eff.merksatz) addUnique(S.merksaetze, eff.merksatz);
     persist();
@@ -555,12 +600,12 @@
     if (!a) return;
     if (a.type === 'doc') {
       var dc = ROOM.docs[a.doc];
-      addUnique(S.docs, { id: a.doc, kind: 'doc', title: dc.title, text: dc.text, table: dc.table }, 'id'); persist();
+      addUnique(S.docs, { id: a.doc, kind: 'doc', title: dc.title, text: dc.text, table: dc.table, audio: dc.audio }, 'id'); persist();
       openDialog({ cls: 'dlg-doc ' + (dc.style || 'paper'), title: dc.title, body: [dc.image ? zoomImg(dc.image, dc.title) : null].concat(docBody(dc)) });
     } else if (a.type === 'docs') {
       var blocks = [];
       a.docs.forEach(function (id) {
-        var dd = ROOM.docs[id]; addUnique(S.docs, { id: id, kind: 'doc', title: dd.title, text: dd.text, table: dd.table }, 'id');
+        var dd = ROOM.docs[id]; addUnique(S.docs, { id: id, kind: 'doc', title: dd.title, text: dd.text, table: dd.table, audio: dd.audio }, 'id');
         blocks.push(el('h3', { text: dd.title })); docBody(dd).forEach(function (n) { if (n) blocks.push(n); });
       });
       persist(); openDialog({ cls: 'dlg-doc paper', title: a.title, body: blocks });
@@ -587,14 +632,48 @@
       if (isUnlocked(m.id) && !S.seen['done-' + m.id] && m.requires.every(isSolved)) {
         S.seen['done-' + m.id] = true; S.solved[m.id] = { t: new Date().toISOString() }; persist();
         if (i < cur) return;
+        var nx = ROOM.missions[i + 1];
         var dlg = openDialog({ cls: 'dlg-done', title: m.doneTitle || 'Mission abgeschlossen', body: paras(m.doneText || '').concat([
+          nx ? el('p', { class: 'muted', text: (unlockMode() === 'auto' ? 'Für die nächste Mission beantwortet ihr zuerst das Do Now im Logbuch. Dann tippt unten auf „Nächste Mission“.' : 'Die nächste Mission schaltet eure Lehrkraft mit einem Code frei. Habt ihr den Code schon, tippt unten auf „Nächste Mission“.') }) : null,
           el('p', { class: 'muted', text: 'Notfall-Code für euer Logbuch: ' + makeCode() }),
-          el('div', { class: 'row end' }, [el('button', { class: 'btn ghost', text: 'Forscherakte', onclick: function () { dlg.close(); openAkte('beweise'); } }),
+          el('div', { class: 'row end' }, [nx ? el('button', { class: 'btn ghost', text: 'Nächste Mission', onclick: function () { dlg.close(); lockScreen(nx, true); } }) : null, el('button', { class: 'btn ghost', text: 'Forscherakte', onclick: function () { dlg.close(); openAkte('beweise'); } }),
             el('button', { class: 'btn', text: 'Spielstand sichern', onclick: function () { saveFile(); toast('Gesichert. Ladet die Datei in WebWeaver hoch.', 6000); } })])]) });
       }
     });
   }
-  function lockScreen(m) {
+  function nextLocked() {
+    if (!ROOM || !ROOM.missions || !S) return null;
+    for (var i = 0; i < ROOM.missions.length; i++) {
+      var m = ROOM.missions[i];
+      if (!isUnlocked(m.id)) {
+        var prev = ROOM.missions[i - 1];
+        return (i === 0 || (prev && (S.seen['done-' + prev.id] || isSolved(prev.id)))) ? m : null;
+      }
+    }
+    return null;
+  }
+  function unlockMode() {
+    var o = null; try { o = sessionStorage.getItem('tresor.modus'); } catch (e) {}
+    return o || (ROOM && ROOM.unlockMode) || 'code';
+  }
+  function startScreen(m, closable) {
+    var cb = el('input', { type: 'checkbox', id: 'start-ok' });
+    var fb = el('div', { class: 'feedback', role: 'status' });
+    function go() {
+      if (!cb.checked) { wrong(fb, 'Beantwortet zuerst das Do Now im Logbuch und setzt dann den Haken.'); return; }
+      S.unlocked.push(m.id); logEvent('freigeschaltet ' + m.id + ' (ohne Code)'); d.close(); refreshRoom(); intro(m);
+    }
+    var d = openDialog({ cls: 'dlg-lock', closable: closable ? undefined : false, title: ROOM.title, body: [
+      el('p', { text: 'Bereit für „' + m.title + '“?' }),
+      el('p', { class: 'paper-task' }, [el('strong', { text: 'Zuerst auf Papier: ' }), 'Beantwortet das Do Now dieser Stunde im Feld „Vorher“ eures Logbuchs.']),
+      el('label', { class: 'check' }, [cb, ' Wir haben das Do Now im Logbuch beantwortet.']), fb,
+      el('div', { class: 'row' }, [el('button', { class: 'btn', text: 'Mission starten', onclick: go }),
+        closable ? el('button', { class: 'btn ghost small', text: 'Abbrechen', onclick: function () { d.close(); } }) : null,
+        el('a', { class: 'btn ghost small', href: BASE + 'index.html', text: 'Zurück zum Museumsplan' })])
+    ] });
+  }
+  function lockScreen(m, closable) {
+    if (unlockMode() === 'auto') { startScreen(m, closable); return; }
     var inp = el('input', { type: 'text', class: 'code-in', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Freischalt-Code' });
     var fb = el('div', { class: 'feedback', role: 'status' });
     function go() {
@@ -602,16 +681,16 @@
       else wrong(fb, 'Die Tür bleibt verschlossen. Den Code bekommt ihr im Unterricht.');
     }
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') go(); });
-    var d = openDialog({ cls: 'dlg-lock', closable: false, title: ROOM.title, body: [
+    var d = openDialog({ cls: 'dlg-lock', closable: closable ? undefined : false, title: ROOM.title, body: [
       el('p', { text: 'Die Tür ist verschlossen. Gebt den Code für „' + m.title + '“ ein.' }),
       el('div', { class: 'row' }, [inp, el('button', { class: 'btn', text: 'Aufschließen', onclick: go })]), fb,
-      el('div', { class: 'row' }, [el('a', { class: 'btn ghost small', href: BASE + 'index.html', text: 'Zurück zum Museumsplan' })])
+      el('div', { class: 'row' }, [closable ? el('button', { class: 'btn ghost small', text: 'Abbrechen', onclick: function () { d.close(); } }) : null, el('a', { class: 'btn ghost small', href: BASE + 'index.html', text: 'Zurück zum Museumsplan' })])
     ] });
   }
   function intro(m) {
     if (S.seen['intro-' + m.id] || !m.intro || (m.requires || []).some(isSolved)) return;
     S.seen['intro-' + m.id] = true; persist();
-    message(m.intro.from, m.intro.text, function () { if (m.intro.next) { message(m.intro.next.from, m.intro.next.text, hint); } else hint(); });
+    message(m.intro.from, m.intro.text, function () { if (m.intro.next) { message(m.intro.next.from, m.intro.next.text, hint, true, m.intro.next.audio); } else hint(); }, true, m.intro.audio);
     function hint() { toast(ROOM.flashlight ? 'Bewegt den Finger über den Bildschirm, um mit der Taschenlampe zu suchen.' : 'Tippt auf Dinge im Raum, um sie zu untersuchen.', 5000); }
   }
 
@@ -694,8 +773,9 @@
         var cur = currentMission();
         if (!cur && m) lockScreen(m);
         else if (cur) {
+          var wasDone = !!S.seen['done-' + cur.id];
           checkMission();
-          if (S.seen['done-' + cur.id] && m) lockScreen(m); else intro(cur);
+          if (wasDone && m) lockScreen(m); else if (!wasDone) intro(cur);
         }
       });
     },
