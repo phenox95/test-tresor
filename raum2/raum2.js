@@ -88,7 +88,7 @@ TRESOR.room({
       hash: 'e53960d80f51e8cd52f935d9da62a4d83ef25ccf0c9f9c924be1cab0a6717218',
       wrongText: 'Kemal schüttelt leicht den Kopf. Prüft jede Stelle noch einmal: Haben heutige Vögel das auch?',
       hints: ['Schaut euch den Kopf genau an. Haben heutige Vögel so etwas?',
-              'Heutige Vögel haben keine Zähne, keine Krallen am Flügel und keinen langen Knochenschwanz.',
+              'Heutige Vögel haben keine Zähne, keinen langen Knochenschwanz und fast nie Krallen am Flügel.',
               'Drei der vier Stellen sind Reptilienmerkmale, nur eine ist typisch für Vögel.'],
       rescue: 'UmVwdGlsaWVubWVya21hbGUgc2luZCBkaWUgWsOkaG5lIGltIEtpZWZlciwgZGllIEtyYWxsZW4gYW0gRmzDvGdlbCB1bmQgZGVyIGxhbmdlIEtub2NoZW5zY2h3YW56LiBEaWUgRmVkZXJuIHNpbmQgdHlwaXNjaCBmw7xyIFbDtmdlbC4=',
       onSolve: { items: [{ id: 'merkmalsliste', label: 'Merkmalsliste', text: 'Reptilienmerkmale: Zähne, Krallen am Flügel, Knochenschwanz. Vogelmerkmal: Federn.' }],
@@ -114,16 +114,16 @@ TRESOR.room({
       onSolve: { message: { from: 'wendt', text: 'Wenn ihr das hier lest, habt ihr den Urvogel verstanden.\n\nMerkt euch sein Bild gut: So sieht ein echter Fund aus. Ein Stein, eine Schicht, ein Tier.\n\nHallmanns Berolinavis sieht auf den ersten Blick ähnlich aus. Auf den zweiten nicht.\n\n– J. W.' } } },
 
     'r2-bonus': { id: 'r2-bonus', type: 'assign', title: 'Dr. Wendts Karteikarten (Bonus)',
-      prompt: 'Auf Dr. Wendts Schreibtisch liegen Karteikarten. Ordnet jedes Merkmal der Tiergruppe zu, bei der es heute vorkommt.',
+      prompt: 'Auf Dr. Wendts Schreibtisch liegen Karteikarten. Ordnet jedes Merkmal der Tiergruppe zu, für die es heute typisch ist.',
       cards: [
-        { id: 'federn', label: 'Federn' }, { id: 'hornschnabel', label: 'Hornschnabel ohne Zähne' },
+        { id: 'federn', label: 'Federn' }, { id: 'gleichwarm', label: 'gleichbleibende Körpertemperatur' },
         { id: 'schuppen', label: 'Hornschuppen am ganzen Körper' }, { id: 'zaehne', label: 'Zähne im Kiefer' },
         { id: 'schwanz', label: 'langer Schwanz mit vielen Wirbeln' }
       ],
-      targets: [{ id: 'voegel', label: 'heutige Vögel' }, { id: 'reptilien', label: 'heutige Reptilien' }],
-      hash: '7632c0b08daaf212815bbaabf27c6b297e387d279209e92338a1d724d130e9ea',
-      hints: ['Denkt an eine Taube und an eine Eidechse.', 'Nur zwei Merkmale gehören zu den heutigen Vögeln.', 'Federn und Hornschnabel gehören zu den Vögeln, der Rest zu den Reptilien.'],
-      rescue: 'SGV1dGlnZSBWw7ZnZWw6IEZlZGVybiwgSG9ybnNjaG5hYmVsIG9obmUgWsOkaG5lLiBIZXV0aWdlIFJlcHRpbGllbjogSG9ybnNjaHVwcGVuLCBaw6RobmUgaW0gS2llZmVyLCBsYW5nZXIgU2Nod2FueiBtaXQgdmllbGVuIFdpcmJlbG4u',
+      targets: [{ id: 'voegel', label: 'typisch für heutige Vögel' }, { id: 'reptilien', label: 'typisch für heutige Reptilien' }],
+      hash: 'bc0d3d83279046a801e00a3cc070e361b04375721da8b5722ed05b9a2a4af4fa',
+      hints: ['Denkt an eine Taube und an eine Eidechse.', 'Nur zwei Merkmale gehören zu den heutigen Vögeln.', 'Federn und die gleichbleibende Körpertemperatur gehören zu den Vögeln, der Rest zu den Reptilien.'],
+      rescue: 'VHlwaXNjaCBmw7xyIGhldXRpZ2UgVsO2Z2VsOiBGZWRlcm4gdW5kIGdsZWljaGJsZWliZW5kZSBLw7ZycGVydGVtcGVyYXR1ci4gVHlwaXNjaCBmw7xyIGhldXRpZ2UgUmVwdGlsaWVuOiBIb3Juc2NodXBwZW4gYW0gZ2FuemVuIEvDtnJwZXIsIFrDpGhuZSBpbSBLaWVmZXIsIGxhbmdlciBTY2h3YW56IG1pdCB2aWVsZW4gV2lyYmVsbi4=',
       onSolve: { merksatz: 'Der Urvogel vereint Merkmale, die heute auf Vögel und Reptilien verteilt sind.',
         text: 'Ihr legt die letzte Karte ab. Zwischen den Karten steckt ein Foto: der Berolinavis. Auf der Rückseite steht in Dr. Wendts Schrift nur ein Wort: „Schichten?“' } }
   }

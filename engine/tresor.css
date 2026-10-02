@@ -213,3 +213,93 @@ table.data th { background: #1B2A2B; color: var(--brass-hi); font-family: var(--
   .dlg-card.has-ref > * { grid-column: 1; }
   .dlg-card.has-ref > .ref { grid-column: 2; grid-row: 2 / span 8; align-self: start; margin: 0; max-height: 68vh; overflow: auto; }
 }
+
+.audio-msg { display: none; font-size: .92rem; color: #E59A8A; }
+.audio-msg a { color: var(--brass-hi); }
+
+/* ---------- Neue Rätselformate ab Engine 1.4 ---------- */
+/* Markieren im Text: Farbe nie allein, hinter jeder Markierung steht das Wort in Klammern */
+.pens { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.pen { min-height: 48px; padding: 8px 16px; border-radius: 999px; border: 2px solid var(--line); background: #182224; color: var(--ink); cursor: pointer; font: inherit; }
+.pen.on { border-color: var(--brass-hi); background: #2E2815; font-weight: 700; }
+.markup-text { line-height: 2.3; font-size: 1.08rem; margin: 12px 0; padding: 14px; border-radius: 14px; background: rgba(255, 255, 255, .04); border: 1px solid var(--line); }
+.seg { display: inline; padding: 4px 6px; margin: 0 1px; border-radius: 8px; border: 2px solid transparent; background: transparent; color: var(--ink); font: inherit; text-align: left; cursor: pointer; }
+.seg:hover { border-color: #56655C; }
+.seg-nr { font-family: var(--serif); font-weight: 700; color: var(--brass-hi); }
+.seg-tag { font-weight: 700; font-size: .9rem; }
+.seg.m-beo { border-bottom: 4px solid var(--brass-hi); background: rgba(230, 194, 122, .18); }
+.seg.m-deu { border: 2px dashed #9CCB7B; background: rgba(156, 203, 123, .16); }
+/* Nachfragen */
+.annahmen { margin: 10px 0; padding: 10px 14px; border-left: 4px solid var(--brass); background: rgba(201, 154, 69, .08); font-size: .97rem; }
+.annahmen p { margin: 6px 0; }
+.nf-rows { display: grid; gap: 14px; margin: 12px 0; }
+.nf-row { padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 255, 255, .03); }
+.nf-say { margin: 0 0 8px; font-family: var(--serif); font-size: 1.08rem; }
+.nf-reply { margin-top: 8px; }
+.nf-label { display: block; margin-top: 8px; }
+/* Netz verbinden */
+.net-stage { position: relative; height: 430px; margin: 12px 0 6px; border-radius: 14px; border: 1px dashed var(--line); background: rgba(255, 255, 255, .03); overflow: hidden; }
+.net-lines { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+.net-node { position: absolute; transform: translate(-50%, -50%); width: 34%; min-width: 150px; max-width: 260px; padding: 10px 12px; text-align: left; border-radius: 12px;
+  border: 2px solid var(--line); background: var(--panel-solid); color: var(--ink); font: inherit; font-size: .95rem; line-height: 1.35; cursor: pointer; display: flex; gap: 8px; align-items: flex-start; z-index: 1; }
+.net-node strong { flex: none; font-family: var(--serif); color: var(--brass-hi); }
+.net-node.from { border-color: var(--brass-hi); background: #2E2815; }
+.net-edges { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 10px; align-items: center; }
+.net-edges .edge { white-space: nowrap; }
+@media (max-width: 640px) { .net-stage { height: 560px; } .net-node { width: 44%; } }
+/* Aufgabe auf Papier */
+.sample-chain { margin: 10px 0; padding-left: 1.4em; }
+.sample-chain li { margin: 6px 0; padding: 6px 10px; border-radius: 10px; background: rgba(255, 255, 255, .05); list-style: decimal; }
+.sample-chain li + li::before { content: ''; }
+
+/* ---------- Schloss-Animation ab Engine 1.5 ---------- */
+.fx-lock { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;
+  background: radial-gradient(circle at 50% 42%, #1B2A2C 0%, #080C0D 70%); color: var(--ink); overflow: hidden; animation: fxFade .35s ease-out; }
+.fx-lock.out { opacity: 0; transition: opacity .3s; }
+.fx-glow { position: absolute; left: 50%; top: 40%; width: 640px; height: 640px; margin: -320px 0 0 -320px; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, rgba(230, 194, 122, .55) 0%, rgba(201, 154, 69, .18) 40%, rgba(201, 154, 69, 0) 70%); animation: fxGlow 2.4s ease-out 2.35s forwards; }
+.fx-ring { position: absolute; left: 50%; top: 40%; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; border: 4px solid var(--brass-hi); opacity: 0; animation: fxRing 1.3s ease-out 2.45s forwards; }
+.fx-ring.r2 { animation-delay: 2.75s; border-width: 2px; }
+.fx-stage { position: relative; width: min(240px, 52vw); }
+.fx-svg { width: 100%; height: auto; display: block; filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .6)); animation: fxShake .5s ease-in-out 1.95s; }
+.fx-shackle { transform-origin: 82px 132px; animation: fxShackle 1s ease-in-out 2.35s forwards; }
+.fx-body { animation: fxFlash .9s ease-out 2.35s; }
+.fx-sparks { position: absolute; left: 50%; top: 47%; width: 0; height: 0; }
+.spark { position: absolute; left: -4px; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--brass-hi); box-shadow: 0 0 10px 2px rgba(230, 194, 122, .9); opacity: 0;
+  animation: fxSpark 1.2s ease-out calc(2.45s + var(--dl)) forwards; }
+.fx-lamps { display: flex; gap: 26px; margin: 18px 0 10px; }
+.fx-lamp { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: .95rem; color: var(--muted); }
+.fx-lamp i { width: 22px; height: 22px; border-radius: 50%; background: #2A3331; border: 2px solid var(--line); }
+.fx-lamp span { font-family: var(--serif); letter-spacing: .02em; }
+.fx-lamp.l1 i { animation: fxLamp .4s ease-out .5s forwards; } .fx-lamp.l2 i { animation: fxLamp .4s ease-out 1.1s forwards; } .fx-lamp.l3 i { animation: fxLamp .4s ease-out 1.7s forwards; }
+.fx-lamp.l1 span { animation: fxLampText .4s ease-out .5s forwards; } .fx-lamp.l2 span { animation: fxLampText .4s ease-out 1.1s forwards; } .fx-lamp.l3 span { animation: fxLampText .4s ease-out 1.7s forwards; }
+.fx-title { margin: 6px 0 4px; font-family: var(--serif); font-size: clamp(1.9rem, 6vw, 3rem); color: var(--brass-hi); letter-spacing: .03em; opacity: 0; transform: translateY(14px); animation: fxIn .7s ease-out 3.1s forwards; }
+.fx-text { margin: 0 0 18px; max-width: 34em; font-size: 1.1rem; opacity: 0; animation: fxIn .7s ease-out 3.5s forwards; }
+.fx-next { opacity: 0; pointer-events: none; animation: fxIn .5s ease-out 4.1s forwards; }
+.fx-lock.done .fx-next { opacity: 1; pointer-events: auto; animation: none; }
+.fx-skip { position: absolute; top: calc(14px + env(safe-area-inset-top, 0px)); right: 16px; min-height: 44px; padding: 8px 14px; background: transparent; border: 1.5px solid var(--line); border-radius: 12px; color: var(--muted); font: inherit; cursor: pointer; }
+.fx-lock.done .fx-skip { display: none; }
+@keyframes fxFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fxLamp { to { background: #FFE9A8; border-color: #FFF4CF; box-shadow: 0 0 18px 6px rgba(255, 224, 140, .85); } }
+@keyframes fxLampText { to { color: var(--ink); } }
+@keyframes fxShake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-6px) rotate(-1.5deg); } 40% { transform: translateX(6px) rotate(1.5deg); } 60% { transform: translateX(-4px); } 80% { transform: translateX(4px); } }
+@keyframes fxShackle { 0% { transform: translateY(0) rotate(0); } 40% { transform: translateY(-30px) rotate(0); } 100% { transform: translateY(-30px) rotate(-42deg); } }
+@keyframes fxFlash { 0% { filter: brightness(1); } 35% { filter: brightness(2.2); } 100% { filter: brightness(1); } }
+@keyframes fxRing { 0% { transform: scale(.25); opacity: .95; } 100% { transform: scale(3.4); opacity: 0; } }
+@keyframes fxGlow { 0% { opacity: 0; transform: scale(.4); } 30% { opacity: 1; } 100% { opacity: .55; transform: scale(1.1); } }
+@keyframes fxSpark { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(.2); } }
+@keyframes fxIn { to { opacity: 1; transform: none; } }
+/* Wer Bewegung abgeschaltet hat (oder „Überspringen“ wählt), sieht sofort das Endbild */
+.fx-lock.still *, .fx-lock.still { animation: none !important; }
+.fx-lock.still .fx-shackle { transform: translateY(-30px) rotate(-42deg); }
+.fx-lock.still .fx-lamp i { background: #FFE9A8; border-color: #FFF4CF; box-shadow: 0 0 14px 4px rgba(255, 224, 140, .7); }
+.fx-lock.still .fx-lamp span { color: var(--ink); }
+.fx-lock.still .fx-glow { opacity: .5; }
+.fx-lock.still .fx-title, .fx-lock.still .fx-text { opacity: 1; transform: none; }
+.fx-lock.still .fx-ring, .fx-lock.still .spark { opacity: 0; }
+.fx-lock.still .fx-next { opacity: 1; pointer-events: auto; }
+/* Effekte dürfen nie Eingaben abfangen; Knöpfe liegen immer oben */
+.fx-glow, .fx-ring, .fx-stage, .fx-sparks, .spark, .fx-lamps, .fx-title, .fx-text { pointer-events: none; }
+.fx-next, .fx-skip { position: relative; z-index: 5; }
+.fx-skip { position: absolute; }
+.fx-svg { overflow: visible; }

@@ -1,6 +1,6 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
-   Version 1.3 (Raum 1: Textkarten, Lückensatz, Einspruch, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
+   Version 1.5 (Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
@@ -18,7 +18,9 @@
     'm1.1', 'm1.2', 'm1.3',
     'r1-1-typen', 'r1-1-frage', 'r1-1-these', 'r1-1-fragetext', 'r1-1-quelle',
     'r1-2-modell', 'r1-2-kette', 'r1-2-vorhersage', 'r1-2-versuch',
-    'r1-3-einspruch', 'r1-3-kette', 'r1-3-belege', 'r1-3-schloss', 'r1-3-modellkritik', 'r1-3-population'
+    'r1-3-einspruch', 'r1-3-kette', 'r1-3-belege', 'r1-3-schloss', 'r1-3-modellkritik', 'r1-3-population',
+    /* ab Engine 1.4 */
+    'r1-3-zahl'
   ];
 
   /* ---------------- Hilfsfunktionen ---------------- */
@@ -96,12 +98,31 @@
       return node;
     });
   }
+  var AUDIO_EXT = [['mp3', 'audio/mpeg'], ['m4a', 'audio/mp4'], ['wav', 'audio/wav'], ['ogg', 'audio/ogg']];
   function audioPlayer(src, label) {
     if (!src) return null;
-    var a = el('audio', { controls: 'controls', preload: 'metadata', src: src, 'aria-label': label || 'Aufnahme anhören' });
-    var box = el('div', { class: 'audio-box' }, [el('span', { class: 'audio-label', text: 'Aufnahme anhören (am besten mit Kopfhörern)' }), a]);
-    var name = String(src).split('/').pop().replace(/\.[a-z0-9]+$/i, '');
-    a.addEventListener('error', function () { box.style.display = 'none'; });   // Datei fehlt: nur Text anzeigen
+    var base = String(src).replace(/\.[a-z0-9]+$/i, '');          // Endung egal: mp3, m4a, wav und ogg werden der Reihe nach versucht
+    var name = base.split('/').pop();
+    var a = el('audio', { controls: 'controls', preload: 'metadata', 'aria-label': label || 'Aufnahme anhören' });
+    var last = null;
+    AUDIO_EXT.forEach(function (x) { last = el('source', { src: base + '.' + x[0], type: x[1] }); a.appendChild(last); });
+    var msg = el('div', { class: 'audio-msg' });
+    var box = el('div', { class: 'audio-box' }, [el('span', { class: 'audio-label', text: 'Aufnahme anhören (am besten mit Kopfhörern)' }), a, msg]);
+    function diagnose() {
+      if (!window.fetch) { box.style.display = 'none'; return; }
+      var found = null, left = AUDIO_EXT.length;
+      AUDIO_EXT.forEach(function (x) {
+        var u = base + '.' + x[0];
+        fetch(u, { method: 'HEAD', cache: 'no-store' }).then(function (r) { if (r.ok && !found) found = u; }).catch(function () {}).then(function () {
+          if (--left) return;
+          if (!found) { box.style.display = 'none'; return; }          // keine Datei vorhanden: nur der Text bleibt
+          a.style.display = 'none'; msg.style.display = 'block'; msg.textContent = 'Die Aufnahme ist hochgeladen, lässt sich in diesem Browser aber nicht abspielen. ';
+          msg.appendChild(el('a', { href: found, target: '_blank', rel: 'noopener', text: 'Datei direkt öffnen' }));
+          logEvent('audio-fehler ' + name);
+        });
+      });
+    }
+    last.addEventListener('error', diagnose);                           // alle Formate gescheitert
     a.addEventListener('play', function () {
       [].forEach.call(document.querySelectorAll('audio'), function (o) { if (o !== a) { try { o.pause(); } catch (e) {} } });
       if (S && !S.seen['audio-' + name]) { S.seen['audio-' + name] = true; logEvent('audio ' + name); }
@@ -213,7 +234,7 @@
   var FIGURES = {
     kemal: { name: 'Kemal Aydın', role: 'Präparator', img: 'figuren/kemal.jpg' },
     wendt: { name: 'Dr. Johanna Wendt', role: 'Kuratorin', img: 'figuren/wendt.jpg' },
-    hallmann: { name: 'Viktor Hallmann', role: 'Händler', img: null }
+    hallmann: { name: 'Viktor Hallmann', role: 'Händler', img: 'figuren/hallmann.jpg' }
   };
   var dialogStack = [];
   function openDialog(opts) {
@@ -317,6 +338,19 @@
     ] });
   }
 
+  /* ---------------- Mischen: Reihenfolge der Antworten darf die Lösung nicht verraten ---------------- */
+  function hashStr(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  /* Pro Spielstand ein fester Startwert, damit die Reihenfolge beim erneuten Öffnen gleich bleibt. avoidIdentity: nie die Ausgangsreihenfolge. */
+  function seededShuffle(list, key, avoidIdentity) {
+    var seed = 1;
+    if (S && S.vars) { S.vars.seed = S.vars.seed || Math.floor(Math.random() * 2147483647); seed = S.vars.seed; }
+    var rnd = mulberry32(hashStr(String(seed) + '|' + key)), a = list.slice();
+    for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; }
+    if (avoidIdentity && a.length > 1 && a.every(function (x, k) { return x === list[k]; })) a.push(a.shift());
+    return a;
+  }
+
   /* ---------------- Rätsel-Bausteine ---------------- */
   function hintArea(p, onRescue) {
     var box = el('div', { class: 'hints' });
@@ -400,7 +434,7 @@
       else { logEvent('fehlversuch ' + p.id); wrong(fb, p.wrongText); }
     }
     if (p.type === 'code') {
-      var inp = el('input', { type: 'text', class: 'code-in', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Lösung eingeben', placeholder: p.placeholder || '' });
+      var inp = el('input', { type: 'text', class: 'code-in', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Lösung eingeben', placeholder: p.placeholder || '', inputmode: p.inputmode });
       inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') attempt(inp.value); });
       body.push(el('div', { class: 'row' }, [inp, el('button', { class: 'btn', text: p.button || 'Öffnen', onclick: function () { attempt(inp.value); } })]));
     }
@@ -419,7 +453,15 @@
     if (p.type === 'order') {
       var seq = [];
       var grid = el('div', { class: 'cards' });
-      p.items.forEach(function (it) {
+      /* Nie in Lösungsreihenfolge zeigen: Jede gemischte Anordnung wird gegen den Hash geprüft (die Lösung bleibt verschlüsselt). */
+      var shown = (function () {
+        for (var n = 0; n < 60; n++) {
+          var cand = seededShuffle(p.items, p.id + '#' + n, true);
+          if (!check(p.id, cand.map(function (x) { return x.id; }).join('-'), p.hash)) return cand;
+        }
+        return seededShuffle(p.items, p.id, true);
+      })();
+      shown.forEach(function (it) {
         var num = el('span', { class: 'num' });
         var b = el('button', { class: 'card-item', onclick: function () {
           if (seq.indexOf(it.id) !== -1) return;
@@ -451,7 +493,7 @@
       var pool = el('div', { class: 'pool' });
       var targets = el('div', { class: 'targets' });
       var cardEls = {};
-      p.cards.forEach(function (cd) {
+      (p.keepOrder ? p.cards : seededShuffle(p.cards, p.id)).forEach(function (cd) {
         var b = el('button', { class: 'chip', text: cd.label, onclick: function () {
           if (placed[cd.id]) { delete placed[cd.id]; pool.appendChild(b); b.classList.remove('active'); return; }
           if (active) cardEls[active].classList.remove('active');
@@ -475,7 +517,7 @@
         } })]));
     }
     if (p.type === 'pick') {
-      var pg = optGroup(p.cards, 'many', function () { fb.textContent = ''; }, p.count || p.max);
+      var pg = optGroup(p.keepOrder ? p.cards : seededShuffle(p.cards, p.id), 'many', function () { fb.textContent = ''; }, p.count || p.max);
       body.push(pg.el, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Auswahl prüfen', onclick: function () {
         var ids = pg.get().sort();
         if (!ids.length) { wrong(fb, 'Wählt zuerst mindestens eine Karte.'); return; }
@@ -493,7 +535,7 @@
         order.push(part.gap);
         var sl = el('select', { class: 'gap', 'aria-label': part.label || ('Lücke ' + order.length) });
         sl.appendChild(el('option', { value: '', text: '… auswählen …' }));
-        p.gaps[part.gap].forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
+        seededShuffle(p.gaps[part.gap], p.id + part.gap).forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
         sl.addEventListener('change', function () { picks[part.gap] = sl.value; fb.textContent = ''; });
         line.appendChild(sl);
       });
@@ -502,9 +544,12 @@
         var ans = order.map(function (g) { return g + '=' + picks[g]; }).join(';');
         if (check(p.id, ans, p.hash)) { d.close(); solve(p, {}); return; }
         logEvent('fehlversuch ' + p.id);
+        S.vars.fails = S.vars.fails || {}; S.vars.fails[p.id] = (S.vars.fails[p.id] || 0) + 1; persist();
         var trap = (p.traps || []).filter(function (t) { return picks[t.g] === t.v; })[0];
         fb.className = 'feedback no'; fb.innerHTML = '';
-        if (trap) fb.appendChild(figureBlock(trap.from || 'kemal', trap.text)); else fb.textContent = p.wrongText || 'Das Schloss bleibt zu. Prüft den Satz noch einmal.';
+        /* Dreierprüfung: Beim ersten Fehlversuch nur „mindestens ein Feld“, genaue Reaktionen erst ab dem zweiten. */
+        if (p.triple && S.vars.fails[p.id] < 2) fb.textContent = p.tripleText || 'Mindestens ein Feld stimmt nicht. Prüft den Satz noch einmal, Feld für Feld.';
+        else if (trap) fb.appendChild(figureBlock(trap.from || 'kemal', trap.text)); else fb.textContent = p.wrongText || 'Das Schloss bleibt zu. Prüft den Satz noch einmal.';
       } })]));
     }
     if (p.type === 'einspruch') {
@@ -520,8 +565,8 @@
       }
       gSt = optGroup(p.statements, 'one', upd);
       gEv = optGroup(p.evidence.map(function (e) { return { id: e.id, label: e.title }; }), 'many', upd, 2);
-      gA = optGroup(p.slotA.options, 'one', upd);
-      gB = optGroup(p.slotB.options, 'one', upd);
+      gA = optGroup(seededShuffle(p.slotA.options, p.id + 'A'), 'one', upd);
+      gB = optGroup(seededShuffle(p.slotB.options, p.id + 'B'), 'one', upd);
       upd();
       var mappe = el('div', { class: 'mappe' }, p.evidence.map(function (e) {
         return el('details', { class: 'evi' }, [el('summary', { text: e.title })].concat(docBody(e)));
@@ -547,6 +592,146 @@
           try { konterBox.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
         } })]));
     }
+
+    /* ---------- Markieren im Text (ab 1.4) ---------- */
+    if (p.type === 'markup') {
+      var marks = {}, pen = p.passes[0].id, penBtns = {}, passLabel = {};
+      p.passes.forEach(function (ps) { passLabel[ps.id] = ps.tag || ps.label; });
+      var penRow = el('div', { class: 'pens', role: 'radiogroup', 'aria-label': 'Welche Markierung setzt ihr?' });
+      p.passes.forEach(function (ps) {
+        var pb = el('button', { class: 'pen' + (ps.id === pen ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': ps.id === pen ? 'true' : 'false', text: ps.label, onclick: function () {
+          pen = ps.id;
+          p.passes.forEach(function (q) { penBtns[q.id].classList.toggle('on', q.id === pen); penBtns[q.id].setAttribute('aria-checked', q.id === pen ? 'true' : 'false'); });
+        } });
+        penBtns[ps.id] = pb; penRow.appendChild(pb);
+      });
+      var flow = el('div', { class: 'markup-text' });
+      p.segments.forEach(function (sg) {
+        var tagEl = el('span', { class: 'seg-tag', 'aria-hidden': 'true' });
+        var seg = el('button', { class: 'seg', type: 'button', 'aria-pressed': 'false', onclick: function () {
+          if (marks[sg.id] === pen) delete marks[sg.id]; else marks[sg.id] = pen;
+          paintSeg(); fb.textContent = '';
+        } }, [el('span', { class: 'seg-nr', text: sg.nr }), ' ', el('span', { class: 'seg-text', text: sg.text }), tagEl]);
+        function paintSeg() {
+          var m = marks[sg.id];
+          seg.className = 'seg' + (m ? ' m-' + m : ''); seg.setAttribute('aria-pressed', m ? 'true' : 'false');
+          tagEl.textContent = m ? ' [' + passLabel[m] + ']' : '';
+          seg.setAttribute('aria-label', sg.nr + ': ' + sg.text + (m ? ' (markiert als ' + passLabel[m] + ')' : ' (nicht markiert)'));
+        }
+        paintSeg();
+        flow.appendChild(seg); flow.appendChild(document.createTextNode(' '));
+      });
+      body.push(penRow, flow, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Markierungen prüfen', onclick: function () {
+        var ids = Object.keys(marks);
+        if (!ids.length) { wrong(fb, 'Markiert zuerst mindestens eine Stelle.'); return; }
+        attempt(p.passes.map(function (ps) { return ps.id + '=' + ids.filter(function (k) { return marks[k] === ps.id; }).sort().join('-'); }).join(';'));
+      } })]));
+    }
+    /* ---------- Nachfragen (ab 1.4) ---------- */
+    if (p.type === 'nachfragen') {
+      var nsel = {};
+      var annBox = el('div', { class: 'annahmen' }, [el('strong', { text: p.optionsTitle || 'Annahmen' })].concat(p.options.map(function (o) { return el('p', { text: o.full || o.label }); })));
+      var nrows = el('div', { class: 'nf-rows' });
+      p.rows.forEach(function (r) {
+        var replyBox = el('div', { class: 'nf-reply', 'aria-live': 'polite' });
+        var asked = false;
+        var askBtn = el('button', { class: 'btn ghost small', type: 'button', text: p.askLabel || 'Nachfragen: „Was muss dafür gelten?“', onclick: function () {
+          if (asked) return; asked = true; askBtn.disabled = true; logEvent('nachfragen ' + p.id + ' ' + r.id);
+          replyBox.appendChild(figureBlock(p.from || 'hallmann', r.reply));
+        } });
+        var sl = el('select', { class: 'gap', 'aria-label': 'Annahme für ' + r.say.split(' ')[0] });
+        sl.appendChild(el('option', { value: '', text: '… Annahme wählen …' }));
+        p.options.forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
+        sl.addEventListener('change', function () { nsel[r.id] = sl.value; fb.textContent = ''; });
+        nrows.appendChild(el('div', { class: 'nf-row' }, [el('p', { class: 'nf-say', text: r.say }), askBtn, replyBox, el('label', { class: 'nf-label' }, [(p.selectLabel || 'Diese Deutung setzt voraus: '), sl])]));
+      });
+      body.push(annBox, nrows, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Annahmen prüfen', onclick: function () {
+        if (p.rows.some(function (r) { return !nsel[r.id]; })) { wrong(fb, 'Wählt zuerst für jede Deutung eine Annahme.'); return; }
+        attempt(p.rows.map(function (r) { return r.id + '=' + nsel[r.id]; }).sort().join(';'));
+      } })]));
+    }
+    /* ---------- Netz verbinden (ab 1.4) ---------- */
+    if (p.type === 'net') {
+      var edges = [], from = null, nodeEls = {}, SVGNS = 'http://www.w3.org/2000/svg';
+      var nstage = el('div', { class: 'net-stage' });
+      var svg = document.createElementNS(SVGNS, 'svg'); svg.setAttribute('class', 'net-lines'); svg.setAttribute('aria-hidden', 'true');
+      svg.innerHTML = '<defs><marker id="net-arr-' + p.id + '" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto" markerUnits="userSpaceOnUse"><path d="M0,0 L10,5 L0,10 z" fill="#E6C27A"/></marker></defs>';
+      nstage.appendChild(svg);
+      var nstatus = el('p', { class: 'muted small net-status', 'aria-live': 'polite', text: 'Tippt eine Karte an, von der ein Pfeil ausgeht, und dann die Karte, auf die er zeigt.' });
+      var elist = el('div', { class: 'net-edges' });
+      var tagOf = {}; p.items.forEach(function (it) { tagOf[it.id] = it.tag || it.id; });
+      function paintNodes() { p.items.forEach(function (it) { nodeEls[it.id].classList.toggle('from', from === it.id); }); }
+      function redraw() {
+        [].slice.call(svg.querySelectorAll('line')).forEach(function (l) { l.remove(); });
+        var sr = nstage.getBoundingClientRect();
+        function box(id) { var r = nodeEls[id].getBoundingClientRect(); return { x: r.left - sr.left + r.width / 2, y: r.top - sr.top + r.height / 2, hw: r.width / 2 + 5, hh: r.height / 2 + 5 }; }
+        edges.forEach(function (k) {
+          var ab = k.split('>'), a = box(ab[0]), b = box(ab[1]), dx = b.x - a.x, dy = b.y - a.y;
+          if (!dx && !dy) return;
+          var tA = Math.min(a.hw / (Math.abs(dx) || 1e-9), a.hh / (Math.abs(dy) || 1e-9));
+          var tB = Math.min(b.hw / (Math.abs(dx) || 1e-9), b.hh / (Math.abs(dy) || 1e-9));
+          var ln = document.createElementNS(SVGNS, 'line');
+          ln.setAttribute('x1', a.x + dx * tA); ln.setAttribute('y1', a.y + dy * tA);
+          ln.setAttribute('x2', b.x - dx * tB); ln.setAttribute('y2', b.y - dy * tB);
+          ln.setAttribute('stroke', '#E6C27A'); ln.setAttribute('stroke-width', '3'); ln.setAttribute('marker-end', 'url(#net-arr-' + p.id + ')');
+          svg.appendChild(ln);
+        });
+      }
+      function renderEdges() {
+        elist.innerHTML = '';
+        if (!edges.length) { elist.appendChild(el('p', { class: 'muted small', text: 'Noch keine Pfeile gesetzt.' })); return; }
+        edges.forEach(function (k) {
+          var ab = k.split('>');
+          elist.appendChild(el('button', { class: 'btn ghost small edge', type: 'button', 'aria-label': 'Pfeil ' + tagOf[ab[0]] + ' nach ' + tagOf[ab[1]] + ' entfernen', text: tagOf[ab[0]] + ' → ' + tagOf[ab[1]] + '  ✕', onclick: function () {
+            edges.splice(edges.indexOf(k), 1); redraw(); renderEdges(); fb.textContent = '';
+          } }));
+        });
+        elist.appendChild(el('button', { class: 'btn ghost small', type: 'button', text: 'Alle Pfeile löschen', onclick: function () { edges = []; from = null; paintNodes(); redraw(); renderEdges(); fb.textContent = ''; } }));
+      }
+      p.items.forEach(function (it) {
+        var pos = (p.layout && p.layout[it.id]) || [50, 50];
+        var nb = el('button', { class: 'net-node', type: 'button', style: 'left:' + pos[0] + '%;top:' + pos[1] + '%', onclick: function () {
+          if (!from) { from = it.id; paintNodes(); nstatus.textContent = 'Der Pfeil beginnt bei ' + tagOf[it.id] + '. Tippt jetzt die Karte, auf die er zeigt.'; return; }
+          if (from === it.id) { from = null; paintNodes(); nstatus.textContent = 'Abgebrochen. Tippt eine Karte an, von der ein Pfeil ausgeht.'; return; }
+          var key = from + '>' + it.id;
+          if (edges.indexOf(key) === -1) edges.push(key);
+          nstatus.textContent = 'Pfeil gesetzt: ' + tagOf[from] + ' → ' + tagOf[it.id] + '.';
+          from = null; paintNodes(); redraw(); renderEdges(); fb.textContent = '';
+        } }, [el('strong', { text: it.tag || '' }), el('span', { text: it.label })]);
+        nodeEls[it.id] = nb; nstage.appendChild(nb);
+      });
+      body.push(nstage, nstatus, elist, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Verbindungen prüfen', onclick: function () {
+        if (edges.length < (p.minEdges || 3)) { wrong(fb, 'Setzt zuerst Pfeile zwischen den Karten.'); return; }
+        attempt(edges.slice().sort().join(';'));
+      } })]));
+      renderEdges();
+      setTimeout(redraw, 60); setTimeout(redraw, 400);
+      if (window.ResizeObserver) { try { new ResizeObserver(function () { redraw(); }).observe(nstage); } catch (e) {} }
+    }
+    /* ---------- Aufgabe auf Papier mit Selbstabgleich (ab 1.4) ---------- */
+    if (p.type === 'paper') {
+      var cb1 = el('input', { type: 'checkbox', id: 'paper-ok1' }), cb2 = el('input', { type: 'checkbox', id: 'paper-ok2' });
+      var step2 = el('div', { class: 'paper-step2' }); step2.hidden = true;
+      var sample = el('ol', { class: 'sample-chain' }, p.sample.map(function (t) { return el('li', { text: t }); }));
+      step2.appendChild(figureBlock('kemal', p.sampleText || 'So sieht die Kette aus. Vergleicht sie mit eurer.'));
+      step2.appendChild(sample);
+      step2.appendChild(el('p', { class: 'muted', text: p.checkText || 'Fehlt bei euch ein Glied, oder steht eines an der falschen Stelle? Korrigiert in einer anderen Farbe.' }));
+      step2.appendChild(el('label', { class: 'check' }, [cb2, ' Wir haben verglichen und unsere Kette korrigiert.']));
+      step2.appendChild(el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Fertig', onclick: function () {
+        if (!cb2.checked) { wrong(fb, 'Vergleicht zuerst eure Kette mit Kemals Kette und setzt dann den Haken.'); return; }
+        logEvent('papier ' + p.id); d.close(); solve(p, {});
+      } })]));
+      var go1 = el('div', { class: 'paper-step1' }, [
+        el('p', { class: 'paper-task' }, [el('strong', { text: 'Auf Papier (Logbuch): ' }), p.paperTask]),
+        el('label', { class: 'check' }, [cb1, ' ' + (p.doneText || 'Wir haben die Kette gezeichnet.')]),
+        el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Mit Kemals Kette vergleichen', onclick: function () {
+          if (!cb1.checked) { wrong(fb, 'Zeichnet zuerst eure Kette ins Logbuch und setzt dann den Haken.'); return; }
+          fb.textContent = ''; step2.hidden = false; go1.hidden = true;
+          try { step2.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+        } })])
+      ]);
+      body.push(go1, step2);
+    }
     if (p.type === 'freetext') {
       var ta = el('textarea', { rows: 5, placeholder: p.placeholder || 'Schreibt hier …' });
       if (S.answers[p.id]) ta.value = S.answers[p.id].text;
@@ -563,6 +748,43 @@
     d = openDialog({ cls: 'dlg-puzzle' + (refEl && p.type === 'freetext' ? ' has-ref' : ''), title: p.title, body: body, focus: p.type === 'code' || p.type === 'freetext' });
   }
 
+  /* ---------------- Schloss-Animation (onSolve: { fx: 'lock', fxTitle, fxText }) ---------------- */
+  function playLockFx(o, done) {
+    var reduce = false;
+    try { reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); } catch (e) {}
+    var title = o.title || 'Schloss geöffnet', closed = false, timer = null;
+    var wrap = el('div', { class: 'fx-lock' + (reduce ? ' still' : ''), role: 'dialog', 'aria-modal': 'true', 'aria-label': title });
+    wrap.innerHTML =
+      '<div class="fx-glow"></div><div class="fx-ring"></div><div class="fx-ring r2"></div>' +
+      '<div class="fx-stage"><svg class="fx-svg" viewBox="0 0 240 280" aria-hidden="true">' +
+      '<defs><linearGradient id="fxbrass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F3D894"/><stop offset=".5" stop-color="#C99A45"/><stop offset="1" stop-color="#7E5A1F"/></linearGradient></defs>' +
+      '<g class="fx-shackle"><path d="M82 126 V84 a38 38 0 0 1 76 0 V126" fill="none" stroke="url(#fxbrass)" stroke-width="17" stroke-linecap="round"/></g>' +
+      '<rect class="fx-body" x="50" y="120" width="140" height="122" rx="22" fill="url(#fxbrass)" stroke="#4E3610" stroke-width="4"/>' +
+      '<circle cx="120" cy="170" r="15" fill="#2B1F0A"/><rect x="113.5" y="176" width="13" height="34" rx="5" fill="#2B1F0A"/></svg>' +
+      '<div class="fx-sparks"></div></div>';
+    var lampBox = el('div', { class: 'fx-lamps' });
+    (o.lamps || ['Aussage', 'Beleg', 'Reichweite']).forEach(function (t, i) {
+      lampBox.appendChild(el('div', { class: 'fx-lamp l' + (i + 1) }, [el('i'), el('span', { text: t })]));
+    });
+    wrap.appendChild(lampBox);
+    wrap.appendChild(el('h2', { class: 'fx-title', text: title }));
+    wrap.appendChild(el('p', { class: 'fx-text', text: o.text || '' }));
+    var sparks = wrap.querySelector('.fx-sparks');
+    for (var i = 0; i < 24; i++) {
+      var ang = (i / 24) * Math.PI * 2 + Math.random() * .25, dist = 90 + Math.random() * 110;
+      sparks.appendChild(el('i', { class: 'spark', style: '--dx:' + Math.round(Math.cos(ang) * dist) + 'px;--dy:' + Math.round(Math.sin(ang) * dist) + 'px;--dl:' + (Math.random() * .25).toFixed(2) + 's' }));
+    }
+    var next = el('button', { class: 'btn fx-next', type: 'button', text: o.button || 'Weiter', onclick: close });
+    var skip = el('button', { class: 'fx-skip', type: 'button', text: 'Überspringen', onclick: function () { wrap.classList.add('still', 'done'); clearTimeout(timer); next.focus(); } });
+    wrap.appendChild(skip); wrap.appendChild(next);
+    function close() {
+      if (closed) return; closed = true; clearTimeout(timer);
+      wrap.classList.add('out'); setTimeout(function () { if (wrap.parentNode) wrap.parentNode.removeChild(wrap); done(); }, 300);
+    }
+    document.body.appendChild(wrap);
+    timer = setTimeout(function () { wrap.classList.add('done'); next.focus(); }, reduce ? 50 : 4600);
+  }
+
   function solve(p, how) {
     S.solved[p.id] = { t: new Date().toISOString(), hints: S.hints[p.id] || 0, rescue: !!how.rescue };
     applyEffects(p.onSolve || {});
@@ -573,9 +795,12 @@
       if (eff.then && ROOM.puzzles[eff.then]) openPuzzle(ROOM.puzzles[eff.then]);
       else if (ROOM) checkMission();
     }
-    if (eff.message) message(eff.message.from, eff.message.text, function () { if (eff.message2) message(eff.message2.from, eff.message2.text, next, true, eff.message2.audio); else next(); }, true, eff.message.audio);
-    else if (eff.text) { var dd = openDialog({ cls: 'dlg-world', body: paras(eff.text).concat([el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Weiter', onclick: function () { dd.close(); } })])]), onClose: next }); }
-    else next();
+    function proceed() {
+      if (eff.message) message(eff.message.from, eff.message.text, function () { if (eff.message2) message(eff.message2.from, eff.message2.text, next, true, eff.message2.audio); else next(); }, true, eff.message.audio);
+      else if (eff.text) { var dd = openDialog({ cls: 'dlg-world', body: paras(eff.text).concat([el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Weiter', onclick: function () { dd.close(); } })])]), onClose: next }); }
+      else next();
+    }
+    if (eff.fx === 'lock') playLockFx({ title: eff.fxTitle, text: eff.fxText, lamps: eff.fxLamps }, proceed); else proceed();
   }
   function applyEffects(eff, silent) {
     (eff.items || []).forEach(function (it) { if (addUnique(S.items, it, 'id') && !silent) toast('Neues Fundstück: ' + it.label); });
@@ -849,5 +1074,5 @@
   }
 
   window.TRESOR = api;
-  window.TRESOR._test = { sha256: sha256, norm: norm, makeCode: makeCode, readCode: readCode };
+  window.TRESOR._test = { sha256: sha256, norm: norm, shuffle: seededShuffle, makeCode: makeCode, readCode: readCode };
 })();
