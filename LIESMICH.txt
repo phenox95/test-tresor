@@ -1,4 +1,4 @@
-tresor-test · KOMPLETTE CODE-DATEIEN · Raum 1 V2 (Engine 1.5) · Stand 02.10.2026
+tresor-test · KOMPLETTE CODE-DATEIEN · Raum 1 V2 (Engine 1.6) · Stand 02.10.2026, Paket V2c
 =====================================================================================
 
 WAS IN DIESEM ORDNER IST
@@ -24,11 +24,18 @@ SO SPIELST DU ES EIN
    Dateien (Bilder, Schriften, Audio) bleiben unberührt.
 2. „Commit“. Nach etwa 1 Minute auf dem iPad öffnen:
    https://phenox95.github.io/tresor-test/
-3. ALTEN SPIELSTAND LÖSCHEN: Einstellungen, Safari, Erweitert, Website-Daten,
-   phenox95.github.io entfernen. Sonst gelten gelöste Rätsel der alten Fassung.
-4. Stimmt die Fassung? Unten im Raum 1 steht beim ersten Rätsel „Hallmanns Rede
-   prüfen“ (Sätze zum Markieren). Steht dort noch eine Zuordnung, lädt Safari
-   die alte Fassung: Website-Daten löschen und neu öffnen.
+3. ALTEN SPIELSTAND LÖSCHEN (wichtig, sonst gelten gelöste Rätsel der alten Fassung
+   und an den Pulten gibt es nichts mehr zu tun, weil die Rätsel-Nummern gleich
+   geblieben sind):
+   AM EINFACHSTEN: diese Adresse einmal öffnen, sie löscht den Spielstand
+       https://phenox95.github.io/tresor-test/?neu=1
+   Alternativen: Im Raum oben auf „Menü“, „Beenden und iPad freigeben“ (löscht
+   alles auf diesem iPad), oder Safari, Einstellungen, Erweitert, Website-Daten.
+   Das brauchst du vor JEDEM neuen Durchlauf von vorn.
+4. Stimmt die Fassung? Im Raum auf „Menü“: ganz unten steht
+       Fassung: Engine 1.6 · 02.10.2026 · Raum 1 V2.1
+   Steht dort etwas anderes oder fehlt die Zeile, lädt Safari noch die alte
+   Fassung: Website-Daten löschen und neu öffnen.
 
 NICHT auf GitHub: Code_und_Quellen (enthält Lösungen im Klartext).
 

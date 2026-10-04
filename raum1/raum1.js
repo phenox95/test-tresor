@@ -99,8 +99,10 @@ TRESOR.room({
   puzzles: {
     /* ---------------- Mission 1.1 ---------------- */
     'r1-1-typen': { id: 'r1-1-typen', type: 'markup', title: 'Hallmanns Rede prüfen',
-      prompt: 'Die Saalanlage hat Hallmanns Vortrag aufgezeichnet. Markiert in zwei Durchgängen:\n\nBeobachtung: Man kann es am Fossil nachsehen.\nDeutung: Hallmann erklärt, warum etwas so ist.\n\nWählt oben die Markierung und tippt dann die passenden Sätze an. Tippt einen markierten Satz noch einmal an, um die Markierung zu entfernen.\n\nWas unmarkiert bleibt, nennen wir Behauptung: eine Wertung, eine Garantie oder ein Verweis auf andere. Sie lässt sich am Fund nicht prüfen.',
-      passes: [{ id: 'beo', label: 'Beobachtung markieren', tag: 'Beobachtung' }, { id: 'deu', label: 'Deutung markieren', tag: 'Deutung' }],
+      prompt: 'Hallmanns Vortrag wurde aufgezeichnet. Markiert in zwei Durchgängen: Wählt eine Markierung und tippt dann die passenden Sätze an. Ein zweiter Tipp entfernt die Markierung.',
+      passes: [{ id: 'beo', label: 'Beobachtung markieren', tag: 'Beobachtung', hint: 'Das lässt sich am Fossil nachsehen.' },
+               { id: 'deu', label: 'Deutung markieren', tag: 'Deutung', hint: 'Hallmann erklärt, warum etwas so ist.' }],
+      note: 'Was unmarkiert bleibt, ist eine Behauptung: eine Wertung, eine Garantie oder ein Verweis auf andere. Sie lässt sich am Fund nicht prüfen.',
       segments: [
         { id: 't1', nr: 'T1', text: '„Der Berolinavis ist das bedeutendste Fossil des Jahrhunderts. Ich garantiere es.“' },
         { id: 't2', nr: 'T2', text: '„Er trägt Federn an den Armen und einen langen Knochenschwanz.“' },
@@ -112,7 +114,8 @@ TRESOR.room({
         { id: 't8', nr: 'T8', text: '„Das Museum hat den Fund geprüft und bestätigt.“' }
       ],
       hash: 'a972c9088f1d44beb82ee37e0c6e7aa04d03697c751e5e6cc954c1857afa7678',
-      wrongText: 'Nichts passiert. Mindestens eine Markierung passt nicht. Hallmann hat bei mindestens einer Aussage mehr behauptet, als er zeigen kann.',
+      passHash: { beo: '5b637e376357201b4d53e1bbc626ca78448d2bf5e1ef35eff42f29dc6fa99403', deu: 'd50121b1e373eb4995bf717fb6197513f10feef6e9dab351decb13c6613f36af' },
+      wrongText: 'Nichts passiert. Mindestens eine Markierung passt nicht.',
       hints: ['Lest jeden Satz einzeln. Bei welchem könntet ihr am Fossil selbst nachsehen, ob er stimmt?',
               'Achtet auf Wörter wie „weil“, „durch“, „denn“, „also“. Was wird dort erklärt, und was wird nur gesehen?',
               'T2 und T6 beschreiben, was man sieht. T1 und T8 bewerten oder verweisen auf andere und lassen sich am Fund nicht prüfen. Die übrigen vier erklären etwas.'],
@@ -161,8 +164,9 @@ TRESOR.room({
 
     /* ---------------- Mission 1.2 ---------------- */
     'r1-2-modell': { id: 'r1-2-modell', type: 'nachfragen', from: 'hallmann', title: 'Die Annahmen hinter Hallmanns Erklärung',
-      prompt: 'Hallmanns Erklärung besteht aus mehreren Deutungen. Jede beruht auf einer Annahme.\n\nIhr dürft Hallmann zu jeder Deutung nachfragen, was dafür gelten muss. Wählt dann für jede Deutung die Annahme, die dahintersteckt.',
-      optionsTitle: 'Die Annahmen (Auszüge vom Lamarck-Pult, vereinfachte Fassung)',
+      askLabel: 'Nachfragen',
+      prompt: 'Jede Deutung Hallmanns beruht auf einer Annahme. Fragt nach, was dafür gelten muss, und wählt dann die passende Annahme.',
+      optionsTitle: 'Die drei Annahmen (vom Lamarck-Pult, vereinfacht)',
       options: [
         { id: 'l1', label: 'L1 · Bedürfnisse', full: 'L1 · Ändert sich die Umwelt, ändern sich die Bedürfnisse der Tiere. Aus neuen Bedürfnissen entstehen neue Gewohnheiten.' },
         { id: 'l2', label: 'L2 · Gebrauch', full: 'L2 · Organe, die oft gebraucht werden, werden stärker und größer. Organe, die nicht gebraucht werden, bilden sich zurück.' },
@@ -221,7 +225,7 @@ TRESOR.room({
     /* ---------------- Mission 1.3 ---------------- */
     'r1-3-zahl': { id: 'r1-3-zahl', type: 'code', inputmode: 'numeric', title: 'Die Zahlen im Trainingsversuch',
       ref: { title: 'Zum Nachschlagen: B2 · Trainingsversuch', docs: ['b2'] },
-      prompt: 'Bevor ihr Einspruch einlegt, lest die Daten in B2 genau.\n\nBerechnet für jede Generation den Unterschied der Mittelwerte von Gruppe T und Gruppe K. Wie groß ist der größte Unterschied, wenn ihr das Vorzeichen weglasst? Tragt die Zahl ein.',
+      prompt: 'Berechnet für jede Generation in B2 den Unterschied der Mittelwerte von Gruppe T und Gruppe K. Tragt den größten Unterschied ein, ohne Vorzeichen.',
       placeholder: 'Zahl', button: 'Prüfen',
       hash: ['9c0e1054e197ecb247478413f6617ac081a6ce86c2b40d836cdc6c5fff86ec99', 'e1bda9486b355436c136a84cf102790cf67f5bf63dbfccd6192507dbbf3b8fe9'],
       wrongText: 'Nichts passiert. Lest die Mittelwerte vor der Klammer ab und vergleicht Gruppe T mit Gruppe K, Generation für Generation.',
@@ -233,7 +237,7 @@ TRESOR.room({
       onSolve: { message: { from: 'kemal', text: 'Zwei Punkte Unterschied. Und die Werte innerhalb einer Gruppe streuen um mehr als 20 Punkte.\n\nMerkt euch, was das heißt, bevor ihr Einspruch einlegt.' }, then: 'r1-3-einspruch' } },
 
     'r1-3-einspruch': { id: 'r1-3-einspruch', type: 'einspruch', title: 'Einspruch',
-      prompt: 'Ihr habt zwei Vorhersagen aus Lamarcks Modell. Legt Einspruch gegen Hallmanns Aussage T5 ein: Wählt Belege aus der Mappe und begründet, was sie zeigen und warum das gegen T5 reicht.\n\nHallmann antwortet auf jeden Einspruch. Ihr könnt es mehrmals versuchen.',
+      prompt: 'Legt Einspruch gegen Hallmanns Aussage T5 ein: Wählt höchstens zwei Belege und begründet, was sie zeigen und warum das reicht. Hallmann antwortet auf jeden Einspruch.',
       statements: [
         { id: 'T3', tag: 'T3', label: 'Weil seine Vorfahren fliegen wollten, streckten sie die Arme immer wieder aus.' },
         { id: 'T4', tag: 'T4', label: 'Durch dieses Training wuchsen ihnen Federn.' },
@@ -279,7 +283,7 @@ TRESOR.room({
         message2: { from: 'kemal', text: 'Die Aussage T5 ist durchgestrichen. Am Darwin-Pult rechts wurde gerade ein Schloss entriegelt. Seht euch an, was dort liegt.' } } },
 
     'r1-3-kette': { id: 'r1-3-kette', type: 'net', title: 'Darwins Erklärung als Netz',
-      prompt: 'Hallmann fragt, wie die Federn stattdessen entstanden sind. Legt Darwins Erklärung als Netz.\n\nZieht Pfeile von einem Schritt zu dem, was daraus folgt. Nicht jeder Schritt hängt vom vorigen ab. Fragt euch bei jedem Pfeil: Muss der erste Schritt da sein, damit der zweite überhaupt passieren kann?',
+      prompt: 'Legt Darwins Erklärung als Netz: Zieht Pfeile von einem Schritt zu dem, was daraus folgt. Nicht jeder Schritt hängt vom vorigen ab.',
       items: [
         { id: 'd1', tag: 'D1', label: 'Individuen einer Population unterscheiden sich in einem Merkmal (Variabilität).' },
         { id: 'd2', tag: 'D2', label: 'Es werden mehr Nachkommen geboren, als überleben können. Sie konkurrieren um begrenzte Ressourcen.' },
@@ -288,7 +292,7 @@ TRESOR.room({
         { id: 'd5', tag: 'D5', label: 'Über viele Generationen wird das Merkmal in der Population häufiger.' }
       ],
       layout: { d4: [50, 14], d1: [17, 46], d5: [83, 46], d2: [30, 84], d3: [70, 84] },
-      minEdges: 3,
+      minEdges: 3, edgeCount: 4,
       hash: ['7c754160e8e20bf9b253ed1cc0cbc2d7e49b00e794fa098c4f4340db10aaab29', 'ce109ca633a9562ea813477600278097efb6972920055a4547e5ff6efc30934c', '0ece2f78a24ded7e46496a2f878b565825b33b081d432c833403aa2a8c0393a9'],
       wrongText: 'Nichts passiert. Fragt euch bei jedem Pfeil: Muss der erste Schritt da sein, damit der zweite überhaupt passieren kann?',
       hints: ['Was ist die Voraussetzung dafür, dass es überhaupt eine Auswahl gibt?',

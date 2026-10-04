@@ -303,3 +303,22 @@ table.data th { background: #1B2A2B; color: var(--brass-hi); font-family: var(--
 .fx-next, .fx-skip { position: relative; z-index: 5; }
 .fx-skip { position: absolute; }
 .fx-svg { overflow: visible; }
+
+/* ---------- V2.1: kompaktere Rätsel, lesbarere Markierung ---------- */
+.pen { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; border-radius: 16px; padding: 8px 16px; }
+.pen small { font-weight: 400; font-size: .85rem; color: var(--muted); }
+.markup-text { display: grid; gap: 6px; line-height: 1.45; padding: 10px; font-size: 1.05rem; }
+.seg { display: flex; gap: 10px; align-items: baseline; width: 100%; min-height: 48px; margin: 0; padding: 8px 12px; border-radius: 10px; }
+.seg-text { flex: 1; }
+.seg-tag { flex: none; margin-left: auto; white-space: nowrap; font-size: .85rem; }
+.markup-note { margin: 6px 2px 0; }
+.annahmen { font-size: .93rem; margin: 6px 0; padding: 8px 12px; }
+.annahmen p { margin: 4px 0; }
+.nf-rows { gap: 10px; margin: 8px 0; }
+.nf-row { padding: 10px 12px; }
+.nf-say { margin: 0 0 8px; font-size: 1rem; }
+.nf-line { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+.nf-label { margin: 0; display: flex; gap: 8px; align-items: center; }
+.nf-reply { margin-top: 8px; }
+@media (min-width: 700px) { .opts.grid2 { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 700px) { .mappe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; } .mappe details[open] { grid-column: 1 / -1; } }

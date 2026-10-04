@@ -1,11 +1,12 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
-   Version 1.5 (Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
+   Version 1.6 (Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
 
   var ENGINE_VERSION = 1;
+  var ENGINE_BUILD = 'Engine 1.6 · 02.10.2026 · Raum 1 V2.1';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
   /* ---------------------------------------------------------------
@@ -162,6 +163,8 @@
       merksaetze: [], decisions: {}, vars: {}, seen: {}, log: [] };
   }
   function load() {
+    /* Test-Hilfe: Adresse mit ?neu=1 öffnen löscht den Spielstand dieses Geräts und startet neu. */
+    try { if (/[?&]neu=1(&|$)/.test(location.search)) { localStorage.removeItem(STORE_KEY); sessionStorage.removeItem('tresor.confirmed'); history.replaceState(null, '', location.pathname); } } catch (e) {}
     try { var raw = localStorage.getItem(STORE_KEY); S = raw ? JSON.parse(raw) : null; } catch (e) { S = null; }
     return S;
   }
@@ -238,6 +241,7 @@
   };
   var dialogStack = [];
   function openDialog(opts) {
+    try { var tt = document.getElementById('toast'); if (tt) tt.classList.remove('show'); } catch (e) {}
     var closeBtn = el('button', { class: 'dlg-close', 'aria-label': 'Schließen', text: '×' });
     var card = el('div', { class: 'dlg-card ' + (opts.cls || ''), role: 'dialog', 'aria-modal': 'true' },
       [opts.closable === false ? null : closeBtn, opts.title ? el('h2', { text: opts.title }) : null].concat(opts.body || []));
@@ -325,7 +329,8 @@
         extra || null,
         el('button', { class: 'btn ghost', text: 'Beenden und iPad freigeben', onclick: function () { d.close(); endGame(); } })
       ]),
-      el('p', { class: 'muted small', text: 'Notfall-Code: ' + makeCode() })
+      el('p', { class: 'muted small', text: 'Notfall-Code: ' + makeCode() }),
+      el('p', { class: 'muted small', text: 'Fassung: ' + ENGINE_BUILD })
     ] });
   }
   function endGame() {
@@ -382,6 +387,12 @@
       } })])
     ] });
   }
+  function watchFb(fb) {
+    if (!window.MutationObserver) return fb;
+    new MutationObserver(function () { if (fb.textContent) { try { fb.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {} } })
+      .observe(fb, { childList: true, characterData: true, subtree: true });
+    return fb;
+  }
   function wrong(fb, text) { fb.className = 'feedback no'; fb.textContent = text || 'Nichts passiert. Prüft eure Antwort noch einmal.'; }
 
   function optGroup(items, mode, onChange, max) {
@@ -425,13 +436,13 @@
   function openPuzzle(p) {
     if (isSolved(p.id)) return;
     logEvent('öffnet ' + p.id);
-    var fb = el('div', { class: 'feedback', role: 'status' });
+    var fb = watchFb(el('div', { class: 'feedback', role: 'status' }));
     var body = [el('div', { class: 'prompt' }, paras(p.prompt))];
     var refEl = refBlock(p); if (refEl) body.push(refEl);
     var d;
-    function attempt(ans) {
+    function attempt(ans, msg) {
       if (check(p.id, ans, p.hash)) { d.close(); solve(p, {}); }
-      else { logEvent('fehlversuch ' + p.id); wrong(fb, p.wrongText); }
+      else { logEvent('fehlversuch ' + p.id); wrong(fb, msg || p.wrongText); }
     }
     if (p.type === 'code') {
       var inp = el('input', { type: 'text', class: 'code-in', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Lösung eingeben', placeholder: p.placeholder || '', inputmode: p.inputmode });
@@ -571,6 +582,7 @@
       var mappe = el('div', { class: 'mappe' }, p.evidence.map(function (e) {
         return el('details', { class: 'evi' }, [el('summary', { text: e.title })].concat(docBody(e)));
       }));
+      gSt.el.classList.add('grid2'); gEv.el.classList.add('grid2'); gA.el.classList.add('grid2'); gB.el.classList.add('grid2');
       body.push(el('h3', { text: '1 · Welche Aussage greift ihr an?' }), gSt.el,
         el('h3', { text: '2 · Belegmappe lesen und höchstens zwei Belege vorlegen' }), mappe, gEv.el,
         el('h3', { text: '3 · ' + p.slotA.label }), gA.el,
@@ -599,10 +611,11 @@
       p.passes.forEach(function (ps) { passLabel[ps.id] = ps.tag || ps.label; });
       var penRow = el('div', { class: 'pens', role: 'radiogroup', 'aria-label': 'Welche Markierung setzt ihr?' });
       p.passes.forEach(function (ps) {
-        var pb = el('button', { class: 'pen' + (ps.id === pen ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': ps.id === pen ? 'true' : 'false', text: ps.label, onclick: function () {
+        var pb = el('button', { class: 'pen' + (ps.id === pen ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': ps.id === pen ? 'true' : 'false', onclick: function () {
           pen = ps.id;
           p.passes.forEach(function (q) { penBtns[q.id].classList.toggle('on', q.id === pen); penBtns[q.id].setAttribute('aria-checked', q.id === pen ? 'true' : 'false'); });
         } });
+        pb.appendChild(el('strong', { text: ps.label })); if (ps.hint) pb.appendChild(el('small', { text: ps.hint }));
         penBtns[ps.id] = pb; penRow.appendChild(pb);
       });
       var flow = el('div', { class: 'markup-text' });
@@ -621,10 +634,16 @@
         paintSeg();
         flow.appendChild(seg); flow.appendChild(document.createTextNode(' '));
       });
-      body.push(penRow, flow, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Markierungen prüfen', onclick: function () {
+      body.push(penRow, flow, p.note ? el('p', { class: 'muted small markup-note', text: p.note }) : null, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Markierungen prüfen', onclick: function () {
         var ids = Object.keys(marks);
         if (!ids.length) { wrong(fb, 'Markiert zuerst mindestens eine Stelle.'); return; }
-        attempt(p.passes.map(function (ps) { return ps.id + '=' + ids.filter(function (k) { return marks[k] === ps.id; }).sort().join('-'); }).join(';'));
+        function ansFor(ps) { return ps.id + '=' + ids.filter(function (k) { return marks[k] === ps.id; }).sort().join('-'); }
+        var full = p.passes.map(ansFor).join(';'), msg = null;
+        /* Rückmeldung je Durchgang (nicht je Satz): sagt, welcher Durchgang noch nicht stimmt, ohne einzelne Sätze zu verraten */
+        if (p.passHash && !check(p.id, full, p.hash)) {
+          msg = 'Nichts passiert. ' + p.passes.map(function (ps) { return ps.tag + ': ' + (check(p.id + '-' + ps.id, ansFor(ps), p.passHash[ps.id]) ? 'stimmt' : 'stimmt noch nicht'); }).join(' · ') + '.';
+        }
+        attempt(full, msg);
       } })]));
     }
     /* ---------- Nachfragen (ab 1.4) ---------- */
@@ -643,7 +662,7 @@
         sl.appendChild(el('option', { value: '', text: '… Annahme wählen …' }));
         p.options.forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
         sl.addEventListener('change', function () { nsel[r.id] = sl.value; fb.textContent = ''; });
-        nrows.appendChild(el('div', { class: 'nf-row' }, [el('p', { class: 'nf-say', text: r.say }), askBtn, replyBox, el('label', { class: 'nf-label' }, [(p.selectLabel || 'Diese Deutung setzt voraus: '), sl])]));
+        nrows.appendChild(el('div', { class: 'nf-row' }, [el('p', { class: 'nf-say', text: r.say }), el('div', { class: 'nf-line' }, [askBtn, el('label', { class: 'nf-label' }, [(p.selectLabel || 'Setzt voraus: '), sl])]), replyBox]));
       });
       body.push(annBox, nrows, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Annahmen prüfen', onclick: function () {
         if (p.rows.some(function (r) { return !nsel[r.id]; })) { wrong(fb, 'Wählt zuerst für jede Deutung eine Annahme.'); return; }
@@ -702,7 +721,19 @@
       });
       body.push(nstage, nstatus, elist, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Verbindungen prüfen', onclick: function () {
         if (edges.length < (p.minEdges || 3)) { wrong(fb, 'Setzt zuerst Pfeile zwischen den Karten.'); return; }
-        attempt(edges.slice().sort().join(';'));
+        var sorted = edges.slice().sort(), msg = null;
+        if (!check(p.id, sorted.join(';'), p.hash)) {
+          var rv = function (k) { var ab = k.split('>'); return ab[1] + '>' + ab[0]; };
+          var okSet = function (l) { return check(p.id, l.slice().sort().join(';'), p.hash); };
+          if (okSet(edges.map(rv))) msg = 'Alle Pfeile zeigen in die falsche Richtung.';
+          else {
+            for (var q = 0; q < edges.length && !msg; q++) { var c = edges.slice(); c[q] = rv(c[q]); if (okSet(c)) msg = 'Ein Pfeil zeigt in die falsche Richtung.'; }
+            if (!msg && p.edgeCount && edges.length < p.edgeCount) msg = 'Es fehlt noch mindestens eine Verbindung.';
+            else if (!msg && p.edgeCount && edges.length > p.edgeCount) msg = 'Mindestens ein Pfeil ist zu viel.';
+          }
+          if (msg) msg = 'Nichts passiert. ' + msg;
+        }
+        attempt(sorted.join(';'), msg);
       } })]));
       renderEdges();
       setTimeout(redraw, 60); setTimeout(redraw, 400);
