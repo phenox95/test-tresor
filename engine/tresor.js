@@ -1,12 +1,12 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
-   Version 1.7 (Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
+   Version 1.8 (Raum 2: Untersuchungsobjekt, Widerspruch markieren, Tabelle ausfüllen; Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 1.7 · 04.10.2026 · Raum 1 V2.2';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
+  var ENGINE_BUILD = 'Engine 1.8 · 05.10.2026 · Raum 1 V2.2 · Raum 2 V1';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
   /* ---------------------------------------------------------------
@@ -21,7 +21,13 @@
     'r1-2-modell', 'r1-2-kette', 'r1-2-vorhersage', 'r1-2-versuch',
     'r1-3-einspruch', 'r1-3-kette', 'r1-3-belege', 'r1-3-schloss', 'r1-3-modellkritik', 'r1-3-population',
     /* ab Engine 1.4 */
-    'r1-3-zahl'
+    'r1-3-zahl',
+    /* Raum 2 (ab Engine 1.8); m2.3 steht schon oben */
+    'm2.1', 'm2.2', 'm2.4',
+    'r2-1-schichten', 'r2-1-tiefe', 'r2-1-aussagekraft', 'r2-1-zettel', 'r2-1-folge', 'r2-1-luecken',
+    'r2-2-kriterium', 'r2-2-vergleich', 'r2-2-tabelle', 'r2-2-passung',
+    'r2-3-mosaik', 'r2-3-deutung', 'r2-3-frage', 'r2-3-kein-brueckentier',
+    'r2-4-zettel', 'r2-4-linien', 'r2-4-ausreden', 'r2-4-schloss', 'r2-4-verwerfung'
   ];
 
   /* ---------------- Hilfsfunktionen ---------------- */
@@ -136,7 +142,7 @@
     if (r.text) kids.push(el('div', { class: 'ref-item' }, paras(r.text)));
     (r.docs || []).forEach(function (id) {
       var dc = ROOM.docs[id]; if (!dc) return;
-      kids.push(el('div', { class: 'ref-item' }, [el('strong', { text: dc.title })].concat(docBody(dc))));
+      kids.push(el('div', { class: 'ref-item' }, [el('strong', { text: dc.title })].concat(docBody(dc, true))));
     });
     (r.answers || []).forEach(function (k) {
       var a = S.answers[k]; if (!a) return;
@@ -150,8 +156,9 @@
     var rows = t.rows.map(function (r) { return el('tr', {}, r.map(function (c) { return el('td', { text: c }); })); });
     return el('div', { class: 'tbl-wrap' }, [el('table', { class: 'data' }, [el('thead', {}, [head]), el('tbody', {}, rows)])]);
   }
-  function docBody(dc) {
-    return [audioPlayer(dc.audio, 'Aufnahme: ' + dc.title), el('div', { class: 'doc-text' }, paras(dc.text)), dc.table ? tableEl(dc.table) : null];
+  function docBody(dc, withImg) {
+    return [withImg && dc.image ? el('img', { class: 'doc-img', src: dc.image, alt: dc.title }) : null,
+      audioPlayer(dc.audio, 'Aufnahme: ' + dc.title), el('div', { class: 'doc-text' }, paras(dc.text)), dc.table ? tableEl(dc.table) : null];
   }
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
 
@@ -237,7 +244,8 @@
   var FIGURES = {
     kemal: { name: 'Kemal Aydın', role: 'Präparator', img: 'figuren/kemal.jpg' },
     wendt: { name: 'Dr. Johanna Wendt', role: 'Kuratorin', img: 'figuren/wendt.jpg' },
-    hallmann: { name: 'Viktor Hallmann', role: 'Händler', img: 'figuren/hallmann.jpg' }
+    hallmann: { name: 'Viktor Hallmann', role: 'Händler', img: 'figuren/hallmann.jpg' },
+    sammler: { name: 'Ein Sammler', role: 'Fossilienbörse', img: null }
   };
   var dialogStack = [];
   function openDialog(opts) {
@@ -650,7 +658,8 @@
     /* ---------- Nachfragen (ab 1.4) ---------- */
     if (p.type === 'nachfragen') {
       var nsel = {};
-      var annBox = el('div', { class: 'annahmen' }, [el('strong', { text: p.optionsTitle || 'Annahmen' })].concat(p.options.map(function (o) { return el('p', { text: o.full || o.label }); })));
+      var nOpts = p.shuffleOptions ? seededShuffle(p.options, p.id, true) : p.options;
+      var annBox = el('div', { class: 'annahmen' }, [el('strong', { text: p.optionsTitle || 'Annahmen' })].concat(nOpts.map(function (o) { return el('p', { text: o.full || o.label }); })));
       var nrows = el('div', { class: 'nf-rows' });
       p.rows.forEach(function (r) {
         var replyBox = el('div', { class: 'nf-reply', 'aria-live': 'polite' });
@@ -659,14 +668,14 @@
           if (asked) return; asked = true; askBtn.disabled = true; logEvent('nachfragen ' + p.id + ' ' + r.id);
           replyBox.appendChild(figureBlock(p.from || 'hallmann', r.reply));
         } });
-        var sl = el('select', { class: 'gap', 'aria-label': 'Annahme für ' + r.say.split(' ')[0] });
-        sl.appendChild(el('option', { value: '', text: '… Annahme wählen …' }));
-        p.options.forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
+        var sl = el('select', { class: 'gap', 'aria-label': (p.selectAria || 'Annahme für ') + r.say.split(' ')[0] });
+        sl.appendChild(el('option', { value: '', text: p.selectPlaceholder || '… Annahme wählen …' }));
+        nOpts.forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
         sl.addEventListener('change', function () { nsel[r.id] = sl.value; fb.textContent = ''; });
         nrows.appendChild(el('div', { class: 'nf-row' }, [el('p', { class: 'nf-say', text: r.say }), el('div', { class: 'nf-line' }, [askBtn, el('label', { class: 'nf-label' }, [(p.selectLabel || 'Setzt voraus: '), sl])]), replyBox]));
       });
       body.push(annBox, nrows, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Annahmen prüfen', onclick: function () {
-        if (p.rows.some(function (r) { return !nsel[r.id]; })) { wrong(fb, 'Wählt zuerst für jede Deutung eine Annahme.'); return; }
+        if (p.rows.some(function (r) { return !nsel[r.id]; })) { wrong(fb, p.missingText || 'Wählt zuerst für jede Deutung eine Annahme.'); return; }
         attempt(p.rows.map(function (r) { return r.id + '=' + nsel[r.id]; }).sort().join(';'));
       } })]));
     }
@@ -748,7 +757,177 @@
       if (window.ResizeObserver) { try { new ResizeObserver(function () { redraw(); }).observe(nstage); } catch (e) {} }
     }
     /* ---------- Aufgabe auf Papier mit Selbstabgleich (ab 1.4) ---------- */
-    if (p.type === 'paper') {
+    /* ---------- Untersuchungsobjekt (ab 1.8) ----------
+       Bild mit Werkzeugen. Ein Werkzeug zeigt seine Stellen (spots). Eine Stelle antippen zeigt den Befund.
+       mode 'zeigen':    je Zeile (rows) eine gefundene Stelle wählen oder „nicht erkennbar“ ('nein').
+                         Antwort: rowId=spotId;… sortiert. Teilprüfung je Kategorie (spot.cat, 'nein'): cat=rowIds.
+       mode 'markieren': Stellen mit Stiften (pens) markieren, unmarkiert heißt „nichts“.
+                         Antwort: penId=spotIds;… in Stift-Reihenfolge. Teilprüfung je Stift (partBy 'pen') oder je Werkzeug (partBy 'tool': tool=spotIds). */
+    if (p.type === 'objekt') {
+      var tool = null, found = {}, oMarks = {}, oRows = {}, current = null, oPen = p.pens ? p.pens[0].id : null;
+      var toolName = function (id) { var t = (p.tools || []).filter(function (x) { return x.id === id; })[0]; return t ? t.label : (p.baseLabel || 'Ohne Werkzeug'); };
+      var penTag = function (id) { var q = (p.pens || []).filter(function (x) { return x.id === id; })[0]; return q ? (q.tag || q.label) : ''; };
+      var img = el('img', { src: p.image, alt: p.imageAlt || '' });
+      var spotLayer = el('div', { class: 'obj-spots' });
+      var objStage = el('div', { class: 'obj-stage' }, [img, spotLayer]);
+      var befund = el('div', { class: 'obj-befund', 'aria-live': 'polite' }, [el('p', { class: 'muted', text: p.startText || 'Wählt ein Werkzeug und tippt auf eine markierte Stelle.' })]);
+      var spotBtns = {};
+      p.spots.forEach(function (sp) {
+        var tagEl = el('span', { class: 'obj-tag' });
+        var b = el('button', { class: 'obj-spot', type: 'button', style: 'left:' + sp.x + '%;top:' + sp.y + '%;width:' + sp.w + '%;height:' + sp.h + '%', 'aria-label': sp.label, onclick: function () { showSpot(sp); } }, [tagEl]);
+        b._tag = tagEl; spotBtns[sp.id] = b; spotLayer.appendChild(b);
+      });
+      var paintSpots = function () {
+        p.spots.forEach(function (sp) {
+          var b = spotBtns[sp.id], vis = (sp.tool || null) === tool;
+          b.hidden = !vis; b.classList.toggle('sel', current === sp.id); b.classList.toggle('marked', !!oMarks[sp.id]);
+          b._tag.textContent = oMarks[sp.id] ? penTag(oMarks[sp.id]) : (found[sp.id] ? sp.label : '');
+          b.setAttribute('aria-label', sp.label + (oMarks[sp.id] ? ' (markiert: ' + penTag(oMarks[sp.id]) + ')' : ''));
+        });
+      };
+      var toolRow = el('div', { class: 'pens obj-tools', role: 'radiogroup', 'aria-label': 'Werkzeug' });
+      var toolBtns = {};
+      [{ id: null, label: p.baseLabel || 'Ohne Werkzeug' }].concat(p.tools || []).forEach(function (t) {
+        var tb = el('button', { class: 'pen' + (t.id === tool ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': t.id === tool ? 'true' : 'false', onclick: function () {
+          tool = t.id; current = null; logEvent('werkzeug ' + p.id + ' ' + (t.id || 'ohne'));
+          Object.keys(toolBtns).forEach(function (k) { var on = String(tool) === k; toolBtns[k].classList.toggle('on', on); toolBtns[k].setAttribute('aria-checked', on ? 'true' : 'false'); });
+          img.src = (p.views && tool && p.views[tool]) || p.image;
+          befund.innerHTML = ''; befund.appendChild(el('p', { class: 'muted', text: (t.hint || ('Ansicht: ' + t.label)) + ' Tippt auf eine markierte Stelle.' }));
+          paintSpots(); fb.textContent = '';
+        } }, [el('strong', { text: t.label })]);
+        toolBtns[String(t.id)] = tb; toolRow.appendChild(tb);
+      });
+      var rowSelects = [];
+      var refreshSelects = function () {
+        rowSelects.forEach(function (sl) {
+          var v = sl.value; sl.innerHTML = '';
+          sl.appendChild(el('option', { value: '', text: '… wählen …' }));
+          p.spots.filter(function (sp) { return found[sp.id] && !sp.noRow; }).forEach(function (sp) { sl.appendChild(el('option', { value: sp.id, text: sp.label })); });
+          sl.appendChild(el('option', { value: 'nein', text: p.noneLabel || 'Am Stück nicht erkennbar' }));
+          sl.value = [].some.call(sl.options, function (o) { return o.value === v; }) ? v : '';
+        });
+      };
+      function showSpot(sp) {
+        current = sp.id; if (!found[sp.id]) { found[sp.id] = true; logEvent('befund ' + p.id + ' ' + sp.id); }
+        befund.innerHTML = '';
+        befund.appendChild(el('p', {}, [el('strong', { text: sp.label + ': ' }), sp.text]));
+        if (p.mode === 'markieren') {
+          var r = el('div', { class: 'row' });
+          p.pens.forEach(function (q) {
+            r.appendChild(el('button', { class: 'btn small' + (oMarks[sp.id] === q.id ? '' : ' ghost'), type: 'button', text: (oMarks[sp.id] === q.id ? '✓ ' : '') + q.label, onclick: function () { oMarks[sp.id] = q.id; fb.textContent = ''; showSpot(sp); } }));
+          });
+          if (oMarks[sp.id]) r.appendChild(el('button', { class: 'btn ghost small', type: 'button', text: 'Markierung entfernen', onclick: function () { delete oMarks[sp.id]; fb.textContent = ''; showSpot(sp); } }));
+          befund.appendChild(r);
+        }
+        paintSpots(); refreshSelects();
+      }
+      var side = [befund];
+      if (p.mode === 'zeigen') {
+        var rowsBox = el('div', { class: 'obj-rows' });
+        p.rows.forEach(function (rw) {
+          var sl = el('select', { class: 'gap', 'aria-label': 'Beleg für: ' + rw.label });
+          sl.addEventListener('change', function () { oRows[rw.id] = sl.value; fb.textContent = ''; });
+          rowSelects.push(sl);
+          rowsBox.appendChild(el('label', { class: 'obj-row' }, [el('span', { text: rw.label }), sl]));
+        });
+        side.push(rowsBox);
+      } else if (p.note) side.push(el('p', { class: 'muted small', text: p.note }));
+      paintSpots(); refreshSelects();
+      body.push(el('div', { class: 'obj-wrap' }, [el('div', { class: 'obj-left' }, [toolRow, objStage]), el('div', { class: 'obj-right' }, side)]),
+        el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Prüfen', onclick: function () {
+          var full, parts = [], msg = null;
+          if (p.mode === 'zeigen') {
+            rowSelects.forEach(function (sl, i) { oRows[p.rows[i].id] = sl.value; });
+            if (p.rows.some(function (rw) { return !oRows[rw.id]; })) { wrong(fb, 'Wählt zuerst für jede Aussage etwas aus.'); return; }
+            full = p.rows.map(function (rw) { return rw.id + '=' + oRows[rw.id]; }).sort().join(';');
+            var catOf = function (v) { if (v === 'nein') return 'nein'; var s = p.spots.filter(function (x) { return x.id === v; })[0]; return s && s.cat; };
+            (p.parts || []).forEach(function (pt) {
+              var ids = p.rows.filter(function (rw) { return catOf(oRows[rw.id]) === pt.id; }).map(function (rw) { return rw.id; }).sort();
+              parts.push(pt.label + ': ' + (check(p.id + '-' + pt.id, pt.id + '=' + ids.join('-'), pt.hash) ? 'stimmt' : 'stimmt noch nicht'));
+            });
+          } else {
+            var ids = Object.keys(oMarks);
+            if (!ids.length) { wrong(fb, 'Markiert zuerst mindestens eine Stelle.'); return; }
+            full = p.pens.map(function (q) { return q.id + '=' + ids.filter(function (k) { return oMarks[k] === q.id; }).sort().join('-'); }).join(';');
+            (p.parts || []).forEach(function (pt) {
+              var key = p.partBy === 'tool'
+                ? pt.id + '=' + ids.filter(function (k) { var s = p.spots.filter(function (x) { return x.id === k; })[0]; return (s.tool || 'ohne') === pt.id; }).sort().join('-')
+                : pt.id + '=' + ids.filter(function (k) { return oMarks[k] === pt.id; }).sort().join('-');
+              parts.push(pt.label + ': ' + (check(p.id + '-' + pt.id, key, pt.hash) ? 'stimmt' : 'stimmt noch nicht'));
+            });
+          }
+          if (parts.length && !check(p.id, full, p.hash)) msg = 'Nichts passiert. ' + parts.join(' · ') + '.';
+          attempt(full, msg);
+        } })]));
+    }
+    /* ---------- Widerspruch markieren (ab 1.8): links und rechts je eine Angabe antippen. Antwort: linksId|rechtsId ---------- */
+    if (p.type === 'widerspruch') {
+      var wSel = { l: null, r: null }, wBtns = { l: {}, r: {} };
+      var wSide = function (key, side) {
+        var col = el('div', { class: 'wd-col' }, [el('h3', { text: side.title })]);
+        side.blocks.forEach(function (bl) {
+          var items = el('div', { class: 'wd-items' });
+          var box = el('div', { class: 'wd-block' }, (bl.title ? [el('strong', { class: 'wd-title', text: bl.title })] : []).concat([items]));
+          bl.items.forEach(function (it) {
+            var b = el('button', { class: 'wd-item', type: 'button', 'aria-pressed': 'false', onclick: function () {
+              wSel[key] = wSel[key] === it.id ? null : it.id; fb.textContent = '';
+              Object.keys(wBtns[key]).forEach(function (k) { var on = wSel[key] === k; wBtns[key][k].classList.toggle('on', on); wBtns[key][k].setAttribute('aria-pressed', on ? 'true' : 'false'); wBtns[key][k]._tag.textContent = on ? ' [gewählt]' : ''; });
+            } }, [el('span', { text: it.label })]);
+            b._tag = el('span', { class: 'seg-tag' }); b.appendChild(b._tag);
+            wBtns[key][it.id] = b; items.appendChild(b);
+          });
+          col.appendChild(box);
+        });
+        return col;
+      };
+      body.push(el('div', { class: 'wd-wrap' }, [wSide('l', p.left), wSide('r', p.right)]),
+        el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Widerspruch prüfen', onclick: function () {
+          if (!wSel.l || !wSel.r) { wrong(fb, 'Tippt links und rechts je eine Angabe an.'); return; }
+          attempt(wSel.l + '|' + wSel.r);
+        } })]));
+    }
+    /* ---------- Tabelle ausfüllen (ab 1.8): Zelle antippen schaltet weiter. Antwort: spalte=z1-z2-…;… sortiert, Teilprüfung je Spalte ---------- */
+    if (p.type === 'tabelle') {
+      var cells = {};
+      var tState = function (id) { return p.states.filter(function (x) { return x.id === id; })[0]; };
+      var thead = el('tr', {}, [el('th', { text: p.cornerLabel || 'Merkmal' })].concat(p.cols.map(function (c) { return el('th', { text: c.label }); })));
+      var tbody = el('tbody');
+      p.rows.forEach(function (rw) {
+        var tr = el('tr', {}, [el('th', { text: rw.label })]);
+        p.cols.forEach(function (c) {
+          var key = c.id + '|' + rw.id;
+          var b = el('button', { class: 'tb-cell', type: 'button', text: '…', 'aria-label': rw.label + ', ' + c.label + ': leer', onclick: function () {
+            var i = cells[key] ? p.states.map(function (x) { return x.id; }).indexOf(cells[key]) + 1 : 0;
+            cells[key] = i < p.states.length ? p.states[i].id : null; if (!cells[key]) delete cells[key];
+            var stt = cells[key] && tState(cells[key]);
+            b.textContent = stt ? stt.label : '…'; b.className = 'tb-cell' + (stt ? ' s-' + stt.id : '');
+            b.setAttribute('aria-label', rw.label + ', ' + c.label + ': ' + (stt ? stt.label : 'leer')); fb.textContent = '';
+          } });
+          tr.appendChild(el('td', {}, [b]));
+        });
+        tbody.appendChild(tr);
+      });
+      body.push(el('p', { class: 'muted small', text: 'Jedes Antippen schaltet weiter: ' + p.states.map(function (x) { return x.label; }).join(' → ') + ' → leer.' }),
+        el('div', { class: 'tbl-wrap' }, [el('table', { class: 'data tb-fill' }, [el('thead', {}, [thead]), tbody])]),
+        el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Tabelle prüfen', onclick: function () {
+          if (Object.keys(cells).length < p.rows.length * p.cols.length) { wrong(fb, 'Füllt zuerst alle Zellen aus.'); return; }
+          var colAns = function (c) { return c.id + '=' + p.rows.map(function (rw) { return cells[c.id + '|' + rw.id]; }).join('-'); };
+          var full = p.cols.map(colAns).sort().join(';'), msg = null;
+          if (p.colHash && !check(p.id, full, p.hash)) msg = 'Nichts passiert. ' + p.cols.map(function (c) { return c.label + ': ' + (check(p.id + '-' + c.id, colAns(c), p.colHash[c.id]) ? 'stimmt' : 'stimmt noch nicht'); }).join(' · ') + '.';
+          attempt(full, msg);
+        } })]));
+    }
+    if (p.type === 'paper' && !p.sample) {
+      /* Papier-Aufgabe ohne Musterlösung (ab 1.8): ein Haken, dann fertig */
+      var pcb = el('input', { type: 'checkbox', id: 'paper-ok1' });
+      body.push(el('p', { class: 'paper-task' }, [el('strong', { text: 'Auf Papier (Logbuch): ' }), p.paperTask]),
+        el('label', { class: 'check' }, [pcb, ' ' + (p.doneText || 'Wir haben es ins Logbuch geschrieben.')]),
+        el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Fertig', onclick: function () {
+          if (!pcb.checked) { wrong(fb, 'Erledigt zuerst den Auftrag im Logbuch und setzt dann den Haken.'); return; }
+          logEvent('papier ' + p.id); d.close(); solve(p, {});
+        } })]));
+    }
+    if (p.type === 'paper' && p.sample) {
       var cb1 = el('input', { type: 'checkbox', id: 'paper-ok1' }), cb2 = el('input', { type: 'checkbox', id: 'paper-ok2' });
       var step2 = el('div', { class: 'paper-step2' }); step2.hidden = true;
       var sample = el('ol', { class: 'sample-chain' }, p.sample.map(function (t) { return el('li', { text: t }); }));
@@ -784,7 +963,7 @@
     body.push(fb);
     body.push(el('div', { class: 'row' }, [el('button', { class: 'btn ghost small', type: 'button', text: 'Forscherakte öffnen (nachschlagen)', onclick: function () { openAkte(); } })]));
     if (p.hints && p.hints.length) body.push(hintArea(p, function () { rescueDialog(p, d); }));
-    d = openDialog({ cls: 'dlg-puzzle' + (refEl && p.type === 'freetext' ? ' has-ref' : ''), title: p.title, body: body, focus: p.type === 'code' || p.type === 'freetext' });
+    d = openDialog({ cls: 'dlg-puzzle' + (refEl && p.type === 'freetext' ? ' has-ref' : '') + (/^(objekt|widerspruch)$/.test(p.type) ? ' dlg-wide' : ''), title: p.title, body: body, focus: p.type === 'code' || p.type === 'freetext' });
   }
 
   /* ---------------- Schloss-Animation (onSolve: { fx: 'lock', fxTitle, fxText }) ---------------- */
@@ -844,7 +1023,7 @@
   function applyEffects(eff, silent) {
     (eff.items || []).forEach(function (it) { if (addUnique(S.items, it, 'id') && !silent) toast('Neues Fundstück: ' + it.label); });
     (eff.docs || []).forEach(function (id) { var dc = ROOM.docs[id]; if (dc) addUnique(S.docs, { id: id, kind: 'doc', title: dc.title, text: dc.text, table: dc.table, audio: dc.audio }, 'id'); });
-    if (eff.evidence) addUnique(S.evidence, eff.evidence, 'id');
+    [].concat(eff.evidence || []).forEach(function (ev) { addUnique(S.evidence, ev, 'id'); });
     if (eff.merksatz) addUnique(S.merksaetze, eff.merksatz);
     persist();
   }
@@ -870,7 +1049,7 @@
       var blocks = [];
       a.docs.forEach(function (id) {
         var dd = ROOM.docs[id]; addUnique(S.docs, { id: id, kind: 'doc', title: dd.title, text: dd.text, table: dd.table, audio: dd.audio }, 'id');
-        blocks.push(el('h3', { text: dd.title })); docBody(dd).forEach(function (n) { if (n) blocks.push(n); });
+        blocks.push(el('h3', { text: dd.title })); docBody(dd, true).forEach(function (n) { if (n) blocks.push(n); });
       });
       persist(); openDialog({ cls: 'dlg-doc paper', title: a.title, body: blocks });
     } else if (a.type === 'puzzle') openPuzzle(ROOM.puzzles[a.puzzle]);
