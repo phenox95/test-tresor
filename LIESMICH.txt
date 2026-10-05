@@ -1,4 +1,4 @@
-tresor-test · KOMPLETTE CODE-DATEIEN · Raum 1 V2.2 (Engine 1.7) · Stand 05.10.2026
+tresor-test · KOMPLETTE CODE-DATEIEN · Raum 1 V2.2, Raum 2 V1 (Engine 1.8) · Stand 05.10.2026
 =====================================================================================
 
 WAS IN DIESEM ORDNER IST
@@ -33,7 +33,7 @@ SO SPIELST DU ES EIN
    alles auf diesem iPad), oder Safari, Einstellungen, Erweitert, Website-Daten.
    Das brauchst du vor JEDEM neuen Durchlauf von vorn.
 4. Stimmt die Fassung? Im Raum auf „Menü“: ganz unten steht
-       Fassung: Engine 1.7 · 04.10.2026 · Raum 1 V2.2
+       Fassung: Engine 1.8 · 05.10.2026 · Raum 1 V2.2 · Raum 2 V1
    Steht dort etwas anderes oder fehlt die Zeile, lädt Safari noch die alte
    Fassung: Website-Daten löschen und neu öffnen.
 
