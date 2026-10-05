@@ -322,3 +322,10 @@ table.data th { background: #1B2A2B; color: var(--brass-hi); font-family: var(--
 .nf-reply { margin-top: 8px; }
 @media (min-width: 700px) { .opts.grid2 { grid-template-columns: 1fr 1fr; } }
 @media (min-width: 700px) { .mappe { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; } .mappe details[open] { grid-column: 1 / -1; } }
+
+/* ---------- V2.2 ---------- */
+/* Querformat-Hinweis liegt über allem, auch über Dialogen (sonst scheint er durch deren Hintergrund) */
+@media (orientation: portrait) and (max-width: 1100px) { .rotate { position: fixed; z-index: 3000; } }
+.cloze-row { margin: 6px 0; line-height: 1.6; }
+.cloze-row select.gap { max-width: 100%; }
+.cloze-row select.gap.block { display: block; width: 100%; margin: 4px 0 0; }

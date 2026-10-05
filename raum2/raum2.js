@@ -16,6 +16,8 @@ TRESOR.room({
     return t;
   },
 
+  end: { title: 'Ende der Testfassung', text: 'Das war die Probe von Raum 2. Die weiteren Missionen dieses Raums gibt es noch nicht.\n\nSichert euren Spielstand.' },
+
   missions: [{
     id: 'm2.3', title: 'Mission 2.3 · Der Urvogel', unlock: '5680699de708283606cdc5495a2c0ab00aa0e39005aee64ece343523da8cbc78',
     intro: { from: 'kemal', text: 'Psst, ich bin es, Kemal. Ich habe euch die Fossilienkammer aufgeschlossen. Hier hat Dr. Wendt zuletzt gearbeitet.\n\nAuf ihrem Schreibtisch liegt noch ihr Notizbuch. Seht euch um, aber seid leise: Der Nachtdienst macht gleich seine Runde.' },
