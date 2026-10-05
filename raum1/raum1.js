@@ -1,4 +1,4 @@
-/* Raum 1 · Der Streitsaal · Missionen 1.1 bis 1.3 (Stand 02.10.2026, Testfassung V2 mit neuen Rätselformaten)
+/* Raum 1 · Der Streitsaal · Missionen 1.1 bis 1.3 (Stand 02.10.2026, Testfassung V2.2 mit neuen Rätselformaten)
    Diese Datei wird aus raum1.src.js erzeugt. Lösungen stehen in raum1.js nur als Hash. */
 TRESOR.room({
   base: '../',
@@ -18,6 +18,8 @@ TRESOR.room({
     if (T.isSolved('r1-3-schloss')) t += '\n\nIhr habt die Erklärung an Versuchen geprüft. Sie hält nicht stand. Über den Fund selbst sagt das noch nichts.';
     return t;
   },
+
+  end: { title: 'Raum 1 geschafft', text: 'Sichert jetzt euren Spielstand. Wie es weitergeht, erfahrt ihr in der nächsten Stunde.' },
 
   missions: [
     { id: 'm1.1', title: 'Mission 1.1 · Die Behauptung', unlock: 'c1ca4d4ef8363a8ece79e862b9aaac8fca28c1589aa2e7ad4da0ce6a10ab8859',
@@ -293,6 +295,7 @@ TRESOR.room({
       ],
       layout: { d4: [50, 14], d1: [17, 46], d5: [83, 46], d2: [30, 84], d3: [70, 84] },
       minEdges: 3, edgeCount: 4,
+      edgeHash: ['6a863b2f86bceb838c38ff1e669b390b049008738f67495d6a4726559dea70bd', '978e070a97617837589fcd0cc31f3fad176a47643c8cf5222b90b947e6b9038a', '57329d637fe542a97d184f21922040458c76c9635e82131a7a6e5d354592d3c0', '201233afaee74193090e754b76d2a0544fc43fb74b56c78eec79f5c72b8b5412', '5dd56302a435cffbf31646a0e5ec095fea8674ede7a018114b24d5ad13d3acf3', '9d69ae81673944bf3bc27e7af4be5dc3a221f073a17ed62d12b097f50a4514d0'],
       hash: ['7c754160e8e20bf9b253ed1cc0cbc2d7e49b00e794fa098c4f4340db10aaab29', 'ce109ca633a9562ea813477600278097efb6972920055a4547e5ff6efc30934c', '0ece2f78a24ded7e46496a2f878b565825b33b081d432c833403aa2a8c0393a9'],
       wrongText: 'Nichts passiert. Fragt euch bei jedem Pfeil: Muss der erste Schritt da sein, damit der zweite überhaupt passieren kann?',
       hints: ['Was ist die Voraussetzung dafür, dass es überhaupt eine Auswahl gibt?',
@@ -320,9 +323,10 @@ TRESOR.room({
       onSolve: { message: { from: 'kemal', text: 'Für Selektion in der Natur fehlt uns noch ein Beleg. B3 zeigt nur, wie Menschen auswählen.\n\nDen Beleg suchen wir später im Labor.' } } },
 
     'r1-3-schloss': { id: 'r1-3-schloss', type: 'cloze', triple: true, title: 'Das Schloss verlangt einen gesicherten Satz',
-      prompt: 'Das Schloss verlangt Aussage, Beleg und Reichweite. Vervollständigt den Satz mit den Bausteinen.\n\nDas Schloss prüft alle drei Lücken gemeinsam.',
-      parts: [{ strong: 'Aussage: ' }, 'Die untersuchten Daten ', { gap: 'g1', label: 'Lücke 1' }, ' die Annahme, dass erworbene Veränderungen vererbt werden. ',
-        { strong: 'Beleg: ' }, { gap: 'g2', label: 'Lücke 2' }, '. ', { strong: 'Reichweite: ' }, { gap: 'g3', label: 'Lücke 3' }],
+      prompt: 'Vervollständigt den Satz. Das Schloss prüft alle drei Lücken gemeinsam.',
+      parts: [{ strong: 'Aussage: ' }, 'Die untersuchten Daten ', { gap: 'g1', label: 'Lücke 1' }, ' die Annahme, dass erworbene Veränderungen vererbt werden.', { nl: true },
+        { strong: 'Beleg: ' }, { gap: 'g2', label: 'Lücke 2', block: true }, { nl: true },
+        { strong: 'Reichweite: ' }, { gap: 'g3', label: 'Lücke 3', block: true }],
       gaps: {
         g1: [{ id: 'a', label: 'stützen nicht' }, { id: 'b', label: 'beweisen' }, { id: 'c', label: 'stützen eindeutig' }],
         g2: [{ id: 'a', label: 'In beiden Versuchen zeigten die Nachkommen die Veränderung ihrer Eltern nicht' }, { id: 'b', label: 'Hallmanns Broschüre nennt viele Sammler als Zeugen' }, { id: 'c', label: 'Weismann schnitt den Mäusen über viele Generationen den Schwanz ab' }],

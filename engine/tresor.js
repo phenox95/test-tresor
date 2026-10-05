@@ -1,12 +1,12 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
-   Version 1.6 (Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
+   Version 1.7 (Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 1.6 · 02.10.2026 · Raum 1 V2.1';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
+  var ENGINE_BUILD = 'Engine 1.7 · 04.10.2026 · Raum 1 V2.2';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
   /* ---------------------------------------------------------------
@@ -538,17 +538,18 @@
     }
     if (p.type === 'cloze') {
       var picks = {};
-      var line = el('div', { class: 'cloze' });
+      var line = el('div', { class: 'cloze' }), row = el('div', { class: 'cloze-row' }); line.appendChild(row);
       var order = [];
       p.parts.forEach(function (part) {
-        if (typeof part === 'string') { line.appendChild(document.createTextNode(part)); return; }
-        if (part.strong) { line.appendChild(el('strong', { text: part.strong })); return; }
+        if (part && part.nl) { row = el('div', { class: 'cloze-row' }); line.appendChild(row); return; }
+        if (typeof part === 'string') { row.appendChild(document.createTextNode(part)); return; }
+        if (part.strong) { row.appendChild(el('strong', { text: part.strong })); return; }
         order.push(part.gap);
-        var sl = el('select', { class: 'gap', 'aria-label': part.label || ('Lücke ' + order.length) });
+        var sl = el('select', { class: 'gap' + (part.block ? ' block' : ''), 'aria-label': part.label || ('Lücke ' + order.length) });
         sl.appendChild(el('option', { value: '', text: '… auswählen …' }));
         seededShuffle(p.gaps[part.gap], p.id + part.gap).forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
         sl.addEventListener('change', function () { picks[part.gap] = sl.value; fb.textContent = ''; });
-        line.appendChild(sl);
+        row.appendChild(sl);
       });
       body.push(line, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Satz prüfen', onclick: function () {
         if (order.some(function (g) { return !picks[g]; })) { wrong(fb, 'Füllt zuerst alle Lücken aus.'); return; }
@@ -723,15 +724,22 @@
         if (edges.length < (p.minEdges || 3)) { wrong(fb, 'Setzt zuerst Pfeile zwischen den Karten.'); return; }
         var sorted = edges.slice().sort(), msg = null;
         if (!check(p.id, sorted.join(';'), p.hash)) {
-          var rv = function (k) { var ab = k.split('>'); return ab[1] + '>' + ab[0]; };
-          var okSet = function (l) { return check(p.id, l.slice().sort().join(';'), p.hash); };
-          if (okSet(edges.map(rv))) msg = 'Alle Pfeile zeigen in die falsche Richtung.';
-          else {
-            for (var q = 0; q < edges.length && !msg; q++) { var c = edges.slice(); c[q] = rv(c[q]); if (okSet(c)) msg = 'Ein Pfeil zeigt in die falsche Richtung.'; }
-            if (!msg && p.edgeCount && edges.length < p.edgeCount) msg = 'Es fehlt noch mindestens eine Verbindung.';
-            else if (!msg && p.edgeCount && edges.length > p.edgeCount) msg = 'Mindestens ein Pfeil ist zu viel.';
+          if (p.edgeHash) {
+            /* Pro Pfeil: gehört er zu einer gültigen Lösung (edgeHash), ist er nur verdreht, oder gehört er nicht dazu? */
+            var turned = 0, foreign = 0;
+            edges.forEach(function (k) {
+              if (check(p.id + '-edge', k, p.edgeHash)) return;
+              var ab = k.split('>');
+              if (check(p.id + '-edge', ab[1] + '>' + ab[0], p.edgeHash)) turned++; else foreign++;
+            });
+            var parts = [];
+            if (turned) parts.push('Mindestens ein Pfeil zeigt in die falsche Richtung.');
+            if (foreign) parts.push('Mindestens ein Pfeil gehört nicht zum Netz.');
+            if (!parts.length && p.edgeCount && edges.length < p.edgeCount) parts.push('Es fehlt noch mindestens eine Verbindung.');
+            else if (!parts.length && p.edgeCount && edges.length > p.edgeCount) parts.push('Mindestens ein Pfeil ist zu viel.');
+            else if (!parts.length) parts.push('Die Pfeile passen einzeln, aber zusammen noch nicht.');
+            msg = 'Nichts passiert. ' + parts.join(' ');
           }
-          if (msg) msg = 'Nichts passiert. ' + msg;
         }
         attempt(sorted.join(';'), msg);
       } })]));
@@ -889,10 +897,10 @@
         S.seen['done-' + m.id] = true; S.solved[m.id] = { t: new Date().toISOString() }; persist();
         if (i < cur) return;
         var nx = ROOM.missions[i + 1];
-        var dlg = openDialog({ cls: 'dlg-done', title: m.doneTitle || 'Mission abgeschlossen', body: paras(m.doneText || '').concat([
+        var dlg = openDialog({ cls: 'dlg-done', title: m.doneTitle || 'Mission abgeschlossen', body: paras(m.doneText || '').concat(!nx && ROOM.end ? [el('h3', { text: ROOM.end.title })].concat(paras(ROOM.end.text)) : []).concat([
           nx ? el('p', { class: 'muted', text: (unlockMode() === 'auto' ? 'Für die nächste Mission beantwortet ihr zuerst das Do Now im Logbuch. Dann tippt unten auf „Nächste Mission“.' : 'Die nächste Mission schaltet eure Lehrkraft mit einem Code frei. Habt ihr den Code schon, tippt unten auf „Nächste Mission“.') }) : null,
           el('p', { class: 'muted', text: 'Notfall-Code für euer Logbuch: ' + makeCode() }),
-          el('div', { class: 'row end' }, [nx ? el('button', { class: 'btn ghost', text: 'Nächste Mission', onclick: function () { dlg.close(); lockScreen(nx, true); } }) : null, el('button', { class: 'btn ghost', text: 'Forscherakte', onclick: function () { dlg.close(); openAkte('beweise'); } }),
+          el('div', { class: 'row end' }, [!nx ? el('a', { class: 'btn ghost', href: BASE + 'index.html', text: 'Zum Museumsplan' }) : null, nx ? el('button', { class: 'btn ghost', text: 'Nächste Mission', onclick: function () { dlg.close(); lockScreen(nx, true); } }) : null, el('button', { class: 'btn ghost', text: 'Forscherakte', onclick: function () { dlg.close(); openAkte('beweise'); } }),
             el('button', { class: 'btn', text: 'Spielstand sichern', onclick: function () { saveFile(); toast('Gesichert. Ladet die Datei in WebWeaver hoch.', 6000); } })])]) });
       }
     });
@@ -1001,7 +1009,7 @@
     ]);
     invEl = el('div', { class: 'inv', 'aria-label': 'Fundstücke' });
     stage.appendChild(hud); stage.appendChild(invEl);
-    stage.appendChild(el('div', { class: 'rotate', text: 'Haltet das iPad bitte quer.' }));
+    document.body.appendChild(el('div', { class: 'rotate', text: 'Haltet das iPad bitte quer.' }));   /* direkt an der Seite, sonst liegt er unter den Dialogen */
     document.body.appendChild(stage);
     function fit() {
       var ratio = ROOM.size[0] / ROOM.size[1], vw = stage.clientWidth, vh = stage.clientHeight;
