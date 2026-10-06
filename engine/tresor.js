@@ -1,12 +1,12 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
-   Version 1.8 (Raum 2: Untersuchungsobjekt, Widerspruch markieren, Tabelle ausfüllen; Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
+   Version 1.9 (Raum 2: Untersuchungsobjekt, Widerspruch markieren, Tabelle ausfüllen; Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 1.8 · 05.10.2026 · Raum 1 V2.2 · Raum 2 V1';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
+  var ENGINE_BUILD = 'Engine 1.9 · 06.10.2026 · Raum 1 V2.2 · Raum 2 V1.1';   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
   /* ---------------------------------------------------------------
@@ -757,20 +757,22 @@
       if (window.ResizeObserver) { try { new ResizeObserver(function () { redraw(); }).observe(nstage); } catch (e) {} }
     }
     /* ---------- Aufgabe auf Papier mit Selbstabgleich (ab 1.4) ---------- */
-    /* ---------- Untersuchungsobjekt (ab 1.8) ----------
-       Bild mit Werkzeugen. Ein Werkzeug zeigt seine Stellen (spots). Eine Stelle antippen zeigt den Befund.
-       mode 'zeigen':    je Zeile (rows) eine gefundene Stelle wählen oder „nicht erkennbar“ ('nein').
+    /* ---------- Untersuchungsobjekt (ab 1.8, „zeigen“ schrittweise ab 1.9) ----------
+       Bild mit Werkzeugen (tools, optional). Eine Stelle (spot) ist in den Ansichten sichtbar, die spot.tools nennt
+       (Standard: nur in der Ansicht spot.tool, ohne Angabe nur ohne Werkzeug). Antippen zeigt den Befund.
+       mode 'zeigen':    eine Aussage (rows) nach der anderen; das Team tippt die Stelle an, die sie belegt, oder „Nicht erkennbar“ ('nein').
                          Antwort: rowId=spotId;… sortiert. Teilprüfung je Kategorie (spot.cat, 'nein'): cat=rowIds.
        mode 'markieren': Stellen mit Stiften (pens) markieren, unmarkiert heißt „nichts“.
                          Antwort: penId=spotIds;… in Stift-Reihenfolge. Teilprüfung je Stift (partBy 'pen') oder je Werkzeug (partBy 'tool': tool=spotIds). */
     if (p.type === 'objekt') {
-      var tool = null, found = {}, oMarks = {}, oRows = {}, current = null, oPen = p.pens ? p.pens[0].id : null;
-      var toolName = function (id) { var t = (p.tools || []).filter(function (x) { return x.id === id; })[0]; return t ? t.label : (p.baseLabel || 'Ohne Werkzeug'); };
+      var tool = null, found = {}, oMarks = {}, oRows = {}, current = null, step = 0;
       var penTag = function (id) { var q = (p.pens || []).filter(function (x) { return x.id === id; })[0]; return q ? (q.tag || q.label) : ''; };
+      var spotById = function (id) { return p.spots.filter(function (x) { return x.id === id; })[0]; };
+      var viewsOf = function (sp) { return sp.tools || [sp.tool || null]; };
       var img = el('img', { src: p.image, alt: p.imageAlt || '' });
       var spotLayer = el('div', { class: 'obj-spots' });
       var objStage = el('div', { class: 'obj-stage' }, [img, spotLayer]);
-      var befund = el('div', { class: 'obj-befund', 'aria-live': 'polite' }, [el('p', { class: 'muted', text: p.startText || 'Wählt ein Werkzeug und tippt auf eine markierte Stelle.' })]);
+      var befund = el('div', { class: 'obj-befund', 'aria-live': 'polite' });
       var spotBtns = {};
       p.spots.forEach(function (sp) {
         var tagEl = el('span', { class: 'obj-tag' });
@@ -779,34 +781,52 @@
       });
       var paintSpots = function () {
         p.spots.forEach(function (sp) {
-          var b = spotBtns[sp.id], vis = (sp.tool || null) === tool;
-          b.hidden = !vis; b.classList.toggle('sel', current === sp.id); b.classList.toggle('marked', !!oMarks[sp.id]);
+          var b = spotBtns[sp.id];
+          b.hidden = viewsOf(sp).indexOf(tool) === -1; b.classList.toggle('sel', current === sp.id); b.classList.toggle('marked', !!oMarks[sp.id]);
           b._tag.textContent = oMarks[sp.id] ? penTag(oMarks[sp.id]) : (found[sp.id] ? sp.label : '');
           b.setAttribute('aria-label', sp.label + (oMarks[sp.id] ? ' (markiert: ' + penTag(oMarks[sp.id]) + ')' : ''));
         });
       };
-      var toolRow = el('div', { class: 'pens obj-tools', role: 'radiogroup', 'aria-label': 'Werkzeug' });
-      var toolBtns = {};
-      [{ id: null, label: p.baseLabel || 'Ohne Werkzeug' }].concat(p.tools || []).forEach(function (t) {
-        var tb = el('button', { class: 'pen' + (t.id === tool ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': t.id === tool ? 'true' : 'false', onclick: function () {
-          tool = t.id; current = null; logEvent('werkzeug ' + p.id + ' ' + (t.id || 'ohne'));
-          Object.keys(toolBtns).forEach(function (k) { var on = String(tool) === k; toolBtns[k].classList.toggle('on', on); toolBtns[k].setAttribute('aria-checked', on ? 'true' : 'false'); });
-          img.src = (p.views && tool && p.views[tool]) || p.image;
-          befund.innerHTML = ''; befund.appendChild(el('p', { class: 'muted', text: (t.hint || ('Ansicht: ' + t.label)) + ' Tippt auf eine markierte Stelle.' }));
-          paintSpots(); fb.textContent = '';
-        } }, [el('strong', { text: t.label })]);
-        toolBtns[String(t.id)] = tb; toolRow.appendChild(tb);
-      });
-      var rowSelects = [];
-      var refreshSelects = function () {
-        rowSelects.forEach(function (sl) {
-          var v = sl.value; sl.innerHTML = '';
-          sl.appendChild(el('option', { value: '', text: '… wählen …' }));
-          p.spots.filter(function (sp) { return found[sp.id] && !sp.noRow; }).forEach(function (sp) { sl.appendChild(el('option', { value: sp.id, text: sp.label })); });
-          sl.appendChild(el('option', { value: 'nein', text: p.noneLabel || 'Am Stück nicht erkennbar' }));
-          sl.value = [].some.call(sl.options, function (o) { return o.value === v; }) ? v : '';
+      var toolRow = null, toolBtns = {};
+      if (p.tools && p.tools.length) {
+        toolRow = el('div', { class: 'pens obj-tools', role: 'radiogroup', 'aria-label': 'Werkzeug' });
+        [{ id: null, label: p.baseLabel || 'Ohne Werkzeug' }].concat(p.tools).forEach(function (t) {
+          var tb = el('button', { class: 'pen' + (t.id === tool ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': t.id === tool ? 'true' : 'false', onclick: function () {
+            tool = t.id; logEvent('werkzeug ' + p.id + ' ' + (t.id || 'ohne'));
+            Object.keys(toolBtns).forEach(function (k) { var on = String(tool) === k; toolBtns[k].classList.toggle('on', on); toolBtns[k].setAttribute('aria-checked', on ? 'true' : 'false'); });
+            img.src = (p.views && tool && p.views[tool]) || p.image;
+            if (current && viewsOf(spotById(current)).indexOf(tool) === -1) current = null;
+            if (!current) showHint(t.hint || ('Ansicht: ' + t.label + '. Tippt auf eine umrandete Stelle.'));
+            paintSpots(); fb.textContent = '';
+          } }, [el('strong', { text: t.label })]);
+          toolBtns[String(t.id)] = tb; toolRow.appendChild(tb);
         });
-      };
+      }
+      function showHint(t) { befund.innerHTML = ''; befund.appendChild(el('p', { class: 'muted', text: t })); }
+      /* --- zeigen: eine Aussage nach der anderen --- */
+      var stepBox = el('div', { class: 'obj-step' }), listBox = el('div', { class: 'obj-list' });
+      var nextOpen = function (from) { for (var k = 0; k < p.rows.length; k++) { var j = (from + k) % p.rows.length; if (!oRows[p.rows[j].id]) return j; } return -1; };
+      var answerLabel = function (v) { return v === 'nein' ? (p.noneLabel || 'Nicht erkennbar') : spotById(v).label; };
+      function assign(v) {
+        oRows[p.rows[step].id] = v; fb.textContent = ''; current = null;
+        var nx = nextOpen(step + 1); step = nx === -1 ? step : nx; renderSteps(nx === -1);
+        showHint(nx === -1 ? 'Alle Aussagen sind belegt. Prüft eure Auswahl unten in der Liste, dann „' + (p.button || 'Prüfen') + '“.' : (p.stepHint || 'Tippt auf die Stelle, die diese Aussage belegt.'));
+        paintSpots();
+      }
+      function renderSteps(done) {
+        stepBox.innerHTML = '';
+        if (!done) {
+          stepBox.appendChild(el('p', { class: 'obj-step-nr', text: 'Aussage ' + (step + 1) + ' von ' + p.rows.length }));
+          stepBox.appendChild(el('p', { class: 'obj-step-text', text: '„' + p.rows[step].label + '“' }));
+          stepBox.appendChild(el('div', { class: 'row' }, [el('button', { class: 'btn ghost small', type: 'button', text: p.noneLabel || 'Nicht erkennbar', onclick: function () { assign('nein'); } })]));
+        } else stepBox.appendChild(el('p', { class: 'obj-step-nr', text: 'Alle ' + p.rows.length + ' Aussagen belegt' }));
+        listBox.innerHTML = '';
+        p.rows.forEach(function (rw, i) {
+          var v = oRows[rw.id];
+          listBox.appendChild(el('button', { class: 'obj-li' + (i === step && !done ? ' on' : ''), type: 'button', onclick: function () { step = i; renderSteps(false); showHint(p.stepHint || 'Tippt auf die Stelle, die diese Aussage belegt.'); } },
+            [el('span', { class: 'obj-li-nr', text: (i + 1) + '' }), el('span', { class: 'obj-li-text', text: rw.label }), el('strong', { class: 'obj-li-ans', text: v ? answerLabel(v) : '…' })]));
+        });
+      }
       function showSpot(sp) {
         current = sp.id; if (!found[sp.id]) { found[sp.id] = true; logEvent('befund ' + p.id + ' ' + sp.id); }
         befund.innerHTML = '';
@@ -818,29 +838,22 @@
           });
           if (oMarks[sp.id]) r.appendChild(el('button', { class: 'btn ghost small', type: 'button', text: 'Markierung entfernen', onclick: function () { delete oMarks[sp.id]; fb.textContent = ''; showSpot(sp); } }));
           befund.appendChild(r);
+        } else if (!sp.noRow) {
+          befund.appendChild(el('div', { class: 'row' }, [el('button', { class: 'btn small', type: 'button', text: 'Das belegt Aussage ' + (step + 1), onclick: function () { assign(sp.id); } })]));
         }
-        paintSpots(); refreshSelects();
+        paintSpots();
       }
-      var side = [befund];
-      if (p.mode === 'zeigen') {
-        var rowsBox = el('div', { class: 'obj-rows' });
-        p.rows.forEach(function (rw) {
-          var sl = el('select', { class: 'gap', 'aria-label': 'Beleg für: ' + rw.label });
-          sl.addEventListener('change', function () { oRows[rw.id] = sl.value; fb.textContent = ''; });
-          rowSelects.push(sl);
-          rowsBox.appendChild(el('label', { class: 'obj-row' }, [el('span', { text: rw.label }), sl]));
-        });
-        side.push(rowsBox);
-      } else if (p.note) side.push(el('p', { class: 'muted small', text: p.note }));
-      paintSpots(); refreshSelects();
+      var side;
+      if (p.mode === 'zeigen') { side = [stepBox, befund, listBox]; renderSteps(false); showHint(p.startText || 'Tippt auf die Stelle am Objekt, die diese Aussage belegt.'); }
+      else { side = [befund, p.note ? el('p', { class: 'muted small', text: p.note }) : null]; showHint(p.startText || 'Tippt auf eine umrandete Stelle.'); }
+      paintSpots();
       body.push(el('div', { class: 'obj-wrap' }, [el('div', { class: 'obj-left' }, [toolRow, objStage]), el('div', { class: 'obj-right' }, side)]),
         el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Prüfen', onclick: function () {
           var full, parts = [], msg = null;
           if (p.mode === 'zeigen') {
-            rowSelects.forEach(function (sl, i) { oRows[p.rows[i].id] = sl.value; });
-            if (p.rows.some(function (rw) { return !oRows[rw.id]; })) { wrong(fb, 'Wählt zuerst für jede Aussage etwas aus.'); return; }
+            if (p.rows.some(function (rw) { return !oRows[rw.id]; })) { wrong(fb, 'Belegt zuerst jede Aussage oder wählt „' + (p.noneLabel || 'Nicht erkennbar') + '“.'); return; }
             full = p.rows.map(function (rw) { return rw.id + '=' + oRows[rw.id]; }).sort().join(';');
-            var catOf = function (v) { if (v === 'nein') return 'nein'; var s = p.spots.filter(function (x) { return x.id === v; })[0]; return s && s.cat; };
+            var catOf = function (v) { if (v === 'nein') return 'nein'; var s = spotById(v); return s && s.cat; };
             (p.parts || []).forEach(function (pt) {
               var ids = p.rows.filter(function (rw) { return catOf(oRows[rw.id]) === pt.id; }).map(function (rw) { return rw.id; }).sort();
               parts.push(pt.label + ': ' + (check(p.id + '-' + pt.id, pt.id + '=' + ids.join('-'), pt.hash) ? 'stimmt' : 'stimmt noch nicht'));
@@ -851,7 +864,7 @@
             full = p.pens.map(function (q) { return q.id + '=' + ids.filter(function (k) { return oMarks[k] === q.id; }).sort().join('-'); }).join(';');
             (p.parts || []).forEach(function (pt) {
               var key = p.partBy === 'tool'
-                ? pt.id + '=' + ids.filter(function (k) { var s = p.spots.filter(function (x) { return x.id === k; })[0]; return (s.tool || 'ohne') === pt.id; }).sort().join('-')
+                ? pt.id + '=' + ids.filter(function (k) { return (spotById(k).tool || 'ohne') === pt.id; }).sort().join('-')
                 : pt.id + '=' + ids.filter(function (k) { return oMarks[k] === pt.id; }).sort().join('-');
               parts.push(pt.label + ': ' + (check(p.id + '-' + pt.id, key, pt.hash) ? 'stimmt' : 'stimmt noch nicht'));
             });
