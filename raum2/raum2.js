@@ -1,4 +1,4 @@
-/* Raum 2 · Die Fossilienkammer · Missionen 2.1 bis 2.4 (Stand 05.10.2026, Fassung V1 nach Steckbriefen Raum 2 V2)
+/* Raum 2 · Die Fossilienkammer · Missionen 2.1 bis 2.4 (Stand 05.10.2026, Fassung V1.1 nach Steckbriefen Raum 2 V2, Ammonit schrittweise)
    Diese Datei wird aus raum2.src.js erzeugt. Lösungen stehen in raum2.js nur als Hash.
    Bilder in raum2/bilder/*.svg sind gezeichnete Platzhalter (tools/make_platzhalter.py). Alle Daten zum Berolinavis sind fiktiv. */
 TRESOR.room({
@@ -146,36 +146,34 @@ TRESOR.room({
       onSolve: { text: 'Die Profilwand leuchtet auf. Im Schrank klickt ein Schloss: Die Schubladen lassen sich öffnen.' } },
 
     'r2-1-aussagekraft': { id: 'r2-1-aussagekraft', type: 'objekt', mode: 'zeigen', title: 'Was der Ammonit belegt',
-      prompt: 'Untersucht den Ammoniten mit Lupe, Streiflicht und „Umdrehen“. Wählt bei jeder Aussage die Stelle, die sie belegt, oder „nicht erkennbar“.',
+      prompt: 'Untersucht den Ammoniten. Zeigt bei jeder Aussage die Stelle, die sie belegt, oder wählt „Nicht erkennbar“. Streiflicht und Umdrehen helfen.',
       image: 'bilder/ammonit.svg', imageAlt: 'Ammonit auf einer Steinplatte (Platzhalter)',
-      tools: [{ id: 'streif', label: 'Streiflicht' }, { id: 'lupe', label: 'Lupe' }, { id: 'um', label: 'Umdrehen' }],
-      views: { streif: 'bilder/ammonit-streiflicht.svg', lupe: 'bilder/ammonit-lupe.svg', um: 'bilder/ammonit-rueckseite.svg' },
+      startText: 'Tippt auf die Stelle am Ammoniten, die diese Aussage belegt.',
+      tools: [{ id: 'streif', label: 'Streiflicht', hint: 'Streiflicht von der Seite: Feine Linien auf dem Gehäuse werden deutlich.' }, { id: 'um', label: 'Umdrehen', hint: 'Die Rückseite des Stücks.' }],
+      views: { streif: 'bilder/ammonit-streiflicht.svg', um: 'bilder/ammonit-rueckseite.svg' },
       spots: [
-        { id: 'gehaeuse', label: 'Gehäuse', cat: 'stueck', x: 40, y: 36, w: 20, h: 28, text: 'Spiralig gewundenes Gehäuse, als Stein erhalten.' },
-        { id: 'bruch', label: 'Bruchkante', cat: 'stueck', x: 69, y: 30, w: 8, h: 26, text: 'Frische Bruchkante am Rand.' },
-        { id: 'loben', label: 'Linien im Streiflicht', cat: 'stueck', tool: 'streif', x: 30, y: 20, w: 16, h: 18, text: 'Verzweigte Linien auf dem Gehäuse: die Ansätze der Kammerwände. So sind Ammoniten gebaut, Kopffüßer des Meeres.' },
-        { id: 'kristalle', label: 'Kristalle', cat: 'stueck', tool: 'lupe', x: 50, y: 56, w: 15, h: 24, text: 'Kleine Kristalle in einer aufgebrochenen Kammer.' },
+        { id: 'gehaeuse', label: 'Gehäuse', cat: 'stueck', tools: [null, 'streif'], x: 40, y: 36, w: 20, h: 28, text: 'Spiralig gewundenes Gehäuse, als Stein erhalten.' },
+        { id: 'loben', label: 'Linien auf dem Gehäuse', cat: 'stueck', tools: [null, 'streif'], x: 30, y: 20, w: 16, h: 18, text: 'Verzweigte Linien: die Ansätze der Kammerwände. Im Streiflicht sieht man sie deutlich. So sind Ammoniten gebaut, Kopffüßer des Meeres.' },
+        { id: 'bruch', label: 'Bruchkante', cat: 'stueck', tools: [null, 'streif'], x: 69, y: 30, w: 8, h: 26, text: 'Frische Bruchkante am Rand.' },
         { id: 'zettel', label: 'Fundzettel', cat: 'zettel', tool: 'um', x: 29, y: 28, w: 42, h: 44, text: 'Ein Zettel auf der Rückseite: „Ammonit · Grube Nordhang · Schicht 2 · brauner Tonstein · 1974“.' }
       ],
       rows: [
         { id: 'a1', label: 'Das Tier hat einmal gelebt.' },
         { id: 'a2', label: 'Es lebte im Meer.' },
-        { id: 'a3', label: 'Es ist 200 Millionen Jahre alt.' },
-        { id: 'a4', label: 'Es ist jünger als der Fischsaurier aus Schicht 3.' },
-        { id: 'a5', label: 'Es ist genau 170 Millionen Jahre alt.' },
-        { id: 'a6', label: 'Es lebte zur selben Zeit wie der Urvogel.' }
+        { id: 'a3', label: 'Es ist jünger als der Fischsaurier aus Schicht 3.' },
+        { id: 'a4', label: 'Es ist 200 Millionen Jahre alt.' }
       ],
-      noneLabel: 'nicht erkennbar',
+      noneLabel: 'Nicht erkennbar',
       parts: [{ id: 'stueck', label: 'Am Stück', hash: 'b8c7e6f7a8b33a063b47cd30025ed17f252aea9c6700d5b251beeadbe9874d4e' },
-              { id: 'zettel', label: 'Auf dem Zettel', hash: 'd281b9349b43fea88f6fb1cdf5bc3ae8e24a2588731a807317dfff96e7d64528' },
-              { id: 'nein', label: 'Nicht erkennbar', hash: '525c8e1293e8b6bef2ecadaa3bfb3204dba547abc758c65b6b158fb30625d2a0' }],
-      hash: '3a758ce7aaedf5a8daf6fe399888855b922517343b59462d3d697409a00c860c',
+              { id: 'zettel', label: 'Auf dem Zettel', hash: 'c5d452603a539164fbd7f1f2e6f630185a9c276d3b6ffce4f9da792e2e977a39' },
+              { id: 'nein', label: 'Nicht erkennbar', hash: '9f5464a45fdbaff6de12889b686ee1d8a53c2ea094a96f80704ae9647b772145' }],
+      hash: '1bcaa8a8377f2bad4277804009f09c114db656ddcf072dc5cd78c5b67fce5dbb',
       button: 'Belege prüfen',
       wrongText: 'Nichts passiert. Fragt bei jeder Aussage: Woher wissen wir das?',
-      hints: ['Prüft jede Aussage: Steht das im Stein, auf dem Zettel oder nirgends?',
+      hints: ['Prüft jede Aussage: Steht das im Stein, auf dem Zettel oder nirgends? Dreht das Stück auch einmal um.',
               'Aus der Lage in den Schichten folgt, ob etwas älter oder jünger ist. Folgt daraus auch eine genaue Zahl?',
-              'Das Gehäuse zeigt, dass es gelebt hat, die Linien im Streiflicht, dass es ein Meerestier war. Der Zettel zeigt: jünger als Schicht 3. Zahlen und „zur selben Zeit“ zeigt nichts davon.'],
-      rescue: 'RGFzIEdlaMOkdXNlIGJlbGVndCwgZGFzcyBkYXMgVGllciBnZWxlYnQgaGF0LiBEaWUgTGluaWVuIGltIFN0cmVpZmxpY2h0IHplaWdlbiBlaW5lbiBBbW1vbml0ZW4sIGFsc28gZWluIE1lZXJlc3RpZXIuIERlciBGdW5kemV0dGVsIG5lbm50IFNjaGljaHQgMjogRGVyIEFtbW9uaXQgaXN0IGrDvG5nZXIgYWxzIEZ1bmRlIGF1cyBTY2hpY2h0IDMuIEVpbiBnZW5hdWVzIEFsdGVyIGluIEphaHJlbiB1bmQg4oCeenVyIHNlbGJlbiBaZWl0IHdpZSBkZXIgVXJ2b2dlbOKAnCBsYXNzZW4gc2ljaCB3ZWRlciBhbSBTdMO8Y2sgbm9jaCBhbSBaZXR0ZWwgZXJrZW5uZW4u',
+              'Das Gehäuse zeigt, dass es gelebt hat, die Linien auf dem Gehäuse, dass es ein Meerestier war. Der Zettel zeigt: jünger als Schicht 3. Eine Zahl in Jahren zeigt nichts davon.'],
+      rescue: 'RGFzIEdlaMOkdXNlIGJlbGVndCwgZGFzcyBkYXMgVGllciBnZWxlYnQgaGF0LiBEaWUgTGluaWVuIGF1ZiBkZW0gR2Vow6R1c2UgemVpZ2VuIGVpbmVuIEFtbW9uaXRlbiwgYWxzbyBlaW4gTWVlcmVzdGllci4gRGVyIEZ1bmR6ZXR0ZWwgbmVubnQgU2NoaWNodCAyOiBEZXIgQW1tb25pdCBpc3QgasO8bmdlciBhbHMgRnVuZGUgYXVzIFNjaGljaHQgMy4gRWluIEFsdGVyIGluIEphaHJlbiBsw6Rzc3Qgc2ljaCB3ZWRlciBhbSBTdMO8Y2sgbm9jaCBhbSBaZXR0ZWwgZXJrZW5uZW4u',
       rescueTask: 'Schreibt auf, was ein Fossil ohne Fundzettel belegt und was nicht.',
       onSolve: { docs: ['pruefkarte'], items: [{ id: 'pruefkarte', label: 'Prüfkarte Fundkontext', text: '1. Wo wurde es gefunden? 2. In welcher Schicht, und passt sie zum Profil? 3. Passt das Gestein zur Schicht?' }],
         message: { from: 'kemal', text: 'Nehmt diese Prüfkarte mit. Ihr braucht sie gleich bei den Fundzetteln im Schrank.' }, then: 'r2-1-zettel' } },
@@ -270,19 +268,18 @@ TRESOR.room({
       placeholder: 'Wir würden messen, …' },
 
     /* ---------------- Mission 2.3 ---------------- */
-    'r2-3-mosaik': { id: 'r2-3-mosaik', type: 'objekt', mode: 'markieren', title: 'Der Urvogel unter der Lupe',
+    'r2-3-mosaik': { id: 'r2-3-mosaik', type: 'objekt', mode: 'markieren', title: 'Der Urvogel unter der Glashaube',
       ref: { title: 'Zum Nachschlagen: Vergleichsprotokoll', docs: ['protokoll'] },
-      prompt: 'Untersucht den Urvogel mit der Lupe. Markiert ursprüngliche und abgeleitete Merkmale. Wo das Fossil nichts zeigt, markiert ihr nichts.',
+      prompt: 'Untersucht den Urvogel. Tippt jede umrandete Stelle an und markiert sie als ursprünglich oder abgeleitet. Wo das Fossil nichts zeigt, markiert ihr nichts.',
       image: 'bilder/urvogel.jpg', imageAlt: 'Fossil eines Urvogels mit Federn, Zähnen, Krallen und langem Schwanz',
-      startText: 'Wählt die Lupe und tippt auf eine markierte Stelle.',
-      tools: [{ id: 'lupe', label: 'Lupe' }],
+      startText: 'Tippt auf eine umrandete Stelle am Urvogel.',
       pens: [{ id: 'urs', label: 'ursprünglich', tag: 'ursprünglich' }, { id: 'abg', label: 'abgeleitet', tag: 'abgeleitet' }],
       spots: [
-        { id: 'zaehne', label: 'Zähne', tool: 'lupe', x: 53, y: 26, w: 8, h: 6, text: 'Spitze Zähne im Kiefer.' },
-        { id: 'krallen', label: 'Fingerkrallen', tool: 'lupe', x: 33, y: 16, w: 9, h: 10, text: 'Drei Finger mit Krallen am Flügel.' },
-        { id: 'schwanz', label: 'Schwanz', tool: 'lupe', x: 25, y: 58, w: 14, h: 16, text: 'Eine lange Schwanzwirbelsäule aus vielen Wirbeln.' },
-        { id: 'federn', label: 'Federn', tool: 'lupe', x: 66, y: 34, w: 22, h: 14, text: 'Abdrücke von Schwungfedern am Flügel.' },
-        { id: 'brustbein', label: 'Brustbein', tool: 'lupe', x: 45, y: 39, w: 8, h: 7, text: 'Im Fund nicht erhalten. Ob es einen Brustbeinkamm gab, ist nicht zu erkennen.' }
+        { id: 'zaehne', label: 'Zähne', x: 53, y: 26, w: 8, h: 6, text: 'Spitze Zähne im Kiefer.' },
+        { id: 'krallen', label: 'Fingerkrallen', x: 33, y: 16, w: 9, h: 10, text: 'Drei Finger mit Krallen am Flügel.' },
+        { id: 'schwanz', label: 'Schwanz', x: 25, y: 58, w: 14, h: 16, text: 'Eine lange Schwanzwirbelsäule aus vielen Wirbeln.' },
+        { id: 'federn', label: 'Federn', x: 66, y: 34, w: 22, h: 14, text: 'Abdrücke von Schwungfedern am Flügel.' },
+        { id: 'brustbein', label: 'Brustbein', x: 45, y: 39, w: 8, h: 7, text: 'Im Fund nicht erhalten. Ob es einen Brustbeinkamm gab, ist nicht zu erkennen.' }
       ],
       note: 'Ursprünglich: gibt es auch beim Raubdinosaurier. Abgeleitet: typisch für heutige Vögel. Was unmarkiert bleibt: Dazu ist keine Aussage möglich.',
       parts: [{ id: 'urs', label: 'Ursprünglich', hash: '8c143f321ab3a65a33749fa0ac5598fa325cd41a240b0609cdf181d6419723e4' }, { id: 'abg', label: 'Abgeleitet', hash: 'cda564a039e0837f1787519af20aa0a5589c94b179c11ed149e1d83a48c3e4dc' }],
