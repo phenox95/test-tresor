@@ -101,7 +101,7 @@ TRESOR.room({
   puzzles: {
     /* ---------------- Mission 1.1 ---------------- */
     'r1-1-typen': { id: 'r1-1-typen', type: 'markup', title: 'Hallmanns Rede prüfen',
-      prompt: 'Hallmanns Vortrag wurde aufgezeichnet. Markiert in zwei Durchgängen: Wählt eine Markierung und tippt dann die passenden Sätze an. Ein zweiter Tipp entfernt die Markierung.',
+      prompt: 'Ordnet die Sätze T1 bis T8 aus Hallmanns Vortrag den Typen Beobachtung und Deutung zu. Sätze, die zu keinem der beiden Typen passen, sind Behauptungen und bleiben unmarkiert.\n\nWählt eine Markierung und tippt die passenden Sätze an. Ein zweiter Tipp entfernt die Markierung.',
       passes: [{ id: 'beo', label: 'Beobachtung markieren', tag: 'Beobachtung', hint: 'Das lässt sich am Fossil nachsehen.' },
                { id: 'deu', label: 'Deutung markieren', tag: 'Deutung', hint: 'Hallmann erklärt, warum etwas so ist.' }],
       note: 'Was unmarkiert bleibt, ist eine Behauptung: eine Wertung, eine Garantie oder ein Verweis auf andere. Sie lässt sich am Fund nicht prüfen.',
@@ -126,19 +126,19 @@ TRESOR.room({
       onSolve: { text: 'Die Aufzeichnung erscheint auf dem Prüfpult, geordnet nach Typ. Die Deutungen sind mit Messing umrandet. Das Prüfpult summt leise.', then: 'r1-1-these' } },
 
     'r1-1-these': { id: 'r1-1-these', type: 'freetext', minLength: 40, title: 'Die These', ref: { title: 'Zum Nachschlagen: Aufzeichnung', docs: ['transkript'] },
-      prompt: 'Hallmann erklärt in T3 bis T5, wie die Federn entstanden sein sollen.\n\nVervollständigt den Satz: „Hallmann behauptet, dass …“\n\nNennt seine zentrale Erklärung in einem Satz.',
+      prompt: 'Beschreibt Hallmanns zentrale Erklärung aus T3 bis T5 in einem Satz, der mit „Hallmann behauptet, dass …“ beginnt.',
       placeholder: 'Hallmann behauptet, dass …',
       hints: ['Beginnt mit „Hallmann behauptet, dass …“. Was sagt er in T3 bis T5 darüber, wie die Federn entstanden sind?'],
       onSolve: { then: 'r1-1-fragetext' } },
 
     'r1-1-fragetext': { id: 'r1-1-fragetext', type: 'freetext', minLength: 40, title: 'Eure Untersuchungsfrage',
       ref: { title: 'Zum Nachschlagen: Aufzeichnung und eure These', docs: ['transkript'], answers: ['r1-1-these'] },
-      prompt: 'Formuliert jetzt eure eigene Untersuchungsfrage zu Hallmanns Erklärung. Sie muss sich mit Beobachtungen oder Versuchen prüfen lassen.',
+      prompt: 'Formuliert eine eigene Untersuchungsfrage zu Hallmanns Erklärung aus T3 bis T5. Sie muss sich mit Beobachtungen oder Versuchen prüfen lassen.',
       placeholder: 'Unsere Untersuchungsfrage: …',
       onSolve: { then: 'r1-1-frage' } },
 
     'r1-1-frage': { id: 'r1-1-frage', type: 'pick', count: 2, title: 'Fragen im Abgleich', ref: { title: 'Zum Nachschlagen: Aufzeichnung, eure These und eure Frage', docs: ['transkript'], answers: ['r1-1-these', 'r1-1-fragetext'] },
-      prompt: 'Kemal legt fünf Fragen auf das Pult. Wählt die zwei Fragen aus, die zu Hallmanns Erklärung in T3 bis T5 passen und sich mit Beobachtungen oder Versuchen prüfen lassen.',
+      prompt: 'Wählt die zwei Fragen aus, die zu Hallmanns Erklärung in T3 bis T5 passen und sich mit Beobachtungen oder Versuchen prüfen lassen.\n\nKemal legt fünf Fragen auf das Pult.',
       cards: [
         { id: 'f1', tag: 'F1', label: 'Ist Hallmann ein ehrlicher Mensch?' },
         { id: 'f2', tag: 'F2', label: 'Werden Veränderungen, die ein Tier durch häufigen Gebrauch erwirbt, an seine Jungen weitergegeben?' },
@@ -160,14 +160,14 @@ TRESOR.room({
     'r1-1-quelle': { id: 'r1-1-quelle', type: 'freetext', minLength: 60, title: 'Zwei Aussagen im Vergleich (Bonus)',
       ref: { title: 'Zum Nachschlagen: Aufzeichnung und Wendts Nachricht', docs: ['transkript'],
         text: 'Dr. Wendts Nachricht (Auszug): „Hallmann versteigert den Berolinavis. Ich habe einen Verdacht. Aber ein Verdacht ist keine Erkenntnis. Prüft zuerst, was er wirklich behauptet.“' },
-      prompt: 'Vergleicht T8 („Das Museum hat den Fund geprüft und bestätigt“) mit Dr. Wendts Nachricht. Beide sind nur Aussagen.\n\nNennt zwei Möglichkeiten, wie ihr herausfinden könntet, wer von beiden die Wahrheit sagt.',
+      prompt: 'Nennt zwei Möglichkeiten, wie ihr prüfen könnt, ob Hallmanns Aussage T8 („Das Museum hat den Fund geprüft und bestätigt“) stimmt. Zieht dazu auch Dr. Wendts Nachricht heran (Auszug unter „Zum Nachschlagen“).',
       placeholder: 'Wir könnten …',
       onSolve: { message: { from: 'kemal', text: 'Gute Frage. Ich schaue im Archiv nach dem Gutachten.' } } },
 
     /* ---------------- Mission 1.2 ---------------- */
     'r1-2-modell': { id: 'r1-2-modell', type: 'nachfragen', from: 'hallmann', title: 'Die Annahmen hinter Hallmanns Erklärung',
       askLabel: 'Nachfragen',
-      prompt: 'Jede Deutung Hallmanns beruht auf einer Annahme. Fragt nach, was dafür gelten muss, und wählt dann die passende Annahme.',
+      prompt: 'Ordnet jeder Deutung Hallmanns (T3, T4, T5, T7) die Annahme L1, L2 oder L3 zu, auf der sie beruht.\n\nFragt Hallmann zu jeder Deutung nach. Seine Antwort hilft bei der Zuordnung.',
       optionsTitle: 'Die drei Annahmen (vom Lamarck-Pult, vereinfacht)',
       options: [
         { id: 'l1', label: 'L1 · Bedürfnisse', full: 'L1 · Ändert sich die Umwelt, ändern sich die Bedürfnisse der Tiere. Aus neuen Bedürfnissen entstehen neue Gewohnheiten.' },
@@ -190,7 +190,7 @@ TRESOR.room({
       onSolve: { docs: ['lamarck'], text: 'Auf dem Lamarck-Pult leuchten die drei Auszüge nacheinander auf.' } },
 
     'r1-2-kette': { id: 'r1-2-kette', type: 'paper', title: 'Das Modell als Wirkungskette',
-      prompt: 'Aus den drei Annahmen ergibt sich Lamarcks Modell. Zeichnet es als Wirkungskette. Beginnt bei der Umwelt und endet bei den Nachkommen.',
+      prompt: 'Stellt Lamarcks Modell als Wirkungskette dar: Zeichnet ins Logbuch ein Kästchen pro Schritt, von der Umwelt bis zu den Nachkommen, mit Pfeilen dazwischen. Nutzt L1 bis L3.',
       paperTask: 'Zeichnet Lamarcks Wirkungskette ins Logbuch: ein Kästchen pro Schritt, Pfeile dazwischen. Schreibt an jeden Pfeil „dadurch“ oder „weil“, wenn ihr erklären könnt, warum der nächste Schritt folgt. Nutzt L1 bis L3.',
       doneText: 'Wir haben die Kette gezeichnet.',
       sample: ['Die Umwelt ändert sich.', 'Das Tier hat ein neues Bedürfnis.', 'Das Tier gebraucht ein Organ häufiger.', 'Das Organ verändert sich.', 'Die Veränderung wird an die Nachkommen vererbt.'],
@@ -199,7 +199,7 @@ TRESOR.room({
       onSolve: { text: 'Die Kette erscheint als Modellskizze an der Wand.' } },
 
     'r1-2-vorhersage': { id: 'r1-2-vorhersage', type: 'pick', count: 2, title: 'Vorhersagen aus dem Modell',
-      prompt: 'Ein Modell macht Vorhersagen, die man prüfen kann. Leitet aus Lamarcks Modell zwei Vorhersagen ab.\n\nWählt die zwei Sätze, die zwingend aus L1 bis L3 folgen.',
+      prompt: 'Wählt die zwei Vorhersagen aus, die sich zwingend aus Lamarcks Annahmen L1 bis L3 ableiten lassen.\n\nEin Modell macht Vorhersagen, die man prüfen kann.',
       cards: [
         { id: 'v1', tag: 'V1', label: 'Wenn Tiere ein Organ stark trainieren, dann müssten ihre Jungen schon bei der Geburt ein kräftigeres Organ haben.' },
         { id: 'v2', tag: 'V2', label: 'Wenn Eltern eine Veränderung erwerben, dann müssten ihre Jungen diese Veränderung zeigen.' },
@@ -221,13 +221,13 @@ TRESOR.room({
     'r1-2-versuch': { id: 'r1-2-versuch', type: 'freetext', minLength: 80, title: 'Einen Versuch planen (Bonus)',
       ref: { title: 'Zum Nachschlagen: Lamarcks Modell und die Vorhersage V1', docs: ['lamarck'],
         text: 'V1: Wenn Tiere ein Organ stark trainieren, dann müssten ihre Jungen schon bei der Geburt ein kräftigeres Organ haben.' },
-      prompt: 'Skizziert einen Versuch, mit dem ihr V1 prüfen könntet: Welche Gruppen vergleicht ihr, was messt ihr, wie viele Generationen braucht ihr?',
+      prompt: 'Skizziert einen Versuch, mit dem ihr V1 prüfen könnt: „Wenn Tiere ein Organ stark trainieren, dann müssten ihre Jungen schon bei der Geburt ein kräftigeres Organ haben.“ Gebt an: Gruppen, Messgröße, Anzahl der Generationen.',
       placeholder: 'Wir würden zwei Gruppen vergleichen …' },
 
     /* ---------------- Mission 1.3 ---------------- */
     'r1-3-zahl': { id: 'r1-3-zahl', type: 'code', inputmode: 'numeric', title: 'Die Zahlen im Trainingsversuch',
       ref: { title: 'Zum Nachschlagen: B2 · Trainingsversuch', docs: ['b2'] },
-      prompt: 'Berechnet für jede Generation in B2 den Unterschied der Mittelwerte von Gruppe T und Gruppe K. Tragt den größten Unterschied ein, ohne Vorzeichen.',
+      prompt: 'Vergleicht in B2 für jede Generation die Mittelwerte von Gruppe T und Gruppe K.\n\nTragt den größten Unterschied ein, ohne Vorzeichen.',
       placeholder: 'Zahl', button: 'Prüfen',
       hash: ['9c0e1054e197ecb247478413f6617ac081a6ce86c2b40d836cdc6c5fff86ec99', 'e1bda9486b355436c136a84cf102790cf67f5bf63dbfccd6192507dbbf3b8fe9'],
       wrongText: 'Nichts passiert. Lest die Mittelwerte vor der Klammer ab und vergleicht Gruppe T mit Gruppe K, Generation für Generation.',
@@ -239,7 +239,7 @@ TRESOR.room({
       onSolve: { message: { from: 'kemal', text: 'Zwei Punkte Unterschied. Und die Werte innerhalb einer Gruppe streuen um mehr als 20 Punkte.\n\nMerkt euch, was das heißt, bevor ihr Einspruch einlegt.' }, then: 'r1-3-einspruch' } },
 
     'r1-3-einspruch': { id: 'r1-3-einspruch', type: 'einspruch', title: 'Einspruch',
-      prompt: 'Legt Einspruch gegen Hallmanns Aussage T5 ein: Wählt höchstens zwei Belege und begründet, was sie zeigen und warum das reicht. Hallmann antwortet auf jeden Einspruch.',
+      prompt: 'Beurteilt Hallmanns Aussage T5 anhand von Belegen aus der Mappe.\n\nWählt höchstens zwei Belege und füllt die Felder „Was zeigen die Belege?“ und „Warum reicht das gegen die Aussage?“ aus. Hallmann antwortet auf jeden Einspruch.',
       statements: [
         { id: 'T3', tag: 'T3', label: 'Weil seine Vorfahren fliegen wollten, streckten sie die Arme immer wieder aus.' },
         { id: 'T4', tag: 'T4', label: 'Durch dieses Training wuchsen ihnen Federn.' },
@@ -285,7 +285,7 @@ TRESOR.room({
         message2: { from: 'kemal', text: 'Die Aussage T5 ist durchgestrichen. Am Darwin-Pult rechts wurde gerade ein Schloss entriegelt. Seht euch an, was dort liegt.' } } },
 
     'r1-3-kette': { id: 'r1-3-kette', type: 'net', title: 'Darwins Erklärung als Netz',
-      prompt: 'Legt Darwins Erklärung als Netz: Zieht Pfeile von einem Schritt zu dem, was daraus folgt. Nicht jeder Schritt hängt vom vorigen ab.',
+      prompt: 'Stellt Darwins Erklärung als Netz dar: Verbindet D1 bis D5 mit Pfeilen von einem Schritt zu dem, was daraus folgt.',
       items: [
         { id: 'd1', tag: 'D1', label: 'Individuen einer Population unterscheiden sich in einem Merkmal (Variabilität).' },
         { id: 'd2', tag: 'D2', label: 'Es werden mehr Nachkommen geboren, als überleben können. Sie konkurrieren um begrenzte Ressourcen.' },
@@ -306,7 +306,7 @@ TRESOR.room({
       onSolve: { text: 'Das Netz erscheint als Wandtafel neben der Kette von Lamarck.', then: 'r1-3-belege' } },
 
     'r1-3-belege': { id: 'r1-3-belege', type: 'assign', title: 'Belege für die Glieder der Kette',
-      prompt: 'Ordnet die Belege aus der Mappe den Gliedern der Kette zu, die sie stützen.',
+      prompt: 'Ordnet den drei Gliedern Variabilität, Überproduktion und Selektion jeweils den Beleg zu, der es zeigt.',
       cards: [
         { id: 'b2', label: 'B2 · Trainingsversuch: Die Werte streuen in beiden Gruppen um etwa 24 Punkte' },
         { id: 'b3', label: 'B3 · Taubenzucht: Züchter wählen Tiere mit dem Merkmal aus' },
@@ -323,7 +323,7 @@ TRESOR.room({
       onSolve: { message: { from: 'kemal', text: 'Für Selektion in der Natur fehlt uns noch ein Beleg. B3 zeigt nur, wie Menschen auswählen.\n\nDen Beleg suchen wir später im Labor.' } } },
 
     'r1-3-schloss': { id: 'r1-3-schloss', type: 'cloze', triple: true, title: 'Das Schloss verlangt einen gesicherten Satz',
-      prompt: 'Vervollständigt den Satz. Das Schloss prüft alle drei Lücken gemeinsam.',
+      prompt: 'Formuliert mit den Bausteinen einen gesicherten Satz aus Aussage, Beleg und Reichweite. Das Schloss prüft alle drei Lücken gemeinsam.',
       parts: [{ strong: 'Aussage: ' }, 'Die untersuchten Daten ', { gap: 'g1', label: 'Lücke 1' }, ' die Annahme, dass erworbene Veränderungen vererbt werden.', { nl: true },
         { strong: 'Beleg: ' }, { gap: 'g2', label: 'Lücke 2', block: true }, { nl: true },
         { strong: 'Reichweite: ' }, { gap: 'g3', label: 'Lücke 3', block: true }],
@@ -354,13 +354,13 @@ TRESOR.room({
 
     'r1-3-modellkritik': { id: 'r1-3-modellkritik', type: 'freetext', minLength: 80, title: 'Was Darwins Modell nicht erklärt (Bonus)',
       ref: { title: 'Zum Nachschlagen: Darwins Erklärung', docs: ['darwin'] },
-      prompt: 'Darwins Erklärung setzt Variabilität voraus. Nennt eine Frage, die Darwins Modell nicht beantwortet, und begründet, warum sie wichtig ist.',
+      prompt: 'Erläutert, welche wichtige Frage Darwins Modell nicht beantwortet.\n\nDarwins Erklärung setzt Variabilität voraus.',
       placeholder: 'Eine offene Frage ist …',
       onSolve: { message: { from: 'kemal', text: 'Genau mit dieser Frage hat Dr. Wendt im Labor weitergearbeitet.' } } },
 
     'r1-3-population': { id: 'r1-3-population', type: 'freetext', minLength: 80, title: 'Die Population in zwei Modellen (Bonus)',
       ref: { title: 'Zum Nachschlagen: beide Modelle', docs: ['lamarck', 'darwin'] },
-      prompt: 'Vergleicht, wie sich eine Population im Modell von Lamarck und im Modell von Darwin verändert. Beschreibt den Unterschied in einem Satz.',
+      prompt: 'Vergleicht, wie sich eine Population nach Lamarck und nach Darwin verändert. Schreibt zwei bis drei Sätze.',
       placeholder: 'Nach Lamarck …, nach Darwin …',
       onSolve: { message: { from: 'kemal', text: 'Merkt euch diesen Unterschied. Im Labor seht ihr ihn in Zahlen.' } } }
   }
