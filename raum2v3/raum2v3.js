@@ -109,7 +109,7 @@ TRESOR.room({
       text: 'Z1 · Ammonit · Grube Nordhang · Schicht 2 · brauner Tonstein · 1974\nZ2 · Fischsaurier-Wirbel · Grube Nordhang · Schicht 3 · dunkler blättriger Ton · 1987\nZ3 · Feder-Abdruck · Grube Nordhang · Schicht 1 · dunkler blättriger Ton · 1999' },
     'pruefkarte': { title: 'Prüfkarte Fundkontext', tag: 'Ergebnis', style: 'paper',
       text: '1. Wo wurde es gefunden?\n2. In welcher Schicht, und gibt es sie im Profil?\n3. Passt das Gestein zur Schicht?' },
-    /* ENTWURF: Inhalt G (Steckbrief: Kopie ohne Unterschrift, zeigt, dass T8 eine Behauptung war) */
+    /* ENTWURF: Inhalt G */
     'g': { title: 'G · Kopie des Museumsgutachtens', tag: 'Bild', style: 'paper',
       text: 'Eine Kopie: „Gutachten zum Fund Berolinavis“. Darunter steht: „Der Fund ist echt.“\n\nDas Feld für die Unterschrift ist leer. Ein Datum fehlt.' },
     'v1': { title: 'V1 · Archaeopteryx, Berliner Exemplar', tag: 'Bild', style: 'paper', image: '../raum2/bilder/fotokarte-archaeopteryx.svg',

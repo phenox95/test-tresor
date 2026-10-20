@@ -26,7 +26,7 @@ TRESOR.room({
 
   end: { title: 'Raum 1 geschafft', text: 'Sichert jetzt euren Spielstand. Wie es weitergeht, erfahrt ihr in der nächsten Stunde.' },
 
-  /* Zufallsmodell der Simulation „Laufrad“ (Spieldaten). Das Training der Eltern hat keinen Einfluss auf die Jungtiere. */
+  /* Zufallsmodell der Simulation „Laufrad“ (Spieldaten). */
   models: {
     laufrad: function (st, rnd) {
       function gauss() { var u = 0; while (!u) u = rnd(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * rnd()); }
