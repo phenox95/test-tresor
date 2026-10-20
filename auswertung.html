@@ -32,10 +32,18 @@
   <div id="out"></div>
 </main>
 <script>
-var CATALOG = [
+var ALL_CATALOG = [
   ['m1.1', 'Mission 1.1 · Die Behauptung', [['r1-1-typen', 'Rede markieren'], ['r1-1-these', 'These (Text)'], ['r1-1-fragetext', 'Untersuchungsfrage (Text)'], ['r1-1-frage', 'Fragen im Abgleich'], ['r1-1-quelle', 'Bonus: zwei Aussagen im Vergleich']]],
   ['m1.2', 'Mission 1.2 · Das Modell', [['r1-2-modell', 'Nachfragen: Annahmen'], ['r1-2-kette', 'Wirkungskette (Papier)'], ['r1-2-vorhersage', 'Vorhersagen ableiten'], ['r1-2-versuch', 'Bonus: Versuch planen']]],
-  ['m1.3', 'Mission 1.3 · Die Prüfung', [['r1-3-zahl', 'Zahl ablesen (B2)'], ['r1-3-einspruch', 'Einspruch'], ['r1-3-kette', 'Darwin-Netz'], ['r1-3-belege', 'Belege zuordnen'], ['r1-3-schloss', 'Schloss (Dreierprüfung)'], ['r1-3-modellkritik', 'Bonus: Modellkritik'], ['r1-3-population', 'Bonus: Population']]]
+  ['m1.3', 'Mission 1.3 · Die Prüfung', [['r1-3-zahl', 'Zahl ablesen (B2)'], ['r1-3-einspruch', 'Einspruch'], ['r1-3-kette', 'Darwin-Netz'], ['r1-3-belege', 'Belege zuordnen'], ['r1-3-schloss', 'Schloss (Dreierprüfung)'], ['r1-3-modellkritik', 'Bonus: Modellkritik'], ['r1-3-population', 'Bonus: Population']]],
+  /* Raum 1 V3 und Raum 2 V3 (ab Engine 2.0, eigene IDs) */
+  ['m1v3.1', 'Raum 1 V3 · Mission 1.1 · Die Behauptung', [['r1v3-1-hoeren', 'Vortrag markieren'], ['r1v3-1-frage', 'Eigene Frage (Text)'], ['r1v3-1-pruefen', 'Prüfbare Fragen wählen'], ['z1v3-quelle', 'Zusatz: Stimmt T8?']]],
+  ['m1v3.2', 'Raum 1 V3 · Mission 1.2 · Das Modell', [['r1v3-2-modell', 'Annahmen zuordnen'], ['r1v3-2-kette', 'Lamarck-Kette'], ['r1v3-2-vorhersage', 'Vorhersagen wählen'], ['z1v3-giraffe', 'Zusatz: Giraffe']]],
+  ['m1v3.3', 'Raum 1 V3 · Mission 1.3 · Die Prüfung', [['r1v3-3-laufrad', 'Simulation Laufrad'], ['r1v3-3-laufrad-aussage', 'Aussage zu den Läufen'], ['r1v3-3-einspruch', 'Einspruch'], ['r1v3-3-kette', 'Darwin-Netz'], ['r1v3-3-belege', 'Belege zuordnen'], ['r1v3-3-schloss', 'Schloss 1'], ['z1v3-modellkritik', 'Zusatz: Modellkritik'], ['z1v3-population', 'Zusatz: Population']]],
+  ['m2v3.1', 'Raum 2 V3 · Mission 2.1 · Ein Fossil ist ein Befund', [['r2v3-1-schichten', 'Profilwand untersuchen'], ['r2v3-1-aussagekraft', 'Folgt das aus dem Fund?'], ['r2v3-1-zettel', 'Fundzettel prüfen'], ['r2v3-1-folge', 'Folgerung wählen'], ['z2v3-luecken', 'Zusatz: Fossillücken']]],
+  ['m2v3.2', 'Raum 2 V3 · Mission 2.2 · Fossilvergleich', [['r2v3-2-kriterium', 'Kriterium (Text)'], ['r2v3-2-urvogel', 'Urvogel untersuchen'], ['r2v3-2-tabelle', 'Vergleich protokollieren'], ['z2v3-passung', 'Zusatz: Passung messen']]],
+  ['m2v3.3', 'Raum 2 V3 · Mission 2.3 · Merkmalsmosaik', [['r2v3-3-mosaik', 'Merkmale einordnen'], ['r2v3-3-deutung', 'Deutung wählen'], ['r2v3-3-frage', 'Eigene Frage (Text)'], ['z2v3-kein-brueckentier', 'Zusatz: kein Brückentier']]],
+  ['m2v3.4', 'Raum 2 V3 · Mission 2.4 · Der Berolinavis', [['r2v3-4-untersuchen', 'Berolinavis untersuchen'], ['r2v3-4-ausreden', 'Ausreden verbinden'], ['r2v3-4-schloss', 'Schloss 2'], ['z2v3-verwerfung', 'Zusatz: Verwerfung']]]
 ];
 var TEAMS = [];
 function esc(s) { return String(s == null ? '' : s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
@@ -59,7 +67,7 @@ function analyse(state, fname) {
     p.solved = true; p.rescue = !!state.solved[id].rescue;
     if (p.done == null && state.solved[id].t && state.solved[id].t !== 'code') p.done = new Date(state.solved[id].t).getTime();
   });
-  CATALOG.forEach(function (c) {
+  ALL_CATALOG.forEach(function (c) {
     var last = null; c[2].forEach(function (pp) { var p = res.puzzles[pp[0]]; if (p && p.done && (last == null || p.done > last)) last = p.done; });
     var m = res.missions[c[0]]; if (m && m.start && last && state.solved[c[0]]) m.ms = last - m.start;
   });
@@ -71,6 +79,7 @@ function pTime(p) { return p && p.open != null && p.done != null ? p.done - p.op
 function render() {
   var out = document.getElementById('out'), h = '';
   if (!TEAMS.length) { out.innerHTML = ''; return; }
+  var CATALOG = ALL_CATALOG.filter(function (c) { return TEAMS.some(function (t) { return t.missions[c[0]] || c[2].some(function (pp) { return t.puzzles[pp[0]]; }); }); });
   h += '<h2>Klassenübersicht (' + TEAMS.length + ' Team' + (TEAMS.length === 1 ? '' : 's') + ')</h2>';
   h += '<p class="muted">Zeit = vom ersten Öffnen des Rätsels bis zur Lösung (Minuten, Median). Rot markiert: mindestens ein Team mit Notfallöffnung oder im Schnitt mehr als drei Fehlversuche.</p>';
   h += '<table><tr><th>Rätsel</th><th class="n">gelöst</th><th class="n">Zeit (Median)</th><th class="n">Fehlversuche (Ø)</th><th class="n">mit Tipp 3</th><th class="n">Notfall</th></tr>';
@@ -106,6 +115,13 @@ function render() {
       ein.forEach(function (e, i) { h += '<tr><td class="n">' + (i + 1) + '</td><td>' + esc(e.st) + '</td><td>' + esc((e.ev || []).join(' + ')) + '</td><td>' + esc(e.a) + '</td><td>' + esc(e.b) + '</td><td>' + (e.res === 'ok' ? 'Aussage gekippt' : esc(e.res)) + '</td></tr>'; });
       h += '</table>';
     }
+    var sims = (t.state.vars && t.state.vars.sim) || {};
+    Object.keys(sims).forEach(function (k) {
+      if (!(sims[k].runs || []).length) return;
+      h += '<h3>Gespeicherte Läufe (' + esc(k) + ')</h3><table><tr><th>Lauf</th><th>Ergebnis</th></tr>';
+      sims[k].runs.forEach(function (r) { h += '<tr><td>' + esc(r.label) + '</td><td>' + esc(r.summary) + '</td></tr>'; });
+      h += '</table>';
+    });
     var ans = t.state.answers || {}, keys = Object.keys(ans);
     if (keys.length) {
       h += '<h3>Texte des Teams</h3>';
