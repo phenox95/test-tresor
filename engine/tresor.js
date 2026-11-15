@@ -1,12 +1,13 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
+   Version 2.1 (15.11.2026: Auswahl mit Beleg, Schloss mit Wortbank, Teil-Rückmeldung erst ab dem zweiten Fehlversuch, Vorhersage und Etikett in der Simulation, Rollentausch beim Missionsstart)
    Version 2.0 (Raum 1 und 2 V3: Simulation, Sammelwand, Freitext mit Haken, Seed aus dem Teamnamen; Raum 2: Untersuchungsobjekt, Widerspruch markieren, Tabelle ausfüllen; Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
 (function () {
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 2.0 · 20.10.2026';
+  var ENGINE_BUILD = 'Engine 2.1 · 15.11.2026';
   var LEGACY_ROOMS = 'Raum 1 V2.2 · Raum 2 V1.1';   /* Räume ohne eigenes Feld version */   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
@@ -533,9 +534,14 @@
     var body = [el('div', { class: 'prompt' }, paras(p.prompt))];
     var refEl = refBlock(p); if (refEl) body.push(refEl);
     var d;
-    function attempt(ans, msg) {
+    function failCount() { S.vars.fails = S.vars.fails || {}; return S.vars.fails[p.id] || 0; }
+    /* Ab 2.1: detail (Rückmeldung je Teil) erscheint erst ab dem zweiten Fehlversuch, damit Durchprobieren nicht belohnt wird. */
+    function attempt(ans, msg, detail) {
       if (check(p.id, ans, p.hash)) { d.close(); solve(p, {}); }
-      else { logEvent('fehlversuch ' + p.id); wrong(fb, msg || p.wrongText); }
+      else {
+        logEvent('fehlversuch ' + p.id); var nFail = failCount() + 1; S.vars.fails[p.id] = nFail; persist();
+        wrong(fb, (detail && failCount() >= 2) ? detail : (msg || p.wrongText));
+      }
     }
     if (p.type === 'code') {
       var inp = el('input', { type: 'text', class: 'code-in', autocomplete: 'off', autocapitalize: 'characters', spellcheck: 'false', 'aria-label': 'Lösung eingeben', placeholder: p.placeholder || '', inputmode: p.inputmode });
@@ -622,12 +628,23 @@
     }
     if (p.type === 'pick') {
       var pg = optGroup(p.keepOrder ? p.cards : seededShuffle(p.cards, p.id), 'many', function () { fb.textContent = ''; }, p.count || p.max);
-      body.push(pg.el, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Auswahl prüfen', onclick: function () {
+      /* Ab 2.1: Auswahl mit Beleg. Geprüft wird das Paar aus Aussage und Beleg (Antwort: ids-beleg-belegId). */
+      var eg = p.evidence ? optGroup(seededShuffle(p.evidence.cards, p.id + '-beleg'), 'many', function () { fb.textContent = ''; }, 1) : null;
+      body.push(pg.el);
+      if (eg) body.push(el('div', { class: 'prompt beleg-prompt' }, paras(p.evidence.prompt || 'Wählt den Beleg, der eure Auswahl trägt.')), eg.el);
+      body.push(el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || (eg ? 'Aussage und Beleg prüfen' : 'Auswahl prüfen'), onclick: function () {
         var ids = pg.get().sort();
         if (!ids.length) { wrong(fb, 'Wählt zuerst mindestens eine Karte.'); return; }
         if (p.count && ids.length !== p.count) { wrong(fb, p.count === 1 ? 'Wählt genau eine Karte.' : 'Wählt genau ' + p.count + ' Karten.'); return; }
         var trap = (p.traps || []).filter(function (t) { return ids.indexOf(t.id) !== -1; })[0];
-        attempt(ids.join('-'), trap ? trap.text : null);
+        if (!eg) { attempt(ids.join('-'), trap ? trap.text : null); return; }
+        var ev = eg.get();
+        if (!ev.length) { wrong(fb, 'Wählt auch einen Beleg.'); return; }
+        var detail = null;
+        if (p.pickHash && !trap) detail = check(p.id + '-wahl', ids.join('-'), p.pickHash)
+          ? (p.evidence.wrongText || 'Nichts passiert. Eure Aussage passt. Der gewählte Beleg trägt sie aber nicht.')
+          : (p.evidence.wrongPick || 'Nichts passiert. Prüft zuerst eure Aussage, dann den Beleg.');
+        attempt(ids.join('-') + '-beleg-' + ev[0], trap ? trap.text : null, detail);
       } })]));
     }
     if (p.type === 'cloze') {
@@ -641,10 +658,11 @@
         order.push(part.gap);
         var sl = el('select', { class: 'gap' + (part.block ? ' block' : ''), 'aria-label': part.label || ('Lücke ' + order.length) });
         sl.appendChild(el('option', { value: '', text: '… auswählen …' }));
-        seededShuffle(p.gaps[part.gap], p.id + part.gap).forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
+        (p.bank ? seededShuffle(p.bank, p.id + 'bank') : seededShuffle(p.gaps[part.gap], p.id + part.gap)).forEach(function (o) { sl.appendChild(el('option', { value: o.id, text: o.label })); });
         sl.addEventListener('change', function () { picks[part.gap] = sl.value; fb.textContent = ''; });
         row.appendChild(sl);
       });
+      if (p.bank) body.push(el('p', { class: 'muted small', text: p.bankNote || 'Alle Lücken teilen sich eine Wortbank. Nicht jeder Baustein wird gebraucht.' }));
       body.push(line, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Satz prüfen', onclick: function () {
         if (order.some(function (g) { return !picks[g]; })) { wrong(fb, 'Füllt zuerst alle Lücken aus.'); return; }
         var ans = order.map(function (g) { return g + '=' + picks[g]; }).join(';');
@@ -655,6 +673,12 @@
         fb.className = 'feedback no'; fb.innerHTML = '';
         /* Dreierprüfung: Beim ersten Fehlversuch nur „mindestens ein Feld“, genaue Reaktionen erst ab dem zweiten. */
         if (p.triple && S.vars.fails[p.id] < 2) fb.textContent = p.tripleText || 'Mindestens ein Feld stimmt nicht. Prüft den Satz noch einmal, Feld für Feld.';
+        else if (p.gapHash) {
+          /* Wortbank: grobe Rückmeldung wie in Deduktionsspielen, dazu höchstens eine Warnung zu einer Falle */
+          var nWrong = order.filter(function (g) { return !check(p.id + '-' + g, g + '=' + picks[g], p.gapHash[g]); }).length;
+          fb.appendChild(el('p', { text: nWrong <= 2 ? 'Das Schloss bleibt zu. Höchstens zwei Lücken stimmen nicht.' : 'Das Schloss bleibt zu. Mehr als zwei Lücken stimmen nicht.' }));
+          if (trap) fb.appendChild(figureBlock(trap.from || 'kemal', trap.text));
+        }
         else if (trap) fb.appendChild(figureBlock(trap.from || 'kemal', trap.text)); else fb.textContent = p.wrongText || 'Das Schloss bleibt zu. Prüft den Satz noch einmal.';
       } })]));
     }
@@ -739,7 +763,7 @@
         if (p.passHash && !check(p.id, full, p.hash)) {
           msg = 'Nichts passiert. ' + p.passes.map(function (ps) { return ps.tag + ': ' + (check(p.id + '-' + ps.id, ansFor(ps), p.passHash[ps.id]) ? 'stimmt' : 'stimmt noch nicht'); }).join(' · ') + '.';
         }
-        attempt(full, msg);
+        attempt(full, null, msg);
       } })]));
     }
     /* ---------- Nachfragen (ab 1.4) ---------- */
@@ -969,7 +993,7 @@
             });
           }
           if (parts.length && !check(p.id, full, p.hash)) msg = 'Nichts passiert. ' + parts.join(' · ') + '.';
-          attempt(full, msg);
+          attempt(full, null, msg);
         } })]));
     }
     /* ---------- Widerspruch markieren (ab 1.8): links und rechts je eine Angabe antippen. Antwort: linksId|rechtsId ---------- */
@@ -1026,7 +1050,7 @@
           var colAns = function (c) { return c.id + '=' + p.rows.map(function (rw) { return cells[c.id + '|' + rw.id]; }).join('-'); };
           var full = p.cols.map(colAns).sort().join(';'), msg = null;
           if (p.colHash && !check(p.id, full, p.hash)) msg = 'Nichts passiert. ' + p.cols.map(function (c) { return c.label + ': ' + (check(p.id + '-' + c.id, colAns(c), p.colHash[c.id]) ? 'stimmt' : 'stimmt noch nicht'); }).join(' · ') + '.';
-          attempt(full, msg);
+          attempt(full, null, msg);
         } })]));
     }
     if (p.type === 'paper' && !p.sample) {
@@ -1083,6 +1107,23 @@
         });
         ctlBox.appendChild(row);
       });
+      /* Ab 2.1: Vorhersage vor dem ersten Lauf (wird gespeichert, hängt an der Sammelwand, bleibt neben jedem Ergebnis sichtbar) */
+      var predBox = null, predLabel = function () { var o = p.predict && p.predict.options.filter(function (x) { return x.id === sv.predict; })[0]; return o ? o.label : ''; };
+      if (p.predict) {
+        var pBtns = {};
+        predBox = el('div', { class: 'sim-predict', role: 'radiogroup', 'aria-label': 'Vorhersage' }, [el('strong', { text: p.predict.prompt || 'Eure Vorhersage vor dem ersten Lauf:' })]);
+        p.predict.options.forEach(function (o) {
+          var b = el('button', { class: 'pen' + (sv.predict === o.id ? ' on' : ''), type: 'button', role: 'radio', 'aria-checked': sv.predict === o.id ? 'true' : 'false', text: o.label, onclick: function () {
+            if (sv.count) return;                                   // nach dem ersten Lauf nicht mehr änderbar
+            sv.predict = o.id; persist(); fb.textContent = '';
+            Object.keys(pBtns).forEach(function (k) { pBtns[k].classList.toggle('on', k === o.id); pBtns[k].setAttribute('aria-checked', k === o.id ? 'true' : 'false'); });
+          } });
+          if (sv.count) b.disabled = true;
+          pBtns[o.id] = b; predBox.appendChild(b);
+        });
+        body.push(predBox);
+      }
+      if (p.badge) body.push(el('p', { class: 'sim-badge', text: p.badge }));
       var out = el('div', { class: 'sim-out', 'aria-live': 'polite' }, [el('p', { class: 'muted', text: p.startText || 'Stellt die Regler ein und startet den Versuch.' })]);
       var savedBox = el('div', { class: 'sim-saved' }), last = null;
       var needMet = function () {
@@ -1106,12 +1147,19 @@
         logEvent('lauf-gespeichert ' + p.id + ' ' + last.n); persist(); refreshRoom(); renderSaved(); toast('Lauf gespeichert. Die Datenkarte hängt an der Sammelwand.');
       } });
       var runBtn = el('button', { class: 'btn', type: 'button', text: p.runLabel || 'Versuch starten', onclick: function () {
+        if (p.predict && !sv.predict) { wrong(fb, p.predict.needText || 'Legt zuerst eure Vorhersage fest.'); return; }
+        if (p.predict && !sv.count) {
+          logEvent('vorhersage ' + p.id + ' ' + sv.predict);
+          S.wall = S.wall || []; addUnique(S.wall, { id: p.id + '-vorhersage', title: 'Unsere Vorhersage', tag: 'Vorhersage', kind: 'ergebnis', text: predLabel() }, 'id');
+          [].forEach.call(predBox.querySelectorAll('button'), function (b) { b.disabled = true; });
+        }
         var rng = mulberry32(hashStr(teamSeed() + '|' + p.id + '|' + sv.count));
         var res = ROOM.models[p.model](JSON.parse(JSON.stringify(setting)), rng);
         sv.count++;
         last = { n: sv.count, setting: JSON.parse(JSON.stringify(setting)), label: 'Lauf ' + sv.count + ' (' + labelOf(setting) + ')', summary: res.summary, table: res.table, saved: false };
         logEvent('lauf ' + p.id + ' ' + sv.count + ' ' + JSON.stringify(setting)); persist();
         out.innerHTML = ''; out.appendChild(el('p', {}, [el('strong', { text: last.label })])); out.appendChild(tableEl(res.table));
+        if (p.predict) out.appendChild(el('p', { class: 'sim-pred-line' }, [el('strong', { text: 'Eure Vorhersage: ' }), predLabel()]));
         if (p.dataNote) out.appendChild(el('p', { class: 'muted small', text: p.dataNote }));
         saveBtn.disabled = false; fb.textContent = '';
       } });
@@ -1317,6 +1365,7 @@
     var d = openDialog({ cls: 'dlg-lock', closable: closable ? undefined : false, title: ROOM.title, body: [
       el('p', { text: 'Bereit für „' + m.title + '“?' }),
       m.sameLesson ? el('p', { class: 'muted', text: 'Diese Mission folgt in derselben Stunde. Ihr könnt direkt weitermachen.' }) : el('p', { class: 'paper-task' }, [el('strong', { text: 'Zuerst auf Papier: ' }), 'Beantwortet das Do Now dieser Stunde im Feld „Vorher“ eures Logbuchs.']),
+      m.sameLesson ? null : el('p', { class: 'muted', text: 'Tauscht die Rollen: Eine Person bedient und liest vor, die andere führt das Logbuch und prüft. Wer zuletzt bedient hat, führt jetzt das Logbuch.' }),
       m.sameLesson ? null : el('label', { class: 'check' }, [cb, ' Wir haben das Do Now im Logbuch beantwortet.']), fb,
       el('div', { class: 'row' }, [el('button', { class: 'btn', text: 'Mission starten', onclick: go }),
         closable ? el('button', { class: 'btn ghost small', text: 'Abbrechen', onclick: function () { d.close(); } }) : null,

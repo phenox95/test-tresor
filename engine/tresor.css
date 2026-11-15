@@ -397,3 +397,11 @@ table.tb-fill td { padding: 4px; }
 .sim-saved p { margin: 2px 0; }
 .ft-checks { margin: 8px 0; }
 .ft-sample { margin: 8px 0; }
+
+/* Ab 2.1: Vorhersage und Etikett in der Simulation, Beleg-Auswahl */
+.sim-predict { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; border: 1px dashed var(--brass-hi); }
+.sim-predict strong { flex: 1 0 100%; }
+.sim-predict .pen:disabled { opacity: .75; cursor: default; }
+.sim-badge { display: inline-block; margin: 0 0 10px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: .85rem; letter-spacing: .04em; text-transform: none; color: var(--muted); }
+.sim-pred-line { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); }
+.beleg-prompt { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }

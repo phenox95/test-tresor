@@ -1,11 +1,13 @@
-/* Raum 1 V3 · Der Streitsaal · Missionen 1.1 bis 1.3 (Stand 20.10.2026, nach Rätselsteckbrief Raum 1 V3 vom 15.10.2026)
+/* Raum 1 V3.1 · Der Streitsaal · Stunde 1A (Mission 1.1 und 1.2) und Stunde 1B (Mission 1.3) (Stand 15.11.2026, nach Prüfbericht vom 14.11.2026;
+   Änderungen vom 15.11. wurden direkt in dieser Datei gemacht, raum1v3.src.js muss nachgezogen werden)
+   Grundlage: Rätselsteckbrief Raum 1 V3 vom 15.10.2026
    Diese Datei wird aus raum1v3.src.js erzeugt. Lösungen stehen in raum1v3.js nur als Hash.
    Eigene IDs (r1v3-…, m1v3.…), damit Spielstände und Notfall-Codes von Raum 1 V2 nicht brechen.
    Texte mit dem Vermerk ENTWURF stehen nicht im Steckbrief und brauchen die Freigabe der Lehrkraft. */
 TRESOR.room({
   base: '../',
   id: 'raum1v3',
-  version: 'Raum 1 V3',
+  version: 'Raum 1 V3.1',
   title: 'Der Streitsaal',
   subtitle: 'Raum 1 · Argumente prüfen',
   image: '../raum1/bilder/streitsaal.jpg',
@@ -43,22 +45,22 @@ TRESOR.room({
   },
 
   missions: [
-    { id: 'm1v3.1', title: 'Mission 1.1 · Die Behauptung', unlock: 'cf9e92a1a95b3b94b145029a171bdc732776ebdd8b612cd1889de323847d719d',
+    { id: 'm1v3.1', title: 'Stunde 1A · Teil 1: Die Behauptung', unlock: 'cf9e92a1a95b3b94b145029a171bdc732776ebdd8b612cd1889de323847d719d',
       intro: { from: 'kemal', audio: 'audio/a0-kemal.mp3', text: 'Ich habe euch in den Streitsaal gelassen. Gestern Abend hat Hallmann hier vor Sammlern gesprochen. Die Saalanlage hat alles aufgezeichnet. Hört zu, aber glaubt nicht alles, was ihr hört.' },
       requires: ['r1v3-1-hoeren', 'r1v3-1-frage', 'r1v3-1-pruefen'],
-      doneTitle: 'Mission 1.1 abgeschlossen',
+      doneTitle: 'Teil 1 abgeschlossen',
       doneText: 'Ihr habt geklärt, was Hallmann behauptet, und daraus eine Frage gemacht, die man prüfen kann.\n\nSchreibt „Hallmann behauptet, dass …“ und eure Untersuchungsfrage ins Logbuch.' },
-    { id: 'm1v3.2', title: 'Mission 1.2 · Das Modell', unlock: '6e1a4d45bacc392e447404bc19f848bb5b56176f525ce981b06f72cd98346e58', sameLesson: true,
+    { id: 'm1v3.2', title: 'Stunde 1A · Teil 2: Das Modell', unlock: '6e1a4d45bacc392e447404bc19f848bb5b56176f525ce981b06f72cd98346e58', sameLesson: true,
       intro: { from: 'kemal', text: 'Hinter jeder Erklärung steckt ein Modell. Am Lamarck-Pult links liegen Auszüge aus einer alten Schrift. Vergleicht sie mit dem, was Hallmann sagt.\n\nDer Text dort ist eine vereinfachte Fassung, kein Originalzitat.' },
-      requires: ['r1v3-2-modell', 'r1v3-2-kette', 'r1v3-2-vorhersage'],
-      doneTitle: 'Mission 1.2 abgeschlossen',
-      doneText: 'Ihr kennt jetzt das Modell hinter Hallmanns Erklärung und habt daraus zwei Vorhersagen abgeleitet.\n\nSchreibt V1 und V2 als Wenn-dann-Sätze ins Logbuch.' },
-    { id: 'm1v3.3', title: 'Mission 1.3 · Die Prüfung', unlock: 'a28f8ac7bfef61dbc9eca668dfd436d657e8fc23e8d43c23f1af73a999a2c808',
+      requires: ['r1v3-2-modell', 'r1v3-2-vorhersage'],
+      doneTitle: 'Stunde 1A abgeschlossen',
+      doneText: 'Ihr kennt jetzt das Modell hinter Hallmanns Erklärung und habt daraus zwei Vorhersagen abgeleitet.\n\nSchreibt V1 und V2 als Wenn-dann-Sätze ins Logbuch. Lamarcks Wirkungskette zeichnet ihr in der Präsenzstunde.' },
+    { id: 'm1v3.3', title: 'Stunde 1B · Die Prüfung', unlock: 'a28f8ac7bfef61dbc9eca668dfd436d657e8fc23e8d43c23f1af73a999a2c808',
       /* ENTWURF: Einstieg 1.3 (V2-Text an das Laufrad angepasst) */
-      intro: { from: 'kemal', text: 'Heute prüft ihr Hallmanns Erklärung. Auf dem Tisch steht ein Laufrad-Experiment. Führt den Versuch selbst durch. Danach könnt ihr am Prüfpult Einspruch einlegen.\n\nHallmann hat auf jeden Beleg eine Antwort. Rechnet damit.' },
-      requires: ['r1v3-3-laufrad', 'r1v3-3-laufrad-aussage', 'r1v3-3-einspruch', 'r1v3-3-kette', 'r1v3-3-belege', 'r1v3-3-schloss'],
-      doneTitle: 'Mission 1.3 abgeschlossen · Schloss 1 geöffnet',
-      doneText: 'Hallmanns Erklärung hält der Prüfung an Beobachtungen nicht stand. Über den Fund selbst wisst ihr damit noch nichts.\n\nSchreibt die Mittelwerte eurer Läufe und Aussage, Beleg und Reichweite in euer Logbuch.' }
+      intro: { from: 'kemal', text: 'Heute prüft ihr Hallmanns Erklärung. Auf dem Tisch steht ein Laufrad-Experiment aus dem Universitätsarchiv. Stellt den Versuch nach. Danach könnt ihr am Prüfpult Einspruch einlegen.\n\nHallmann hat auf jeden Beleg eine Antwort. Rechnet damit.' },
+      requires: ['r1v3-3-laufrad', 'r1v3-3-laufrad-aussage', 'r1v3-3-datenwert', 'r1v3-3-einspruch', 'r1v3-3-schloss'],
+      doneTitle: 'Stunde 1B abgeschlossen · Schloss 1 geöffnet',
+      doneText: 'Hallmanns Erklärung hält der Prüfung an Beobachtungen nicht stand. Über den Fund selbst wisst ihr damit noch nichts.\n\nSchreibt die Mittelwerte eurer Läufe und Aussage, Beleg und Reichweite in euer Logbuch. Darwins Erklärung am Pult rechts ist Thema der Präsenzstunde.' }
   ],
 
   /* Bereiche in Prozent des Raumbilds. Neue Stellen (Lautsprecher, Laufrad-Tisch, Katalog, Einladung, Wandtafel) sind PLATZHALTER,
@@ -78,20 +80,21 @@ TRESOR.room({
     { id: 'laufrad', label: 'Tisch mit Laufrad', rect: [64.6, 60, 6.8, 16], states: [
       { if: { unlocked: 'm1v3.3', notSolved: 'r1v3-3-laufrad' }, action: { type: 'puzzle', puzzle: 'r1v3-3-laufrad' } },
       { if: { unlocked: 'm1v3.3', notSolved: 'r1v3-3-laufrad-aussage' }, action: { type: 'puzzle', puzzle: 'r1v3-3-laufrad-aussage' } },
+      { if: { unlocked: 'm1v3.3', notSolved: 'r1v3-3-datenwert' }, action: { type: 'puzzle', puzzle: 'r1v3-3-datenwert' } },
       { action: { type: 'text', text: 'Ein Laufrad und zwei Käfige. Das Experiment ist noch nicht aufgebaut.' } } ] },   /* ENTWURF */
     { id: 'lamarck', label: 'Pult links', rect: [6, 56.5, 22.5, 34], states: [
       { if: { unlocked: 'm1v3.2', notFound: 'm1' }, action: { type: 'doc', doc: 'm1' } },
       { if: { unlocked: 'm1v3.2', notSolved: 'r1v3-2-modell' }, action: { type: 'puzzle', puzzle: 'r1v3-2-modell' } },
-      { if: { unlocked: 'm1v3.2', notSolved: 'r1v3-2-kette' }, action: { type: 'puzzle', puzzle: 'r1v3-2-kette' } },
       { if: { unlocked: 'm1v3.2', notSolved: 'r1v3-2-vorhersage' }, action: { type: 'puzzle', puzzle: 'r1v3-2-vorhersage' } },
+      { if: { unlocked: 'm1v3.2', notSolved: 'r1v3-2-kette' }, action: { type: 'puzzle', puzzle: 'r1v3-2-kette' } },   /* ab V3.1 Zusatzaufgabe */
       { if: { found: 'm1' }, action: { type: 'doc', doc: 'm1' } },
       { action: { type: 'text', text: 'Dieses Pult ist noch verschlossen.' } } ] },
     { id: 'pruefpult', label: 'Prüfpult in der Mitte', rect: [36, 57, 28.5, 34], states: [
       { if: { unlocked: 'm1v3.1', notSolved: 'r1v3-1-hoeren' }, action: { type: 'puzzle', puzzle: 'r1v3-1-hoeren' } },
       { if: { unlocked: 'm1v3.1', notSolved: 'r1v3-1-frage' }, action: { type: 'puzzle', puzzle: 'r1v3-1-frage' } },
       { if: { unlocked: 'm1v3.1', notSolved: 'r1v3-1-pruefen' }, action: { type: 'puzzle', puzzle: 'r1v3-1-pruefen' } },
-      { if: { unlocked: 'm1v3.3', solved: 'r1v3-3-laufrad-aussage', notSolved: 'r1v3-3-einspruch' }, action: { type: 'puzzle', puzzle: 'r1v3-3-einspruch' } },
-      { if: { unlocked: 'm1v3.3', solved: 'r1v3-3-belege', notSolved: 'r1v3-3-schloss' }, action: { type: 'puzzle', puzzle: 'r1v3-3-schloss' } },
+      { if: { unlocked: 'm1v3.3', solved: 'r1v3-3-datenwert', notSolved: 'r1v3-3-einspruch' }, action: { type: 'puzzle', puzzle: 'r1v3-3-einspruch' } },
+      { if: { unlocked: 'm1v3.3', solved: 'r1v3-3-einspruch', notSolved: 'r1v3-3-schloss' }, action: { type: 'puzzle', puzzle: 'r1v3-3-schloss' } },
       { if: { missionDone: 'm1v3.1', notSolved: 'z1v3-quelle' }, action: { type: 'puzzle', puzzle: 'z1v3-quelle' } },
       { action: { type: 'doc', doc: 'a1' } } ] },
     { id: 'darwin', label: 'Pult rechts', rect: [71.5, 56.5, 22.5, 34], states: [
@@ -116,7 +119,7 @@ TRESOR.room({
     'm2': { title: 'M2 · Auszüge nach Darwin (vereinfacht)', tag: 'Text', style: 'paper',
       text: 'Vereinfachte Fassung, sinngemäß, kein Originalzitat.\n\nD1: Individuen einer Art unterscheiden sich in vielen Merkmalen.\nD2: Es werden mehr Nachkommen geboren, als überleben können, sie konkurrieren um begrenzte Ressourcen.\nD3: Individuen mit vorteilhaften Merkmalen überleben und pflanzen sich häufiger fort.\nD4: Ein Teil der Unterschiede wird an die Nachkommen weitergegeben.\nD5: Über viele Generationen wird das vorteilhafte Merkmal in der Population häufiger.' },
     'b1': { title: 'B1 · Weismann: Mäuseschwänze', tag: 'Text', style: 'paper',
-      text: 'Ab 1887 schneidet der Biologe August Weismann weißen Mäusen den Schwanz ab. Die Mäuse bekommen Junge. Auch diesen Jungen und allen folgenden Generationen wird der Schwanz abgeschnitten. Das geschieht über 22 Generationen. Ergebnis: Alle Jungen werden mit vollständigem Schwanz geboren.' },
+      text: 'Ab 1887 schneidet der Biologe August Weismann weißen Mäusen den Schwanz ab. Die Mäuse bekommen Junge. Auch diesen Jungen und allen folgenden Generationen wird der Schwanz abgeschnitten. Das geschieht über fünf Generationen. Ergebnis: Alle 901 Jungen werden mit vollständigem Schwanz geboren.' },
     'b3': { title: 'B3 · Taubenzucht', tag: 'Text und Bild', style: 'paper',
       text: 'Alle Taubenrassen, zum Beispiel Pfautaube und Kropftaube, stammen von der wilden Felsentaube ab. Züchter wählen aus jeder Generation die Tiere mit dem gewünschten Merkmal aus und paaren nur diese. Nach vielen Generationen sind die Rassen deutlich verschieden.' },
     'b4': { title: 'B4 · Kabeljau', tag: 'Faktenkarte', style: 'paper',
@@ -191,7 +194,7 @@ TRESOR.room({
       rescue: 'RGllIEZyYWdlbiBGMiB1bmQgRjUgZ2Vow7ZyZW4genVyIEVya2zDpHJ1bmcgdW5kIGxhc3NlbiBzaWNoIHByw7xmZW4uIEYxIHVuZCBGMyBzaW5kIG5pY2h0IG1lc3NiYXIuIEY0IGlzdCBwcsO8ZmJhciwgYmV0cmlmZnQgYWJlciBkYXMgQWx0ZXIgdW5kIG5pY2h0IGRpZSBFcmtsw6RydW5nLg==',
       rescueTask: 'Schreibt in eigenen Worten, warum ‚Wie alt ist der Berolinavis?‘ eine gute Frage ist, aber nicht zu Hallmanns Erklärung passt.',
       onSolve: { message: { from: 'wendt', text: 'Gut. Eine Frage ist der Anfang jeder Untersuchung. Jetzt braucht ihr das Modell dahinter.\n\n– J. W.' },
-        message2: { from: 'kemal', text: 'Vergleicht eure Frage mit diesen beiden. Welche passt am besten?' } } },
+        message2: { from: 'kemal', text: 'Vergleicht eure eigene Frage mit F2 und F5.\n\nÜberarbeitet sie im Logbuch, bis sie sich mit Beobachtungen oder Versuchen prüfen lässt und zu T3 bis T5 gehört.' }   /* ENTWURF 15.11. */ } },
 
     'z1v3-quelle': { id: 'z1v3-quelle', type: 'freetext', minLength: 60, title: 'Stimmt T8? (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: T8, Wendts Nachricht, Deckblatt des Gutachtens', docs: ['a1', 'a2', 'x4'] },
@@ -220,9 +223,9 @@ TRESOR.room({
               'T3 handelt vom Wollen, T4 und T7 vom Gebrauch, T5 von den Jungen. T6 ist eine Beobachtung.'],
       rescue: 'VDMgZ2Vow7ZydCB6dSBMMSAoQmVkw7xyZm5pcykuIFQ0IHVuZCBUNyBnZWjDtnJlbiB6dSBMMiAoR2VicmF1Y2gpLiBUNSBnZWjDtnJ0IHp1IEwzIChWZXJlcmJ1bmcpLiBUNiBpc3QgZWluZSBCZW9iYWNodHVuZyB1bmQgc3RlaHQgZsO8ciBrZWluZSBBbm5haG1lLg==',
       rescueTask: 'Beschreibt in eigenen Worten, welche drei Annahmen Hallmanns Erklärung enthält.',
-      onSolve: { text: 'Die drei Auszüge leuchten nacheinander auf dem Pult auf.', then: 'r1v3-2-kette' } },
+      onSolve: { text: 'Die drei Auszüge leuchten nacheinander auf dem Pult auf.', then: 'r1v3-2-vorhersage' } },
 
-    'r1v3-2-kette': { id: 'r1v3-2-kette', type: 'net', title: 'Lamarcks Wirkungskette',
+    'r1v3-2-kette': { id: 'r1v3-2-kette', type: 'net', title: 'Lamarcks Wirkungskette (Zusatzaufgabe)',
       prompt: 'Verbindet die Schritte nach Lamarck zu einer Wirkungskette. Ein Pfeil zeigt, was woraus folgt.',
       items: [
         { id: 'k1', tag: 'K1', label: 'Die Umwelt ändert sich.' },
@@ -244,7 +247,7 @@ TRESOR.room({
       rescueTask: 'Zeichnet die fünf Kästchen mit Pfeilen ins Logbuch.',
       onSolve: { text: 'Die Kette hängt als Modellskizze an der Wand.',
         wall: [{ id: 'w-lamarck-kette', title: 'Lamarcks Wirkungskette', tag: 'Ergebnis', kind: 'ergebnis',
-          text: 'Die Umwelt ändert sich → Das Tier hat ein neues Bedürfnis → Das Tier gebraucht ein Organ häufiger → Das Organ verändert sich → Die Veränderung wird an die Nachkommen vererbt.' }], then: 'r1v3-2-vorhersage' } },
+          text: 'Die Umwelt ändert sich → Das Tier hat ein neues Bedürfnis → Das Tier gebraucht ein Organ häufiger → Das Organ verändert sich → Die Veränderung wird an die Nachkommen vererbt.' }] } },
 
     'r1v3-2-vorhersage': { id: 'r1v3-2-vorhersage', type: 'pick', count: 2, title: 'Vorhersagen aus dem Modell',
       ref: { title: 'Zum Nachschlagen: M1 · Lamarck', docs: ['m1'] },
@@ -277,8 +280,12 @@ TRESOR.room({
       hints: ['Lest den Text am Skelett.', 'Was braucht ein Beleg, was ein Beispiel nicht hat?', 'Eine ungeklärte Frage kann kein Beweis sein.'] },
 
     /* ---------------- Mission 1.3 ---------------- */
-    'r1v3-3-laufrad': { id: 'r1v3-3-laufrad', type: 'sim', model: 'laufrad', title: 'Das Laufrad-Experiment',
-      prompt: 'Führt den Versuch mit und ohne Training der Eltern durch, je Bedingung mindestens zwei Läufe.\n\nDas Laufrad-Experiment steht auf dem Tisch.',
+    'r1v3-3-laufrad': { id: 'r1v3-3-laufrad', type: 'sim', model: 'laufrad', title: 'Archivversuch nachstellen: das Laufrad',
+      /* ENTWURF 15.11.: Rahmen „Archivversuch nachstellen“, Vorhersage, Etikett */
+      prompt: 'Stellt den Versuch mit und ohne Training der Eltern nach, je Bedingung mindestens zwei Läufe. Legt vorher eure Vorhersage fest.\n\nDas Laufrad-Experiment aus dem Universitätsarchiv steht auf dem Tisch.',
+      predict: { prompt: 'Eure Vorhersage vor dem ersten Lauf: Was erwartet ihr bei den Jungtieren?',
+        options: [{ id: 'staerker', label: 'Die Jungen trainierter Eltern haben stärkere Beine.' }, { id: 'gleich', label: 'Beide Gruppen sind etwa gleich.' }, { id: 'schwaecher', label: 'Die Jungen trainierter Eltern haben schwächere Beine.' }] },
+      badge: 'Archivversuch zum Nachstellen · Spieldaten',
       controls: [
         { id: 'training', label: 'Training der Eltern', short: 'Training', options: [{ id: 'aus', label: 'aus' }, { id: 'taeglich', label: 'täglich im Laufrad' }] },
         { id: 'maeuse', label: 'Mäuse je Gruppe', short: 'Mäuse', def: '20', options: [{ id: '10', label: '10' }, { id: '20', label: '20' }, { id: '40', label: '40' }] },
@@ -287,7 +294,7 @@ TRESOR.room({
       need: { min: 4, per: { control: 'training', min: 2 } },
       /* ENTWURF: Hinweise rund um die Simulation */
       startText: 'Stellt die Regler ein und startet den Versuch. Gemessen wird die Beinmuskulatur der Jungtiere, bevor sie selbst trainieren (Index, Gruppe ohne Training im Mittel 100).',
-      dataNote: 'Spieldaten: für das Spiel erzeugt.',
+      dataNote: 'Spieldaten: für das Spiel erzeugt. Im Spiel stehen sie für einen echten Zuchtversuch.',
       cardTag: 'Datenkarte (Spieldaten)',
       needText: 'Speichert zuerst vier Läufe, je zwei mit und ohne Training der Eltern.',
       button: 'Versuch abschließen',
@@ -306,12 +313,37 @@ TRESOR.room({
         { id: 'c', label: 'Mäuse vererben überhaupt nichts.' },
         { id: 'd', label: 'Der Versuch zeigt, dass Training nutzlos ist.' }
       ],
-      hash: '04ef4bf505890460430aa878d4f8e134396d182c5697998e784afb9933eeae70',
+      /* ENTWURF 15.11.: Aussage mit Beleg (Rateschutz) */
+      evidence: { prompt: 'Wählt den Beleg, der eure Aussage trägt.', cards: [
+        { id: 'e1', label: 'Alle vier gespeicherten Datenkarten zusammen' },
+        { id: 'e2', label: 'Der eine Lauf, in dem die Gruppe mit Training vorn lag' },
+        { id: 'e3', label: 'Die Wandtafel: „Gebrauch macht stark“' },
+        { id: 'e4', label: 'Hallmanns Vortrag (A1)' } ] },
+      pickHash: '4876229b90cb7636fb4d1af92f9f3b46de63e2b654e3512cd31d816903269cb1',
+      hash: 'c25fd17791eb1f5d562e8b1d1cde53dc0abfdb4b7f5adc62ac79a32b5713ec91',
       wrongText: 'Nichts passiert. Vergleicht eure gespeicherten Läufe an der Sammelwand noch einmal.',   /* ENTWURF */
       hints: ['Vergleicht alle gespeicherten Läufe, nicht nur einen.', 'Welche Gruppe liegt vorn: immer dieselbe?', 'Der Unterschied ist kleiner als die Streuung innerhalb der Gruppen.'],
       rescue: 'RGllIE1pdHRlbHdlcnRlIGJlaWRlciBHcnVwcGVuIGxpZWdlbiBuYWggYmVpZWluYW5kZXIuIE1hbCBsaWVndCBkaWUgZWluZSwgbWFsIGRpZSBhbmRlcmUgR3J1cHBlIGtuYXBwIHZvcm4uIERlciBVbnRlcnNjaGllZCBpc3Qga2xlaW5lciBhbHMgZGllIFN0cmV1dW5nIGlubmVyaGFsYiBkZXIgR3J1cHBlbi4=',
       rescueTask: 'Schreibt in einem Satz auf, was eure Läufe zeigen.',   /* ENTWURF */
-      onSolve: { then: 'r1v3-3-einspruch' } },
+      onSolve: { then: 'r1v3-3-datenwert' } },
+
+    /* ENTWURF 15.11.: neue Pflichtfrage zur Aussagekraft von Spieldaten */
+    'r1v3-3-datenwert': { id: 'r1v3-3-datenwert', type: 'pick', count: 2, title: 'Was sind eure Daten wert?',
+      prompt: 'Wählt die zwei Aussagen, die zutreffen.\n\nEure Läufe sind am iPad entstanden.',
+      cards: [
+        { id: 'a', label: 'Die Zahlen sind Spieldaten. Im Spiel stehen sie für einen echten Zuchtversuch.' },
+        { id: 'b', label: 'Im echten Leben müsste man den Versuch mit lebenden Mäusen durchführen und die Jungtiere messen.' },
+        { id: 'c', label: 'Was am iPad herauskommt, gilt automatisch auch für echte Mäuse.' },
+        { id: 'd', label: 'Die Läufe beweisen, dass erworbene Eigenschaften nie vererbt werden.' },
+        { id: 'e', label: 'Ein einzelner Lauf reicht als Beleg.' }
+      ],
+      traps: [{ id: 'd', text: 'Vorsicht. „Beweisen“ und „nie“ sind große Worte für vier Läufe.' }],
+      hash: '5e6c6ca38c210fec9c84a32b050f80344f41cf5b84b13b69943b1ae9f3748f03',
+      wrongText: 'Nichts passiert. Fragt euch: Woher kommen die Zahlen, und was müsste man draußen tun, um sie zu bekommen?',
+      hints: ['Lest den Hinweis unter euren Datenkarten.', 'Wer hat die Zahlen erzeugt: Mäuse oder das Spiel?', 'Zwei Aussagen sagen, woher die Zahlen kommen und was ein echter Versuch bräuchte.'],
+      rescue: 'RGllIFphaGxlbiBzaW5kIFNwaWVsZGF0ZW46IERhcyBTcGllbCBoYXQgc2llIGVyemV1Z3QsIGltIFNwaWVsIHN0ZWhlbiBzaWUgZsO8ciBlaW5lbiBlY2h0ZW4gWnVjaHR2ZXJzdWNoLiBJbSBlY2h0ZW4gTGViZW4gbcO8c3N0ZSBtYW4gZGVuIFZlcnN1Y2ggbWl0IGxlYmVuZGVuIE3DpHVzZW4gZHVyY2hmw7xocmVuIHVuZCBkaWUgSnVuZ3RpZXJlIG1lc3Nlbi4gVmllciBMw6R1ZmUgYW0gaVBhZCBiZXdlaXNlbiBuaWNodHMgw7xiZXIgZWNodGUgTcOkdXNlLCB1bmQgZWluIGVpbnplbG5lciBMYXVmIHJlaWNodCBuaWUu',
+      rescueTask: 'Erklärt in eigenen Worten, warum eine Simulation allein kein Beleg ist.',
+      onSolve: { message: { from: 'kemal', text: 'Merkt euch das. Im Spiel zählt dieser Versuch als Beleg. Draußen müsste ihn jemand wirklich durchführen.\n\nDer Versuch von Weismann im Archivregal (B1) wurde wirklich gemacht.' }, then: 'r1v3-3-einspruch' } },
 
     'r1v3-3-einspruch': { id: 'r1v3-3-einspruch', type: 'einspruch', title: 'Einspruch',
       prompt: 'Legt gegen Hallmanns Aussage T5 Einspruch ein: Wählt Belege von der Sammelwand und begründet, was sie zeigen und warum das gegen T5 reicht.\n\nIhr habt zwei Vorhersagen aus Lamarcks Modell.',
@@ -323,7 +355,7 @@ TRESOR.room({
       ],
       evidenceTitle: '2 · Belege von der Sammelwand lesen und höchstens zwei vorlegen',
       evidencePool: [
-        { id: 'B1', needs: 'b1', title: 'B1 · Weismann: Mäuseschwänze', text: 'Ab 1887 schneidet der Biologe August Weismann weißen Mäusen den Schwanz ab. Die Mäuse bekommen Junge. Auch diesen Jungen und allen folgenden Generationen wird der Schwanz abgeschnitten. Das geschieht über 22 Generationen. Ergebnis: Alle Jungen werden mit vollständigem Schwanz geboren.' },
+        { id: 'B1', needs: 'b1', title: 'B1 · Weismann: Mäuseschwänze', text: 'Ab 1887 schneidet der Biologe August Weismann weißen Mäusen den Schwanz ab. Die Mäuse bekommen Junge. Auch diesen Jungen und allen folgenden Generationen wird der Schwanz abgeschnitten. Das geschieht über fünf Generationen. Ergebnis: Alle 901 Jungen werden mit vollständigem Schwanz geboren.' },
         { id: 'B2', needs: 'solved:r1v3-3-laufrad', sim: 'r1v3-3-laufrad', title: 'B2 · Eure Läufe am Laufrad (Spieldaten)', text: 'Gemessen wurde die Beinmuskulatur der Jungtiere, bevor sie selbst trainieren.' },
         { id: 'B3', needs: 'b3', title: 'B3 · Taubenzucht', text: 'Alle Taubenrassen, zum Beispiel Pfautaube und Kropftaube, stammen von der wilden Felsentaube ab. Züchter wählen aus jeder Generation die Tiere mit dem gewünschten Merkmal aus und paaren nur diese. Nach vielen Generationen sind die Rassen deutlich verschieden.' },
         { id: 'B4', needs: 'b4', title: 'B4 · Kabeljau', text: 'Ein Kabeljau-Weibchen legt pro Jahr Hunderttausende bis mehrere Millionen Eier. Trotzdem wächst der Bestand nicht ins Unendliche. Die meisten Jungtiere sterben, bevor sie sich fortpflanzen.' },
@@ -360,9 +392,9 @@ TRESOR.room({
       rescue: 'V2Vpc21hbm5zIFZlcnN1Y2ggKEIxKSBwcsO8ZnQgbnVyIFZlcmxldHp1bmdlbiwgZGFyYXVmIGhhdCBIYWxsbWFubiBlaW5lIEF1c3JlZGUuIEV1ZXIgTGF1ZnJhZHZlcnN1Y2ggKEIyKSBwcsO8ZnQgVHJhaW5pbmc6IERhcyBUcmFpbmluZyBkZXIgRWx0ZXJuIHZlcsOkbmRlcnQgZGllIEp1bmd0aWVyZSBuaWNodC4gV2VpbCBMYW1hcmNrcyBNb2RlbGwgZsO8ciBhbGxlIFRpZXJlIGdlbHRlbiBzb2xsLCBnZW7DvGd0IGVpbiBHZWdlbmJlaXNwaWVsLg==',
       rescueTask: 'Erklärt in eigenen Worten, was Weismanns Versuch zeigt und was er nicht zeigt.',
       onSolve: { message: { from: 'hallmann', text: 'Nun gut. Dann erklären Sie mir, wie die Federn entstanden sind.' },
-        message2: { from: 'kemal', text: 'Die Aussage T5 ist durchgestrichen. Am Pult rechts wurde gerade ein Schloss entriegelt. Seht euch an, was dort liegt.' } } },
+        message2: { from: 'kemal', text: 'Die Aussage T5 ist durchgestrichen. Das Schloss am Prüfpult wartet auf euren Satz.\n\nAm Pult rechts liegt jetzt Darwins Erklärung. Sie ist Thema der Präsenzstunde. Wer nach dem Schloss noch Zeit hat, kann schon hineinsehen.'   /* ENTWURF 15.11. */ } } },
 
-    'r1v3-3-kette': { id: 'r1v3-3-kette', type: 'net', title: 'Darwins Erklärung als Netz',
+    'r1v3-3-kette': { id: 'r1v3-3-kette', type: 'net', title: 'Darwins Erklärung als Netz (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: M2 · Darwin', docs: ['m2'] },
       prompt: 'Verbindet die Schritte von Darwins Erklärung. Ein Pfeil zeigt, was woraus folgt.\n\nHallmann fragt, wie die Federn stattdessen entstanden sind.',
       items: [
@@ -387,7 +419,7 @@ TRESOR.room({
         wall: [{ id: 'w-darwin-netz', title: 'Darwins Netz', tag: 'Ergebnis', kind: 'ergebnis', text: 'D1 → D3, D2 → D3, D3 → D4, D4 → D5' }],
         message: { from: 'kemal', text: 'Für Selektion in der Natur fehlt noch ein Beleg. Den suchen wir im Labor.' }, then: 'r1v3-3-belege' } },
 
-    'r1v3-3-belege': { id: 'r1v3-3-belege', type: 'assign', title: 'Belege für Darwins Schritte',
+    'r1v3-3-belege': { id: 'r1v3-3-belege', type: 'assign', title: 'Belege für Darwins Schritte (Zusatzaufgabe)',
       prompt: 'Ordnet jeden Beleg dem Schritt von Darwins Erklärung zu, den er stützt.',
       cards: [
         { id: 'b1', label: 'B1 · Weismann: Mäuseschwänze' },
@@ -401,29 +433,31 @@ TRESOR.room({
       hints: ['Welcher Beleg zeigt, dass sich Tiere unterscheiden?', 'Wer wählt bei den Tauben aus: der Züchter oder die Natur?', 'B2 für die Unterschiede, B4 für die vielen Nachkommen, B3 für die Auslese. B1 prüfte Lamarck.'],
       rescue: 'QjIgemVpZ3QgVW50ZXJzY2hpZWRlIChkaWUgTMOkdWZlIHN0cmV1ZW4pLiBCNCB6ZWlndCDDnGJlcnByb2R1a3Rpb24uIEIzIHplaWd0IEF1c2xlc2UgZHVyY2ggWsO8Y2h0ZXIgYWxzIFZlcmdsZWljaCwgZGllIEF1c2xlc2UgaW4gZGVyIE5hdHVyIGtvbW10IGluIFJhdW0gMy4gQjEgc3TDvHR6dCBrZWluZW4gU2Nocml0dCwgV2Vpc21hbm4gcHLDvGZ0ZSBMYW1hcmNrLg==',
       rescueTask: 'Schreibt zu jedem Schritt von Darwins Erklärung einen Beleg oder „Beleg fehlt noch“ ins Logbuch.',   /* aus V2 */
-      onSolve: { message: { from: 'kemal', text: 'Das Schloss am Prüfpult wartet auf euren Satz.' } } },   /* ENTWURF */
+      onSolve: { message: { from: 'kemal', text: 'Darwins Kette hat jetzt Belege. Für Selektion in der Natur fehlt noch einer.' } } },   /* ENTWURF 15.11. */
 
+    /* ab V3.1: Schloss mit gemeinsamer Wortbank (ENTWURF 15.11.) */
     'r1v3-3-schloss': { id: 'r1v3-3-schloss', type: 'cloze', triple: true, title: 'Schloss 1',
       prompt: 'Vervollständigt den Satz. Das Schloss verlangt einen gesicherten Satz aus Aussage, Beleg und Reichweite.',
-      parts: [{ strong: 'Aussage: ' }, 'Die untersuchten Daten ', { gap: 'g1', label: 'Lücke 1' }, ' die Annahme, dass erworbene Veränderungen vererbt werden.', { nl: true },
-        { strong: 'Beleg: ' }, { gap: 'g2', label: 'Lücke 2', block: true }, { nl: true },
-        { strong: 'Reichweite: ' }, 'Über ', { gap: 'g3', label: 'Lücke 3' }, ' sagt das noch nichts.'],
-      gaps: {
-        g1: [{ id: 'a', label: 'stützen nicht' }, { id: 'b', label: 'beweisen' }, { id: 'c', label: 'stützen eindeutig' }, { id: 'd', label: 'stützen zum Teil' }],
-        g2: [{ id: 'a', label: 'In den Versuchen zeigten die Nachkommen die Veränderung ihrer Eltern nicht.' }, { id: 'b', label: 'Hallmanns Broschüre nennt viele Sammler als Zeugen.' }, { id: 'c', label: 'Der Berolinavis ist sehr alt.' }, { id: 'd', label: 'Einige Versuche ließen sich nicht wiederholen.' }],
-        g3: [{ id: 'a', label: 'die Echtheit des Berolinavis' }, { id: 'b', label: 'Lamarcks Lebenslauf' }, { id: 'c', label: 'die Fälschung, die damit bewiesen ist' }, { id: 'd', label: 'die Weitergabe von Trainingseffekten bei Mäusen' }]
-      },
+      parts: [{ strong: 'Aussage: ' }, 'Die untersuchten Daten ', { gap: 'g1', label: 'Lücke 1' }, ' die Annahme, dass ', { gap: 'g2', label: 'Lücke 2' }, ' vererbt werden.', { nl: true },
+        { strong: 'Beleg: ' }, 'In ', { gap: 'g3', label: 'Lücke 3' }, ' zeigten die Nachkommen ', { gap: 'g4', label: 'Lücke 4' }, '.', { nl: true },
+        { strong: 'Reichweite: ' }, 'Über ', { gap: 'g5', label: 'Lücke 5' }, ' sagt das noch nichts.'],
+      bank: [{ id: 'sn', label: 'stützen nicht' }, { id: 'bw', label: 'beweisen' }, { id: 'se', label: 'stützen eindeutig' },
+        { id: 'ev', label: 'erworbene Veränderungen' }, { id: 'am', label: 'alle Merkmale' },
+        { id: 'bv', label: 'beiden Versuchen' }, { id: 'hv', label: 'Hallmanns Vortrag' },
+        { id: 'vn', label: 'die Veränderung ihrer Eltern nicht' }, { id: 'vd', label: 'die Veränderung ihrer Eltern deutlich' },
+        { id: 'eb', label: 'die Echtheit des Berolinavis' }, { id: 'fb', label: 'die Fälschung, die damit bewiesen ist' }],
+      gapHash: { g1: '778e9f8eb8d4428cca83add61879957de143f07e309f2b258a1d62a305c096aa', g2: 'a96d2b8fccfcb6d327e7ed19bc3e53bf71b86b3912b7f92a6bffe06a5f1b4546', g3: 'a5ec35377f5c65698719485c5c27085aa69d7be996c920df80eef557afbbea7e', g4: 'f00a8f4fa6edbb84bc041eb3894e763154e8a449c47cff6613c5e6bc74371088', g5: '49d8e65bf5b0241368f7f94edfa684e076800a394b58898f2277e705c2f9dd93' },
       tripleText: 'Das Schloss bleibt zu. Mindestens eine Lücke stimmt nicht. Lest den Satz laut und prüft jede Lücke einzeln.',
       traps: [
-        { g: 'g3', v: 'c', from: 'kemal', text: 'Vorsicht. Das haben wir nicht gezeigt. Wir haben eine Erklärung geprüft, nicht den Fund.' },
-        { g: 'g1', v: 'b', from: 'kemal', text: 'Zwei Versuche zeigen etwas. Beweisen ist ein großes Wort.' },
-        { g: 'g2', v: 'b', from: 'kemal', text: 'Wie viele Leute etwas sagen, ist kein Befund.' }
+        { g: 'g5', v: 'fb', from: 'kemal', text: 'Vorsicht. Das haben wir nicht gezeigt. Wir haben eine Erklärung geprüft, nicht den Fund.' },
+        { g: 'g1', v: 'bw', from: 'kemal', text: 'Zwei Versuche zeigen etwas. Beweisen ist ein großes Wort.' },
+        { g: 'g3', v: 'hv', from: 'kemal', text: 'Ein Vortrag ist kein Versuch.' }
       ],
-      hash: '4d9ba8691d928df7811853d94d8f1dc9d07896fd5bfccc121477cfd626ae4254',
+      hash: '327b675ccce775088768d6dfb498897a860b14012280bbe20fe6d663c8347114',
       hints: ['Lest den Satz laut. Was ist die Aussage, was der Beleg, was die Grenze?',
               'Was haben die Versuche gemessen? Und haben wir den Berolinavis untersucht?',
               'Die Daten stützen die Annahme nicht. Die Nachkommen zeigten die Veränderung nicht. Über den Fund wissen wir noch nichts.'],
-      rescue: 'QXVzc2FnZTogRGllIHVudGVyc3VjaHRlbiBEYXRlbiBzdMO8dHplbiBkaWUgQW5uYWhtZSBuaWNodC4gQmVsZWc6IEluIGRlbiBWZXJzdWNoZW4gemVpZ3RlbiBkaWUgTmFjaGtvbW1lbiBkaWUgVmVyw6RuZGVydW5nIGlocmVyIEVsdGVybiBuaWNodC4gUmVpY2h3ZWl0ZTogw5xiZXIgZGllIEVjaHRoZWl0IGRlcyBCZXJvbGluYXZpcyBzYWd0IGRhcyBub2NoIG5pY2h0cy4=',
+      rescue: 'QXVzc2FnZTogRGllIHVudGVyc3VjaHRlbiBEYXRlbiBzdMO8dHplbiBuaWNodCBkaWUgQW5uYWhtZSwgZGFzcyBlcndvcmJlbmUgVmVyw6RuZGVydW5nZW4gdmVyZXJidCB3ZXJkZW4uIEJlbGVnOiBJbiBiZWlkZW4gVmVyc3VjaGVuIHplaWd0ZW4gZGllIE5hY2hrb21tZW4gZGllIFZlcsOkbmRlcnVuZyBpaHJlciBFbHRlcm4gbmljaHQuIFJlaWNod2VpdGU6IMOcYmVyIGRpZSBFY2h0aGVpdCBkZXMgQmVyb2xpbmF2aXMgc2FndCBkYXMgbm9jaCBuaWNodHMu',
       rescueTask: 'Schreibt Aussage, Beleg und Reichweite in euren Worten ins Logbuch.',
       onSolve: {
         fx: 'lock', fxTitle: 'Schloss 1 geöffnet', fxText: 'Aussage, Beleg und Reichweite halten. Eure Prüfung hat standgehalten.',
