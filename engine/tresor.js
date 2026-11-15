@@ -8,7 +8,7 @@
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 2.2 · 15.11.2026';
+  var ENGINE_BUILD = 'Engine 2.3 · 15.11.2026';
   var LEGACY_ROOMS = 'Raum 1 V2.2 · Raum 2 V1.1';   /* Räume ohne eigenes Feld version */   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
@@ -392,9 +392,11 @@
     var used = S.hints[p.id] || 0;
     function render() {
       box.innerHTML = '';
-      for (var i = 0; i < used && i < p.hints.length; i++) box.appendChild(figureBlock('kemal', p.hints[i]));
+      var staged = p.hints.length === 3;
+      var STUFE = ['Wohin schauen', 'Wie vorgehen', 'Teilergebnis'];
+      for (var i = 0; i < used && i < p.hints.length; i++) box.appendChild(figureBlock('kemal', (staged ? STUFE[i] + ': ' : '') + p.hints[i]));
       if (used < p.hints.length) {
-        box.appendChild(el('button', { class: 'btn ghost small', text: 'Kemal um Hilfe bitten (Tipp ' + (used + 1) + ' von ' + p.hints.length + ')', onclick: function () {
+        box.appendChild(el('button', { class: 'btn ghost small', text: 'Kemal um Hilfe bitten (Tipp ' + (used + 1) + ' von ' + p.hints.length + (staged ? ': ' + STUFE[used] : '') + ')', onclick: function () {
           used++; S.hints[p.id] = used; logEvent('tipp ' + p.id + ' ' + used); render();
         } }));
       } else if (p.rescue) {
@@ -1264,6 +1266,7 @@
     }
     body.push(fb);
     body.push(el('div', { class: 'row' }, [(ROOM && ROOM.wall) ? el('button', { class: 'btn ghost small', type: 'button', text: 'Sammelwand öffnen (nachschlagen)', onclick: function () { openWall(); } }) : el('button', { class: 'btn ghost small', type: 'button', text: 'Forscherakte öffnen (nachschlagen)', onclick: function () { openAkte(); } })]));
+    if (p.logbook) body.push(el('p', { class: 'logbook-line' }, [el('strong', { text: 'Logbuch: ' }), p.logbook.where + '. Den Eintrag schreibt ihr, wenn die Aufgabe gelöst ist.']));
     if (p.hints && p.hints.length) body.push(hintArea(p, function () { rescueDialog(p, d); }));
     d = openDialog({ cls: 'dlg-puzzle' + (refEl && p.type === 'freetext' ? ' has-ref' : '') + (/^(objekt|widerspruch|sim)$/.test(p.type) ? ' dlg-wide' : ''), title: p.title, body: body, focus: p.type === 'code' || p.type === 'freetext' });
   }
@@ -1333,10 +1336,19 @@
       if (eff.then && ROOM.puzzles[eff.then]) openPuzzle(ROOM.puzzles[eff.then]);
       else if (ROOM) checkMission();
     }
-    function proceed() {
+    function proceed0() {
       if (eff.message) message(eff.message.from, eff.message.text, function () { if (eff.message2) message(eff.message2.from, eff.message2.text, next, true, eff.message2.audio); else next(); }, true, eff.message.audio);
       else if (eff.text) { var dd = openDialog({ cls: 'dlg-world', body: paras(eff.text).concat([el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Weiter', onclick: function () { dd.close(); } })])]), onClose: next }); }
       else next();
+    }
+    /* ab 2.3: Logbuch-Dialog nach dem Lösen (nicht bei Notfallöffnung, die hat ihren eigenen Auftrag) */
+    function proceed() {
+      if (!p.logbook || how.rescue) { proceed0(); return; }
+      var lb = openDialog({ title: 'Jetzt ins Logbuch', body: [
+        el('div', { class: 'logbook-card' }, [el('p', { class: 'lb-where', text: p.logbook.where }), el('p', { text: p.logbook.task })]),
+        el('p', { class: 'muted small', text: 'Schreibt den Eintrag jetzt, bevor ihr weiterspielt. Die Aufgabe bleibt in der Stunde, nicht in der Hausaufgabe.' }),
+        el('div', { class: 'row end' }, [el('button', { class: 'btn', text: 'Eingetragen, weiter', onclick: function () { logEvent('logbuch ' + p.id); lb.close(); } })])
+      ], onClose: proceed0 });
     }
     if (eff.fx === 'lock') playLockFx({ title: eff.fxTitle, text: eff.fxText, lamps: eff.fxLamps }, proceed); else proceed();
   }
