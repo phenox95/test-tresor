@@ -423,3 +423,14 @@ table.tb-fill td { padding: 4px; }
 .logbook-line { margin: 10px 0 0; padding: 8px 12px; border: 2px solid var(--brass); border-radius: 10px; font-size: .92rem; }
 .logbook-card { border: 3px double var(--brass-hi); border-radius: 12px; padding: 14px 16px; margin: 12px 0; font-size: 1.05rem; }
 .logbook-card .lb-where { font-family: var(--serif); font-weight: 700; color: var(--brass-hi); font-size: 1.15rem; }
+/* Engine 2.4: Säulenbild, Zahleneingabe, Entscheidung */
+.hist { margin: 12px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255, 255, 255, .03); }
+.hist-title { display: block; margin-bottom: 6px; }
+.hist-row { display: grid; grid-template-columns: 5.2em 1fr 2.4em; gap: 8px; align-items: center; margin: 3px 0; font-size: .92rem; }
+.hist-track { display: block; height: 16px; border: 1px solid var(--line); border-radius: 4px; }
+.hist-bar { display: block; height: 100%; background: repeating-linear-gradient(45deg, #E6C27A 0 4px, #8A6A2B 4px 8px); border-radius: 3px; }
+.hist-n { text-align: right; font-variant-numeric: tabular-nums; }
+.zahl-felder { display: grid; gap: 12px; margin: 12px 0; }
+.zahl-feld { display: grid; grid-template-columns: 1fr 9em auto; gap: 10px; align-items: center; }
+.zahl-in { font-family: var(--serif); font-size: 1.3rem; text-align: right; }
+.entscheidung { display: grid; gap: 12px; margin: 14px 0; }
