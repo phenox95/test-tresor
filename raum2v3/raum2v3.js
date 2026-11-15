@@ -172,7 +172,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Überlegt, wie die Schichten entstanden sind: Was wurde zuerst abgelagert?',
       hints: ['Schaut auf die Wand. Welche Schicht liegt unten, welche oben?',
               'Wenn sich Sediment ablagert, welches kommt zuerst, das untere oder das obere?',
-              'Was unten liegt, ist älter. Ein noch älteres Fossil müsste noch tiefer liegen.'],
+              'Die Wand zeigt es: Unten lagert sich zuerst Sediment ab. Daraus folgt eine Regel für die Reihenfolge der Fossilien.'],
       rescue: 'RGVyIMOkbHRlc3RlIEZ1bmQgbGllZ3QgaW4gU2NoaWNodCAzLCBkZXIgasO8bmdzdGUgaW4gU2NoaWNodCAxLiBFaW4gbm9jaCDDpGx0ZXJlcyBGb3NzaWwgbcO8c3N0ZSBub2NoIHRpZWZlciBsaWVnZW4sIGluIGRlciBHcnViZW5zb2hsZS4gV2FzIHVudGVuIGxpZWd0LCBpc3Qgw6RsdGVyLg==',
       rescueTask: 'Erklärt in eigenen Worten, warum tiefer liegende Schichten älter sind, und nennt eine Bedingung, unter der das nicht gilt.',
       onSolve: { docs: ['p'], text: 'Die Profilwand leuchtet auf. Im Schrank klickt ein Schloss: Die Schubladen lassen sich öffnen.', then: 's2v3-2a' } },
@@ -212,7 +212,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Fragt bei jeder Aussage: Woher wissen wir das?',
       hints: ['Prüft jede Aussage: Steht das im Stein oder auf dem Zettel?',
               'Aus der Lage in den Schichten folgt, ob etwas älter oder jünger ist. Folgt daraus auch eine genaue Zahl?',
-              'Ohne Zettel: nur dass es gelebt hat und im Meer lebte. Mit Zettel: älter als oben, jünger als unten. Keine Jahreszahl, kein ‚zur selben Zeit‘.'],
+              'Ohne Zettel folgt nur, dass das Tier gelebt hat. Fragt bei den übrigen Aussagen: Steht das im Stein, auf dem Zettel oder in keinem von beiden?'],
       rescue: 'QXVzIGRlbSBGdW5kIGZvbGd0OiBBbW1vbml0IEEgaGF0IGdlbGVidCB1bmQgbGVidGUgaW0gTWVlci4gQW1tb25pdCBCIGlzdCBqw7xuZ2VyIGFscyBkZXIgRmlzY2hzYXVyaWVyIGF1cyBTY2hpY2h0IDMgdW5kIMOkbHRlciBhbHMgZGVyIFVydm9nZWwgYXVzIFNjaGljaHQgMS4gRWluZSBKYWhyZXN6YWhsIHVuZCDigJ56dXIgc2VsYmVuIFplaXTigJwgZm9sZ2VuIG5pY2h0IGRhcmF1cy4=',
       rescueTask: 'Schreibt auf, was ein Fossil ohne Fundzettel belegt und was nicht.',
       onSolve: { docs: ['pruefkarte'],
@@ -231,12 +231,12 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Vergleicht Schicht und Gestein auf jedem Zettel mit der Wand.',
       hints: ['Vergleicht bei jedem Zettel Schicht und Gestein mit der Wand.',
               'Welche Schicht ist hell und feinkörnig? Was steht auf dem Zettel?',
-              'Z3 nennt Schicht 1, aber ein Gestein, das nur zu Schicht 3 passt.'],
+              'Bei zwei Zetteln passen Schicht und Gestein zusammen. Beim dritten nicht.'],
       rescue: 'QWxsZSBkcmVpIFNjaGljaHRlbiBnaWJ0IGVzIGltIFByb2ZpbC4gQmVpIFoxIHVuZCBaMiBwYXNzdCBkYXMgR2VzdGVpbiB6dXIgU2NoaWNodC4gWjMgbmVubnQgU2NoaWNodCAxLCBiZXNjaHJlaWJ0IGFiZXIgZHVua2xlbiwgYmzDpHR0cmlnZW4gVG9uLiBTY2hpY2h0IDEgaXN0IGhlbGxlciBQbGF0dGVua2FsaywgZHVua2xlciBUb24gcGFzc3QgbnVyIHp1IFNjaGljaHQgMy4=',
       rescueTask: 'Schreibt auf, woran ihr einen Fundzettel gegen das Profil prüft.',
       onSolve: { then: 'r2v3-1-folge' } },
 
-    'r2v3-1-folge': { id: 'r2v3-1-folge', type: 'pick', count: 1, title: 'Was folgt daraus?',
+    'r2v3-1-folge': { id: 'r2v3-1-folge', type: 'pick', count: 1, title: 'Was folgt daraus?', logbook: { where: 'Logbuch Seite 2.1, Feld „Lernprodukt“', task: 'Füllt die Fundkontext-Karte aus: Fossil und Fundzettel, passt der Zettel, was folgt daraus, was folgt nicht daraus.' },
       prompt: 'Wählt, was aus dem Ergebnis für Zettel Z3 folgt.',
       cards: [
         { id: 'a', label: 'Der Zettel ist falsch oder das Stück wurde vertauscht. Die Herkunft ist unklar.' },
@@ -256,7 +256,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Was wisst ihr sicher: dass etwas nicht passt, oder warum es nicht passt?',
       hints: ['Was wisst ihr sicher: dass etwas nicht passt, oder warum es nicht passt?',
               'Kann man aus einem falschen Zettel ablesen, woher das Stück wirklich kommt?',
-              'Sicher ist nur: Die Herkunft ist unklar.'],
+              'Der Zettel stimmt nicht. Was lässt sich daraus ablesen, was nicht? Kennt ihr die richtige Herkunft?'],
       rescue: 'QXVzIGVpbmVtIFpldHRlbCwgZGVyIG5pY2h0IHp1bSBQcm9maWwgcGFzc3QsIGZvbGd0IG51cjogRGVyIFpldHRlbCBpc3QgZmFsc2NoIG9kZXIgZGFzIFN0w7xjayB3dXJkZSB2ZXJ0YXVzY2h0LCBkaWUgSGVya3VuZnQgaXN0IHVua2xhci4gT2IgamVtYW5kIGdldMOkdXNjaHQgaGF0LCB6ZWlndCBlciBuaWNodC4=',
       rescueTask: 'Schreibt auf, warum ein falscher Zettel noch keine Fälschung beweist.',
       onSolve: { wall: [{ id: 'w-z3', title: 'Z3: Herkunft unklar', tag: 'Ergebnis', kind: 'ergebnis', text: 'Fundzettel Z3 nennt Schicht 1, aber ein Gestein aus Schicht 3. Die Herkunft des Feder-Abdrucks ist unklar.' }],
@@ -266,7 +266,9 @@ TRESOR.room({
       prompt: 'Nennt zwei Gründe, warum von den meisten Lebewesen kein Fossil erhalten ist.',
       placeholder: 'Von den meisten Lebewesen bleibt kein Fossil, weil …',
       checks: ['Das Feld ist ausgefüllt.', 'Der Logbuch-Eintrag ist erstellt.'],
-      hints: ['Was passiert mit einem toten Tier an der Oberfläche?', 'Wer frisst Aas, was zersetzt Weichteile?', 'Verwesung und Aasfresser, und schnelle Einbettung ist selten.'],
+      hints: ['Was passiert mit einem toten Tier an der Oberfläche?',
+              'Wer frisst Aas, was zersetzt Weichteile?',
+              'Ein Grund betrifft das, was nach dem Tod passiert. Ein zweiter betrifft die Bedingungen der Einbettung.'],
       onSolve: { message: { from: 'kemal', text: 'Fehlende Fossilien sagen nichts gegen die Evolution. Sie zeigen, wie selten die Bedingungen sind.' } } },
 
     /* ---------------- Mission 2.2 ---------------- */
@@ -278,7 +280,7 @@ TRESOR.room({
       onSolve: { wall: [{ id: 'w-kriterium', title: 'Unser Kriterium', tag: 'Eigener Text', kind: 'ergebnis', answer: 'r2v3-2-kriterium' }],
         text: 'Die Vitrine öffnet sich. Drei Fotos mit Maßstab liegen darin.', message: { from: 'kemal', text: 'Wendet euer Kriterium an.' } } },
 
-    'r2v3-2-urvogel': { id: 'r2v3-2-urvogel', type: 'objekt', mode: 'zeigen', title: 'Der Urvogel',
+    'r2v3-2-urvogel': { id: 'r2v3-2-urvogel', type: 'objekt', mode: 'zeigen', title: 'Der Urvogel', logbook: { where: 'Logbuch Seite 2.2, Feld „Lernprodukt“', task: 'Notiert, welche der fünf Merkmale am Foto des Urvogels zu sehen sind und welche nicht. Das Protokoll mit Raubdinosaurier und Taube folgt in der Präsenzstunde.' },
       prompt: 'Belegt jede Aussage durch eine Stelle am Fossil, oder wählt „Nicht erkennbar“.\n\nDas Berliner Exemplar liegt in der Vitrine.',
       image: '../raum2/bilder/urvogel.jpg', imageAlt: 'Fossil eines Urvogels mit Federabdrücken, Zähnen, Krallen und langem Schwanz',
       startText: 'Tippt auf die Stelle am Urvogel, die diese Aussage belegt.',
@@ -300,7 +302,9 @@ TRESOR.room({
       hash: '8913d7253083f41dabab2c18209d29ccdc40b4837bbbefeed23a97cb1afd0ac7',
       button: 'Belege prüfen',
       wrongText: 'Nichts passiert. Mindestens eine Aussage ist nicht durch die gewählte Stelle belegt.',
-      hints: ['Tippt Stelle für Stelle an und lest, was dort zu sehen ist.', 'Eine Aussage lässt sich am Foto nicht belegen. Welche?', 'Beim Brustbeinkamm ist am Fossil nichts zu erkennen.'],
+      hints: ['Tippt Stelle für Stelle an und lest, was dort zu sehen ist.',
+              'Eine Aussage lässt sich am Foto nicht belegen. Welche?',
+              'Bei einer der fünf Aussagen zeigt das Foto nichts. Es ist ein Teil des Skeletts.'],
       rescue: 'WsOkaG5lOiBhbSBLaWVmZXIuIEtyYWxsZW46IGFuIGRlciBIYW5kLiBMYW5nZSBTY2h3YW56d2lyYmVsc8OkdWxlOiBhbSBTY2h3YW56LiBTY2h3dW5nZmVkZXJuOiBGZWRlcmFiZHLDvGNrZSBhbSBBcm0uIEJlaW0gQnJ1c3RiZWlua2FtbSBpc3QgYW0gRm9zc2lsIG5pY2h0cyB6dSBlcmtlbm5lbi4=',
       rescueTask: 'Erklärt in eigenen Worten, warum ‚nicht erkennbar‘ nicht heißt ‚nicht vorhanden‘.',
       onSolve: { wall: [
@@ -355,7 +359,7 @@ TRESOR.room({
       itemHash: { k1: '44d22aea7aed8a769520afbf08341151672dc2eebb3bdbb05be264206f6db481', k2: '8179ea62dd9730d89184a551294e59bf030e0cc1aaab0ea0a1bae9cbdca001f5', k3: 'a10e573700c944d4f88132f6f2ce5130c812c7b9fe946a2c509ffd8f580458fc', k4: 'f2671b28dab08d2579e4e435edbf72b5a218a7836e19e0fe9c906275a8860d6d', k5: '2ceea70f7a56be879cf05d0bde5d1cb95c4ca2c3d7852984452a443085c419f3', k6: '85611188dbb94c2fb32d7ca76d441722f7af8fde8867c1e5af8237200fd35456', k7: '23f0f629edbc6dda3bdbcd32c1581e2aeb8ab396c14618530ba2fcb2a16deb21' },
       onSolve: { docs: ['vp'], text: 'Die Haube bleibt offen. Das Vergleichsprotokoll hängt jetzt an der Sammelwand.', then: 'r2v3-3-mosaik' } },
 
-    'r2v3-3-mosaik': { id: 'r2v3-3-mosaik', type: 'assign', title: 'Merkmale einordnen',
+    'r2v3-3-mosaik': { id: 'r2v3-3-mosaik', type: 'assign', title: 'Merkmale einordnen', logbook: { where: 'Logbuch Seite 2.3, Feld „Lernprodukt“', task: 'Tragt jedes Merkmal in die Tabelle ein: ursprünglich, abgeleitet oder keine Aussage, mit kurzer Begründung.' },
       ref: { title: 'Zum Nachschlagen: Vergleichsprotokoll', docs: ['vp'] },
       prompt: 'Ordnet die fünf Merkmale des Urvogels zu: ursprünglich (auch beim Raubdinosaurier), abgeleitet (typisch für heutige Vögel) oder keine Aussage möglich.\n\nNutzt euer Vergleichsprotokoll aus dem Logbuch. Zum Nachschlagen liegt es auch hier bereit.',
       cards: [
@@ -367,7 +371,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. „Ursprünglich“ meint: Das Merkmal gab es schon bei den Verwandten.',
       hints: ['Schaut auf euer Protokoll: Welche Merkmale hat der Raubdinosaurier auch?',
               'Ein Merkmal steht beim Urvogel und beim Raubdinosaurier auf ‚nicht nachgewiesen‘. Was lässt sich dazu sagen?',
-              'Zähne, Krallen und Schwanz hat auch der Raubdinosaurier. Schwungfedern hat die Taube, beim Raubdinosaurier sind sie nicht nachgewiesen. Beim Brustbeinkamm lässt sich nichts sagen.'],
+              'Zähne, Krallen und Schwanz hat auch der Raubdinosaurier. Bei Federn und Brustbeinkamm prüft ihr, was bei ihm nachgewiesen ist.'],
       rescue: 'VXJzcHLDvG5nbGljaCAoYXVjaCBiZWltIFJhdWJkaW5vc2F1cmllcik6IFrDpGhuZSwgS3JhbGxlbiBhbiBkZW4gRmluZ2VybiwgbGFuZ2UgU2Nod2FuendpcmJlbHPDpHVsZS4gQWJnZWxlaXRldCAodHlwaXNjaCBmw7xyIGhldXRpZ2UgVsO2Z2VsKTogU2Nod3VuZ2ZlZGVybi4gWnVtIEJydXN0YmVpbmthbW0gaXN0IGtlaW5lIEF1c3NhZ2UgbcO2Z2xpY2gu',
       rescueTask: 'Erklärt in eigenen Worten, was ‚ursprünglich‘ und ‚abgeleitet‘ bedeuten.',
       onSolve: { wall: [{ id: 'w-diagramm', title: 'Merkmalsdiagramm', tag: 'Ergebnis', kind: 'ergebnis',
@@ -393,7 +397,9 @@ TRESOR.room({
       pickHash: '35746ad3b3bdd1e1ad2c5d1c617f9278710fb2f48d72b2e4d4a3fdbd58ca09dc',
       hash: '32caba5de59699b20a70525e822d04cb66a353abc65adb51ba9f4328f56f62a4',
       wrongText: 'Nichts passiert. Eine Kombination von Merkmalen zeigt Verwandtschaft, keine Abstammungslinie.',
-      hints: ['Was zeigt das Diagramm an der Wand: eine Linie oder ein Netz von Ähnlichkeiten?', 'Kann man aus Merkmalen allein sagen, wer wessen Kind war?', 'Aus Merkmalen folgt Verwandtschaft, nicht eine einzelne Ahnenreihe.'],
+      hints: ['Was zeigt das Diagramm an der Wand: eine Linie oder ein Netz von Ähnlichkeiten?',
+              'Kann man aus Merkmalen allein sagen, wer wessen Kind war?',
+              'Das Diagramm zeigt Ähnlichkeiten. Prüft, ob die Aussage mehr behauptet, als Ähnlichkeiten tragen.'],
       rescue: 'RGllIE1lcmttYWxza29tYmluYXRpb24gc3ByaWNodCBmw7xyIGdlbWVpbnNhbWUgVm9yZmFocmVuIHZvbiBSYXViZGlub3NhdXJpZXJuIHVuZCBWw7ZnZWxuLiBBdXMgTWVya21hbGVuIGZvbGd0IFZlcndhbmR0c2NoYWZ0LCBuaWNodCBlaW5lIGVpbnplbG5lIEFobmVucmVpaGU6IERhc3MgZGVyIFVydm9nZWwgZGVyIGRpcmVrdGUgVm9yZmFociBvZGVyIGRhcyDigJ5mZWhsZW5kZSBHbGllZOKAnCBpc3QsIGZvbGd0IGRhcmF1cyBuaWNodC4=',
       rescueTask: 'Beschreibt in einem Satz, warum ‚Bindeglied‘ ein schwieriger Begriff ist.',
       onSolve: { merksatz: 'Ein Brückentier zeigt eine Kombination ursprünglicher und abgeleiteter Merkmale. Es ist kein direkter Vorfahr und kein „fehlendes Glied“.',
@@ -446,7 +452,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Mindestens eine Markierung passt nicht.',
       hints: ['Nehmt die Prüfkarte und geht die Fragen durch: Wo, welche Schicht, passt das Gestein?',
               'Wechselt die Ansicht. Manche Auffälligkeiten sieht man nur im Schliff, beim Messen oder im CT.',
-              'Normal: der Zettel. Schliff: die Naht. Messen: die Wirbel. CT: Füllmasse und Riefen.'],
+              'Normal: der Zettel. Schliff: die Naht. Für Messen und CT entscheidet ihr selbst, was dort auffällt.'],
       rescue: 'Tm9ybWFsOiBEZXIgWmV0dGVsIG5lbm50IE1ldGVyIDE0IHVuZCBTY2hpY2h0IDEsIGRvcnQgaXN0IFNjaGljaHQgMSBhYmdldHJhZ2VuLiBTY2hsaWZmOiBEaWUgTmFodCB6d2lzY2hlbiB6d2VpIEdlc3RlaW5lbiBsw6R1ZnQgcXVlciB6dXIgU2NoaWNodHVuZy4gTWVzc2VuOiBEaWUgV2lyYmVsIHBhc3NlbiBuaWNodCB6dXNhbW1lbiwgZGFzIFZlcmjDpGx0bmlzIDAsNDQgbGllZ3Qgd2VpdCBhdcOfZXJoYWxiIGRlciBWZXJnbGVpY2hzdGllcmUuIENUOiBGw7xsbG1hc3NlIGFuIGRlciBOYWh0IHVuZCBwYXJhbGxlbGUgUmllZmVuIGFuIGRlbiBLcmFsbGVuLiBGZWRlcm4sIFrDpGhuZSB1bmQgZGllIGdsZWljaG3DpMOfaWdlbiBTdGVsbGVuIHNpbmQgdW5hdWZmw6RsbGlnLg==',
       rescueTask: 'Schreibt zu jeder Ansicht einen Satz: Was zeigt der Befund? Was zeigt er nicht?',
       onSolve: { docs: ['h'],
@@ -463,7 +469,7 @@ TRESOR.room({
         message: { from: 'hallmann', audio: 'audio/h-hallmann.mp3', text: 'Jeder Fund hat seine Eigenheiten.' }, then: 'r2v3-4-ausreden' } },
 
     /* ab V3.1 umgedreht (ENTWURF 15.11.): nicht „welcher Befund gehört zur Ausrede“, sondern „woran scheitert sie“ */
-    'r2v3-4-ausreden': { id: 'r2v3-4-ausreden', type: 'assign', title: 'Hallmanns Ausreden',
+    'r2v3-4-ausreden': { id: 'r2v3-4-ausreden', type: 'assign', title: 'Hallmanns Ausreden', logbook: { where: 'Logbuch Seite B2, Beweisstück 2', task: 'Tragt für jede der vier Linien ein: Befund, Ausrede und warum sie nicht reicht.' },
       ref: { title: 'Zum Nachschlagen: Evidenzkarten und Vergleichstiere', text: 'A: Zettel und Profil passen nicht zusammen.\nB: zwei Gesteine, Naht quer zur Schichtung.\nC: Wirbelbreiten weit außerhalb der Vergleichstiere.\nD: Füllmasse an der Naht, Riefen an den Krallen.', docs: ['vergleichstiere'] },
       prompt: 'Ordnet jede Ausrede dem Feld zu, das auf sie zutrifft.\n\nHallmann hat zu jedem Befund eine Erklärung. Nehmt jede ernst: Wenn sie stimmt, erklärt sie dann alles, was ihr an diesem Befund gesehen habt?',
       cards: [
@@ -484,7 +490,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Nehmt jede Ausrede ernst: Was müsste man dann am Fossil sehen, und was seht ihr wirklich?',
       hints: ['Lest die Evidenzkarten A bis D. Zu welchem Befund gehört jede Ausrede?',
               'Wie verläuft eine natürliche Grenze zwischen zwei Schichten? Was macht ein Präparator mit dem Gestein? Wie groß sind die Unterschiede zwischen den Vergleichstieren?',
-              'Eine Ausrede hält an ihrem eigenen Befund stand: der vertauschte Zettel. Am Stein selbst erklärt sie aber nichts. Eine andere behauptet nichts, was man prüfen kann.'],
+              'Fragt bei jedem Befund: Wird die Ausrede am Stein selbst geprüft oder nur behauptet?'],
       rescue: 'RGVyIHZlcnRhdXNjaHRlIFpldHRlbCBlcmtsw6RydCBkZW4gWmV0dGVsLCBhYmVyIG5pY2h0cyBhbSBTdGVpbi4gRGllIFNjaGljaHRncmVuemUgc2NoZWl0ZXJ0OiBFaW5lIG5hdMO8cmxpY2hlIEdyZW56ZSBsw6R1ZnQgZW50bGFuZyBkZXIgU2NoaWNodHVuZywgZGllIE5haHQgbMOkdWZ0IHF1ZXIuIERpZSBWYXJpYWJpbGl0w6R0IHNjaGVpdGVydDogRGllIFZlcmdsZWljaHN0aWVyZSBsaWVnZW4gendpc2NoZW4gMCw5MiB1bmQgMSwwNSwgZGVyIEJlcm9saW5hdmlzIGJlaSAwLDQ0LiBEaWUgUHLDpHBhcmF0aW9uIHNjaGVpdGVydDogQmVpbSBQcsOkcGFyaWVyZW4gd2lyZCBHZXN0ZWluIGVudGZlcm50LCBhbiBkZXIgTmFodCBsaWVndCBhYmVyIEbDvGxsbWFzc2UuIOKAnkRhcyBGb3NzaWwgaXN0IGViZW4gYmVzb25kZXJz4oCcIGzDpHNzdCBzaWNoIGFuIGtlaW5lbSBCZWZ1bmQgcHLDvGZlbi4gVmllciB1bmFiaMOkbmdpZ2UgQmVmdW5kZSBtw7xzc3RlbiBhbGxlIHp1ZsOkbGxpZyBoYXJtbG9zIHNlaW4uIERhcyBpc3QgdW53YWhyc2NoZWlubGljaC4=',
       rescueTask: 'Erklärt, warum vier unabhängige Befunde stärker sind als ein einzelner.',
       onSolve: { wall: [{ id: 'w-ausreden', title: 'Hallmanns Ausreden', tag: 'Ergebnis', kind: 'ergebnis',
@@ -492,7 +498,7 @@ TRESOR.room({
         message: { from: 'kemal', text: 'Drei Ausreden scheitern schon am eigenen Befund. Eine hält, erklärt aber nur den Zettel.\n\nVier Befunde, die nichts miteinander zu tun haben, müsste Hallmann alle einzeln wegerklären. Das Schloss am Arbeitstisch wartet.' } } },
 
     /* ab V3.1: Schloss mit gemeinsamer Wortbank (ENTWURF 15.11.) */
-    'r2v3-4-schloss': { id: 'r2v3-4-schloss', type: 'cloze', triple: true, title: 'Schloss 2',
+    'r2v3-4-schloss': { id: 'r2v3-4-schloss', type: 'cloze', triple: true, title: 'Schloss 2', logbook: { where: 'Logbuch Seite B2, Feld „Unser vorläufiger Satz“', task: 'Schreibt den Satz aus Schloss 2 in euren Worten: Aussage, Beleg und Reichweite.' },
       prompt: 'Vervollständigt den Satz. Das Schloss verlangt einen gesicherten Satz aus Aussage, Beleg, Reichweite und offener Frage.',
       parts: [{ strong: 'Aussage: ' }, 'Der Befund spricht dafür, dass der Berolinavis ', { gap: 'g1', label: 'Lücke 1' }, ' ist.', { nl: true },
         { strong: 'Beleg: ' }, { gap: 'g2', label: 'Lücke 2' }, ' Befunde zeigen dasselbe, und jede Ausrede erklärt ', { gap: 'g3', label: 'Lücke 3' }, '.', { nl: true },
@@ -514,7 +520,7 @@ TRESOR.room({
       hash: '826193d9390ecc3a34d03caaea46ca947690271a0c91acbf842b456679ebe12b',
       hints: ['Lest den Satz Teil für Teil. Was haben wir gezeigt, was nicht?',
               'Haben wir gezeigt, wer den Berolinavis so gemacht hat?',
-              'Zusammengesetzt, vier unabhängige Befunde, starker Verdacht, Vorsatz noch offen.'],
+              'Die Lücken nennen den Befund, die Stärke der Aussage und das, was offen bleibt. Streicht in der Wortbank zuerst, was nicht passt.'],
       rescue: 'QXVzc2FnZTogRGVyIEJlZnVuZCBzcHJpY2h0IGRhZsO8ciwgZGFzcyBkZXIgQmVyb2xpbmF2aXMgYXVzIHZlcnNjaGllZGVuZW4gVGVpbGVuIHp1c2FtbWVuZ2VzZXR6dCBpc3QuIEJlbGVnOiBWaWVyIHZvbmVpbmFuZGVyIHVuYWJow6RuZ2lnZSBCZWZ1bmRlIHplaWdlbiBkYXNzZWxiZSwgdW5kIGplZGUgQXVzcmVkZSBlcmtsw6RydCBow7ZjaHN0ZW5zIGVpbmVuIGRhdm9uLiBSZWljaHdlaXRlOiBadXNhbW1lbiBlcmdpYnQgZGFzIGVpbmVuIHN0YXJrZW4gVmVyZGFjaHQsIG5vY2gga2VpbiBVcnRlaWwuIE9mZmVuOiBPYiBIYWxsbWFubiBkYXZvbiB3dXNzdGUsIGlzdCBub2NoIG9mZmVuLg==',
       rescueTask: 'Schreibt den Satz in euren Worten ins Logbuch.',
       onSolve: {

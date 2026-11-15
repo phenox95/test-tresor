@@ -167,21 +167,21 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Mindestens eine Markierung passt nicht.',
       hints: ['Lest jede Aussage einzeln. Bei welcher könntet ihr am Fossil selbst nachsehen, ob sie stimmt?',
               'Achtet auf ‚weil‘, ‚durch‘, ‚denn‘, ‚also‘. Was wird dort erklärt, was nur gesehen?',
-              'T2 und T6 beschreiben, was man sieht. T1 und T8 sind Behauptungen ohne Beleg. Die übrigen vier erklären etwas.'],
+              'Fangt mit T2 an: Das ist eine Beobachtung. Bei T1 fehlt jeder Beleg. Ordnet die übrigen Aussagen jetzt selbst ein.'],
       rescue: 'VDIgdW5kIFQ2IHNpbmQgQmVvYmFjaHR1bmdlbi4gVDMsIFQ0LCBUNSB1bmQgVDcgc2luZCBEZXV0dW5nZW4uIFQxIHVuZCBUOCBzaW5kIEJlaGF1cHR1bmdlbjogZWluZSBXZXJ0dW5nIHVuZCBlaW4gVmVyd2VpcyBhdWYgYW5kZXJlLCBhbSBGdW5kIG5pY2h0IHByw7xmYmFyLg==',
       rescueTask: 'Erklärt in eigenen Worten den Unterschied zwischen einer Beobachtung und einer Deutung an einem Beispiel aus dem Transkript.',
       onSolve: { text: 'Das Prüfpult geht an. Die Aussagen erscheinen getypt an der Sammelwand.',
         wall: [{ id: 'w-typen', title: 'Hallmanns Aussagen, getypt', tag: 'Ergebnis', kind: 'ergebnis',
           text: 'Beobachtung: T2, T6\nDeutung: T3, T4, T5, T7\nBehauptung: T1, T8' }], then: 'r1v3-1-frage' } },
 
-    'r1v3-1-frage': { id: 'r1v3-1-frage', type: 'freetext', minLength: 40, title: 'Eure Frage',
+    'r1v3-1-frage': { id: 'r1v3-1-frage', type: 'freetext', minLength: 40, title: 'Eure Frage', logbook: { where: 'Logbuch Seite 1.1, Feld „Lernprodukt“', task: 'Schreibt „Hallmann behauptet, dass …“ und danach eure Untersuchungsfrage.' },
       ref: { title: 'Zum Nachschlagen: A1 · Hallmanns Vortrag', docs: ['a1'] },
       prompt: 'Formuliert eine Frage, mit der ihr Hallmanns Erklärung überprüfen könnt.\n\nHallmann erklärt in T3 bis T5, wie die Federn entstanden sein sollen.',
       placeholder: 'Unsere Frage: …',
-      checks: ['Die Frage steht im Feld.', 'Die Frage steht im Logbuch.'],
+      checks: ['Die Frage steht im Feld.'],
       hints: ['Eine prüfbare Frage lässt sich mit einer Beobachtung oder einem Versuch beantworten.',
               'Worauf bezieht sich eure Frage: auf Hallmann als Person, auf den Preis, auf das Alter oder auf die Erklärung in T3 bis T5?',
-              'Zwei Dinge lassen sich prüfen: ob die Jungen weitergeben, was die Eltern erwerben, und ob die Erklärung zu Beobachtungen passt.'],
+              'Eine prüfbare Frage betrifft die Weitergabe an die Jungen. Eine zweite betrifft den Vergleich mit Beobachtungen. Formuliert eine davon.'],
       onSolve: { wall: [{ id: 'w-frage', title: 'Unsere Frage', tag: 'Eigener Text', kind: 'ergebnis', answer: 'r1v3-1-frage' }], then: 'r1v3-1-pruefen' } },
 
     'r1v3-1-pruefen': { id: 'r1v3-1-pruefen', type: 'pick', count: 2, title: 'Fragen wählen',
@@ -197,7 +197,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Nicht jede Frage lässt sich mit Beobachtungen beantworten. Und nicht jede gehört zu dieser Erklärung.',
       hints: ['Welche Fragen könnt ihr nicht messen?',
               'Worauf bezieht sich die Frage: Person, Preis, Alter oder die Erklärung?',
-              'Zwei Fragen fragen nach der Erklärung selbst: nach der Weitergabe und nach dem Vergleich mit Beobachtungen.'],
+              'Eine der beiden richtigen Fragen fragt, ob die Jungen weitergeben, was die Eltern erworben haben. Die zweite sucht ihr selbst.'],
       rescue: 'RGllIEZyYWdlbiBGMiB1bmQgRjUgZ2Vow7ZyZW4genVyIEVya2zDpHJ1bmcgdW5kIGxhc3NlbiBzaWNoIHByw7xmZW4uIEYxIHVuZCBGMyBzaW5kIG5pY2h0IG1lc3NiYXIuIEY0IGlzdCBwcsO8ZmJhciwgYmV0cmlmZnQgYWJlciBkYXMgQWx0ZXIgdW5kIG5pY2h0IGRpZSBFcmtsw6RydW5nLg==',
       rescueTask: 'Schreibt in eigenen Worten, warum ‚Wie alt ist der Berolinavis?‘ eine gute Frage ist, aber nicht zu Hallmanns Erklärung passt.',
       onSolve: { message: { from: 'wendt', text: 'Gut. Eine Frage ist der Anfang jeder Untersuchung. Jetzt braucht ihr das Modell dahinter.\n\n– J. W.' },
@@ -244,7 +244,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Die drei Annahmen betreffen verschiedene Schritte: Was Tiere brauchen, was sie tun, was sie weitergeben.',
       hints: ['Lest L1 bis L3. Was ist bei jeder Annahme das Schlüsselwort?',
               'Bei welcher Karte geht es um das, was das Tier will, bei welcher um das, was es tut, bei welcher um die Jungen? Und welche beschreibt nur, was man sieht?',
-              'T3 handelt vom Wollen, T4 und T7 vom Gebrauch, T5 von den Jungen. T6 ist eine Beobachtung.'],
+              'T3 handelt vom Wollen. Bei den übrigen Karten fragt ihr: Geht es um Gebrauch, um die Jungen oder nur um etwas, das man sieht?'],
       rescue: 'VDMgZ2Vow7ZydCB6dSBMMSAoQmVkw7xyZm5pcykuIFQ0IHVuZCBUNyBnZWjDtnJlbiB6dSBMMiAoR2VicmF1Y2gpLiBUNSBnZWjDtnJ0IHp1IEwzIChWZXJlcmJ1bmcpLiBUNiBpc3QgZWluZSBCZW9iYWNodHVuZyB1bmQgc3RlaHQgZsO8ciBrZWluZSBBbm5haG1lLg==',
       rescueTask: 'Beschreibt in eigenen Worten, welche drei Annahmen Hallmanns Erklärung enthält.',
       onSolve: { text: 'Die drei Auszüge leuchten nacheinander auf dem Pult auf.', then: 'r1v3-2-vorhersage' } },
@@ -273,7 +273,7 @@ TRESOR.room({
         wall: [{ id: 'w-lamarck-kette', title: 'Lamarcks Wirkungskette', tag: 'Ergebnis', kind: 'ergebnis',
           text: 'Die Umwelt ändert sich → Das Tier hat ein neues Bedürfnis → Das Tier gebraucht ein Organ häufiger → Das Organ verändert sich → Die Veränderung wird an die Nachkommen vererbt.' }] } },
 
-    'r1v3-2-vorhersage': { id: 'r1v3-2-vorhersage', type: 'pick', count: 2, title: 'Vorhersagen aus dem Modell',
+    'r1v3-2-vorhersage': { id: 'r1v3-2-vorhersage', type: 'pick', count: 2, title: 'Vorhersagen aus dem Modell', logbook: { where: 'Logbuch Seite 1.2, Feld „Lernprodukt“', task: 'Schreibt die beiden Vorhersagen als „Wenn …, dann …“-Sätze.' },
       ref: { title: 'Zum Nachschlagen: M1 · Lamarck', docs: ['m1'] },
       prompt: 'Wählt die zwei Sätze, die zwingend aus L1 bis L3 folgen.\n\nEin Modell macht Vorhersagen, die man prüfen kann.',
       cards: [
@@ -288,7 +288,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Eine Vorhersage muss sich aus dem Modell ergeben, nicht aus dem, was ihr sonst zu wissen glaubt.',
       hints: ['Streicht alles, was in L1 bis L3 gar nicht vorkommt.',
               'Welche Annahme betrifft die Jungen? Was müsste man dann bei den Jungen sehen?',
-              'V1 und V2 folgen aus L2 und L3. Die anderen kommen in Lamarcks Modell gar nicht vor.'],
+              'Eine Vorhersage betrifft die Jungen von trainierten Eltern. Die zweite sucht ihr unter den Aussagen, die zu L1 bis L3 passen.'],
       rescue: 'VjEgdW5kIFYyIGZvbGdlbiBhdXMgZGVtIE1vZGVsbDogV2VubiBlcndvcmJlbmUgVmVyw6RuZGVydW5nZW4gdmVyZXJidCB3ZXJkZW4sIG3DvHNzdGVuIGRpZSBKdW5nZW4gc2llIHplaWdlbi4gVjQgdW5kIFY1IGtvbW1lbiBpbSBNb2RlbGwgbmljaHQgdm9yLCBWMyDDvGJlcmRlaG50IGVzLCBWNiB2ZXJtaXNjaHQgRXJrbMOkcnVuZyB1bmQgRWNodGhlaXQu',
       rescueTask: 'Schreibt V1 und V2 als Wenn-dann-Sätze mit euren eigenen Worten auf.',
       onSolve: { wall: [
@@ -366,13 +366,15 @@ TRESOR.room({
       pickHash: '4876229b90cb7636fb4d1af92f9f3b46de63e2b654e3512cd31d816903269cb1',
       hash: 'c25fd17791eb1f5d562e8b1d1cde53dc0abfdb4b7f5adc62ac79a32b5713ec91',
       wrongText: 'Nichts passiert. Vergleicht eure gespeicherten Läufe an der Sammelwand noch einmal.',   /* ENTWURF */
-      hints: ['Vergleicht alle gespeicherten Läufe, nicht nur einen.', 'Welche Gruppe liegt vorn: immer dieselbe?', 'Der Unterschied ist kleiner als die Streuung innerhalb der Gruppen.'],
+      hints: ['Vergleicht alle gespeicherten Läufe, nicht nur einen.',
+              'Welche Gruppe liegt vorn: immer dieselbe?',
+              'Schaut zuerst auf die Streuung innerhalb einer Gruppe, bevor ihr die Gruppen vergleicht.'],
       rescue: 'RGllIE1pdHRlbHdlcnRlIGJlaWRlciBHcnVwcGVuIGxpZWdlbiBuYWggYmVpZWluYW5kZXIuIE1hbCBsaWVndCBkaWUgZWluZSwgbWFsIGRpZSBhbmRlcmUgR3J1cHBlIGtuYXBwIHZvcm4uIERlciBVbnRlcnNjaGllZCBpc3Qga2xlaW5lciBhbHMgZGllIFN0cmV1dW5nIGlubmVyaGFsYiBkZXIgR3J1cHBlbi4=',
       rescueTask: 'Schreibt in einem Satz auf, was eure Läufe zeigen.',   /* ENTWURF */
       onSolve: { then: 'r1v3-3-datenwert' } },
 
     /* ENTWURF 15.11.: neue Pflichtfrage zur Aussagekraft von Spieldaten */
-    'r1v3-3-datenwert': { id: 'r1v3-3-datenwert', type: 'pick', count: 2, title: 'Was sind eure Daten wert?',
+    'r1v3-3-datenwert': { id: 'r1v3-3-datenwert', type: 'pick', count: 2, title: 'Was sind eure Daten wert?', logbook: { where: 'Logbuch Seite 1.3, Feld „Lernprodukt“', task: 'Schreibt den Befund (die Mittelwerte eurer Läufe) und dazu „Das folgt daraus“ und „Das folgt daraus nicht“. Denkt daran: Es sind Spieldaten, keine Mäuse.' },
       prompt: 'Wählt die zwei Aussagen, die zutreffen.\n\nEure Läufe sind am iPad entstanden.',
       cards: [
         { id: 'a', label: 'Die Zahlen sind Spieldaten. Im Spiel stehen sie für einen echten Zuchtversuch.' },
@@ -384,7 +386,9 @@ TRESOR.room({
       traps: [{ id: 'd', text: 'Vorsicht. „Beweisen“ und „nie“ sind große Worte für vier Läufe.' }],
       hash: '5e6c6ca38c210fec9c84a32b050f80344f41cf5b84b13b69943b1ae9f3748f03',
       wrongText: 'Nichts passiert. Fragt euch: Woher kommen die Zahlen, und was müsste man draußen tun, um sie zu bekommen?',
-      hints: ['Lest den Hinweis unter euren Datenkarten.', 'Wer hat die Zahlen erzeugt: Mäuse oder das Spiel?', 'Zwei Aussagen sagen, woher die Zahlen kommen und was ein echter Versuch bräuchte.'],
+      hints: ['Lest den Hinweis unter euren Datenkarten.',
+              'Wer hat die Zahlen erzeugt: Mäuse oder das Spiel?',
+              'Eine richtige Aussage sagt, woher die Zahlen stammen. Die zweite beschreibt, was ein echter Versuch bräuchte.'],
       rescue: 'RGllIFphaGxlbiBzaW5kIFNwaWVsZGF0ZW46IERhcyBTcGllbCBoYXQgc2llIGVyemV1Z3QsIGltIFNwaWVsIHN0ZWhlbiBzaWUgZsO8ciBlaW5lbiBlY2h0ZW4gWnVjaHR2ZXJzdWNoLiBJbSBlY2h0ZW4gTGViZW4gbcO8c3N0ZSBtYW4gZGVuIFZlcnN1Y2ggbWl0IGxlYmVuZGVuIE3DpHVzZW4gZHVyY2hmw7xocmVuIHVuZCBkaWUgSnVuZ3RpZXJlIG1lc3Nlbi4gVmllciBMw6R1ZmUgYW0gaVBhZCBiZXdlaXNlbiBuaWNodHMgw7xiZXIgZWNodGUgTcOkdXNlLCB1bmQgZWluIGVpbnplbG5lciBMYXVmIHJlaWNodCBuaWUu',
       rescueTask: 'Erklärt in eigenen Worten, warum eine Simulation allein kein Beleg ist.',
       onSolve: { message: { from: 'kemal', text: 'Merkt euch das. Im Spiel zählt dieser Versuch als Beleg. Draußen müsste ihn jemand wirklich durchführen.\n\nDer Versuch von Weismann im Archivregal (B1) wurde wirklich gemacht.' }, then: 'r1v3-3-einspruch' } },
@@ -432,7 +436,7 @@ TRESOR.room({
       defaultWrong: 'Das steht so noch nicht in den Belegen. Prüft, ob eure Begründung zu den vorgelegten Belegen passt.',
       hints: ['Lest B1 und seht euch eure Läufe an. Wovon hängt das Ergebnis ab: von einer Verletzung oder vom Gebrauch?',
               'Was hat Weismann genau getan, und was sagt Lamarcks Modell über Gebrauch? Passt der Versuch zur Vorhersage?',
-              'B1 prüft Verletzungen, euer Laufrad prüft Training. Hallmann hat auf B1 eine gute Ausrede, auf das Laufrad nicht. Wenn ein Modell für alle Tiere gelten soll, genügt ein Gegenbeispiel.'],
+              'B1 prüft Verletzungen, euer Laufrad prüft Gebrauch. Welcher von beiden Versuchen passt zu Lamarcks Modell?'],
       rescue: 'V2Vpc21hbm5zIFZlcnN1Y2ggKEIxKSBwcsO8ZnQgbnVyIFZlcmxldHp1bmdlbiwgZGFyYXVmIGhhdCBIYWxsbWFubiBlaW5lIEF1c3JlZGUuIEV1ZXIgTGF1ZnJhZHZlcnN1Y2ggKEIyKSBwcsO8ZnQgVHJhaW5pbmc6IERhcyBUcmFpbmluZyBkZXIgRWx0ZXJuIHZlcsOkbmRlcnQgZGllIEp1bmd0aWVyZSBuaWNodC4gV2VpbCBMYW1hcmNrcyBNb2RlbGwgZsO8ciBhbGxlIFRpZXJlIGdlbHRlbiBzb2xsLCBnZW7DvGd0IGVpbiBHZWdlbmJlaXNwaWVsLg==',
       rescueTask: 'Erklärt in eigenen Worten, was Weismanns Versuch zeigt und was er nicht zeigt.',
       onSolve: { message: { from: 'hallmann', text: 'Nun gut. Dann erklären Sie mir, wie die Federn entstanden sind.' },
@@ -456,7 +460,7 @@ TRESOR.room({
       wrongText: 'Nichts passiert. Fragt euch bei jedem Pfeil: Muss der erste Schritt da sein, damit der zweite überhaupt passieren kann?',
       hints: ['Was ist die Voraussetzung dafür, dass es überhaupt eine Auswahl gibt?',
               'Wählt die Natur aus, wenn alle Tiere gleich sind? Und wenn alle überleben?',
-              'Unterschiede und zu viele Nachkommen führen beide zur Auslese. Dann folgen Weitergabe und Veränderung der Population.'],
+              'Am Anfang stehen zwei Voraussetzungen für die Auslese. Danach folgen Weitergabe und Veränderung der Population.'],
       rescue: 'VW50ZXJzY2hpZWRlIChEMSkgdW5kIHp1IHZpZWxlIE5hY2hrb21tZW4gKEQyKSBmw7xocmVuIGJlaWRlIHp1ciBBdXNsZXNlIChEMykuIERhcmF1cyBmb2xndCBkaWUgV2VpdGVyZ2FiZSAoRDQpIHVuZCBkYXJhdXMgZGllIFZlcsOkbmRlcnVuZyBkZXIgUG9wdWxhdGlvbiAoRDUpLiBENiBnZWjDtnJ0IG5pY2h0IHp1IERhcndpbnMgRXJrbMOkcnVuZy4=',
       rescueTask: 'Zeichnet Darwins Netz mit fünf Kästchen und schreibt zu jedem einen Beleg oder ‚Beleg fehlt noch‘.',
       onSolve: { text: 'Das Netz hängt neben der Lamarck-Kette.',
@@ -474,13 +478,15 @@ TRESOR.room({
       targets: [{ id: 'unterschiede', label: 'Unterschiede (D1)' }, { id: 'ueberproduktion', label: 'Überproduktion (D2)' }, { id: 'auslese', label: 'Auslese (D3)' }, { id: 'keiner', label: 'stützt keinen Schritt' }],
       hash: '6bb918a1a2235baea7e6f3d1b8b028a3210ed5f6b26a227dd5322f9d0b17fdf8',
       wrongText: 'Nichts passiert. Fragt euch bei jedem Beleg: Welchen Schritt zeigt er?',
-      hints: ['Welcher Beleg zeigt, dass sich Tiere unterscheiden?', 'Wer wählt bei den Tauben aus: der Züchter oder die Natur?', 'B2 für die Unterschiede, B4 für die vielen Nachkommen, B3 für die Auslese. B1 prüfte Lamarck.'],
+      hints: ['Welcher Beleg zeigt, dass sich Tiere unterscheiden?',
+              'Wer wählt bei den Tauben aus: der Züchter oder die Natur?',
+              'B2 gehört zu den Unterschieden. Bei den übrigen Schritten entscheidet ihr, wer auswählt und was überlebt.'],
       rescue: 'QjIgemVpZ3QgVW50ZXJzY2hpZWRlIChkaWUgTMOkdWZlIHN0cmV1ZW4pLiBCNCB6ZWlndCDDnGJlcnByb2R1a3Rpb24uIEIzIHplaWd0IEF1c2xlc2UgZHVyY2ggWsO8Y2h0ZXIgYWxzIFZlcmdsZWljaCwgZGllIEF1c2xlc2UgaW4gZGVyIE5hdHVyIGtvbW10IGluIFJhdW0gMy4gQjEgc3TDvHR6dCBrZWluZW4gU2Nocml0dCwgV2Vpc21hbm4gcHLDvGZ0ZSBMYW1hcmNrLg==',
       rescueTask: 'Schreibt zu jedem Schritt von Darwins Erklärung einen Beleg oder „Beleg fehlt noch“ ins Logbuch.',   /* aus V2 */
       onSolve: { message: { from: 'kemal', text: 'Darwins Kette hat jetzt Belege. Für Selektion in der Natur fehlt noch einer.' } } },   /* ENTWURF 15.11. */
 
     /* ab V3.1: Schloss mit gemeinsamer Wortbank (ENTWURF 15.11.) */
-    'r1v3-3-schloss': { id: 'r1v3-3-schloss', type: 'cloze', triple: true, title: 'Schloss 1',
+    'r1v3-3-schloss': { id: 'r1v3-3-schloss', type: 'cloze', triple: true, title: 'Schloss 1', logbook: { where: 'Logbuch Seite 1.3, Feld „Merksatz“', task: 'Schreibt den Satz aus Schloss 1 zuerst in eigenen Worten. Der Vergleich im Plenum folgt in der Präsenzstunde.' },
       prompt: 'Vervollständigt den Satz. Das Schloss verlangt einen gesicherten Satz aus Aussage, Beleg und Reichweite.',
       parts: [{ strong: 'Aussage: ' }, 'Die untersuchten Daten ', { gap: 'g1', label: 'Lücke 1' }, ' die Annahme, dass ', { gap: 'g2', label: 'Lücke 2' }, ' vererbt werden.', { nl: true },
         { strong: 'Beleg: ' }, 'In ', { gap: 'g3', label: 'Lücke 3' }, ' zeigten die Nachkommen ', { gap: 'g4', label: 'Lücke 4' }, '.', { nl: true },
@@ -500,7 +506,7 @@ TRESOR.room({
       hash: '327b675ccce775088768d6dfb498897a860b14012280bbe20fe6d663c8347114',
       hints: ['Lest den Satz laut. Was ist die Aussage, was der Beleg, was die Grenze?',
               'Was haben die Versuche gemessen? Und haben wir den Berolinavis untersucht?',
-              'Die Daten stützen die Annahme nicht. Die Nachkommen zeigten die Veränderung nicht. Über den Fund wissen wir noch nichts.'],
+              'Die Lücken nennen die Aussage, den Beleg und die Grenze. Streicht in der Wortbank zuerst, was nicht passt.'],
       rescue: 'QXVzc2FnZTogRGllIHVudGVyc3VjaHRlbiBEYXRlbiBzdMO8dHplbiBuaWNodCBkaWUgQW5uYWhtZSwgZGFzcyBlcndvcmJlbmUgVmVyw6RuZGVydW5nZW4gdmVyZXJidCB3ZXJkZW4uIEJlbGVnOiBJbiBiZWlkZW4gVmVyc3VjaGVuIHplaWd0ZW4gZGllIE5hY2hrb21tZW4gZGllIFZlcsOkbmRlcnVuZyBpaHJlciBFbHRlcm4gbmljaHQuIFJlaWNod2VpdGU6IMOcYmVyIGRpZSBFY2h0aGVpdCBkZXMgQmVyb2xpbmF2aXMgc2FndCBkYXMgbm9jaCBuaWNodHMu',
       rescueTask: 'Schreibt Aussage, Beleg und Reichweite in euren Worten ins Logbuch.',
       onSolve: {
@@ -522,7 +528,9 @@ TRESOR.room({
       prompt: 'Vergleicht, wie sich eine Population nach Lamarck und nach Darwin verändert, in einem Satz.',
       placeholder: 'Nach Lamarck …, nach Darwin …',
       checks: ['Das Feld ist ausgefüllt.', 'Der Logbuch-Eintrag ist erstellt.'],
-      hints: ['Vergleicht beide Ketten nebeneinander.', 'Wer verändert sich bei Lamarck, was verändert sich bei Darwin?', 'Lamarck: jedes Tier. Darwin: der Anteil in der Population.'],
+      hints: ['Vergleicht beide Ketten nebeneinander.',
+              'Wer verändert sich bei Lamarck, was verändert sich bei Darwin?',
+              'Bei Lamarck verändert sich das einzelne Tier. Wie ist das bei Darwin?'],
       onSolve: { message: { from: 'kemal', text: 'Merkt euch diesen Unterschied. Im Labor seht ihr ihn in Zahlen.' } } }
   }
 });
