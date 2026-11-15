@@ -26,7 +26,7 @@ TRESOR.room({
     return t;
   },
 
-  end: { title: 'Raum 1 geschafft', text: 'Sichert jetzt euren Spielstand. Wie es weitergeht, erfahrt ihr in der nächsten Stunde.' },
+  end: { title: 'Raum 1 geschafft', text: 'Sichert jetzt euren Spielstand. In der nächsten iPad-Stunde schließt Kemal euch die Fossilienkammer auf.' },
 
   /* Zufallsmodell der Simulation „Laufrad“ (Spieldaten). */
   models: {
@@ -46,7 +46,12 @@ TRESOR.room({
 
   missions: [
     { id: 'm1v3.1', title: 'Stunde 1A · Teil 1: Die Behauptung', unlock: 'cf9e92a1a95b3b94b145029a171bdc732776ebdd8b612cd1889de323847d719d',
-      intro: { from: 'kemal', audio: 'audio/a0-kemal.mp3', text: 'Ich habe euch in den Streitsaal gelassen. Gestern Abend hat Hallmann hier vor Sammlern gesprochen. Die Saalanlage hat alles aufgezeichnet. Hört zu, aber glaubt nicht alles, was ihr hört.' },
+      /* ENTWURF 15.11.: Vorgeschichte vor dem ersten Raum (wer ihr seid, worum es geht, was der Tresor ist). Mit Game Design V4 abgleichen. */
+      intro: { before: [
+          { from: 'wendt', text: 'Hier ist Johanna Wendt, Kuratorin am Museum. Ihr seid mein Junior-Forschungsteam, und ich brauche euch.\n\nDer Händler Viktor Hallmann will ein Fossil versteigern, den Berolinavis. Schätzpreis: 2,4 Millionen Euro. Er nennt ihn das Bindeglied zwischen Dinosaurier und Vogel. Ich habe Zweifel.' },
+          { from: 'wendt', text: 'Ich kann zurzeit nicht ins Museum kommen. Fragt nicht, warum. Ich weiß nicht, wem ich dort trauen kann.\n\nMeine Unterlagen liegen in meinem Tresor. Er hat sechs Schlösser. Jedes öffnet sich nur mit einem Satz, den ihr belegen könnt. Wer den Tresor öffnet, soll geprüft haben und nicht geglaubt.\n\n– J. W.' },
+          { from: 'kemal', text: 'Kemal Aydın hier, Präparator. Dr. Wendt hat mir geschrieben.\n\nKommt heute nach Schließung zum Seiteneingang. Ich lasse euch hinein.' } ],
+        from: 'kemal', audio: 'audio/a0-kemal.mp3', text: 'Ich habe euch in den Streitsaal gelassen. Gestern Abend hat Hallmann hier vor Sammlern gesprochen. Die Saalanlage hat alles aufgezeichnet. Hört zu, aber glaubt nicht alles, was ihr hört.' },
       requires: ['r1v3-1-hoeren', 'r1v3-1-frage', 'r1v3-1-pruefen'],
       doneTitle: 'Teil 1 abgeschlossen',
       doneText: 'Ihr habt geklärt, was Hallmann behauptet, und daraus eine Frage gemacht, die man prüfen kann.\n\nSchreibt „Hallmann behauptet, dass …“ und eure Untersuchungsfrage ins Logbuch.' },
@@ -130,7 +135,7 @@ TRESOR.room({
     'x2': { title: 'Auktionskatalog', tag: 'Text', style: 'paper',
       text: 'Los 1: „Berolinavis“. Fundort laut Katalog: Grube Nordhang. Alter laut Katalog: etwa 150 Millionen Jahre. Schätzpreis: 2,4 Millionen Euro.' },
     'x3': { title: 'Einladung zur Versteigerung', tag: 'Text', style: 'paper',
-      text: 'Einladung. Versteigerung des Berolinavis am kommenden Samstag, 20 Uhr, im Großen Saal. Einlass nur mit dieser Karte.' },
+      text: 'Einladung. Versteigerung des Berolinavis im Großen Saal. Der Termin wird den geladenen Gästen mitgeteilt. Einlass nur mit dieser Karte.' },
     'x4': { title: 'Deckblatt des Museumsgutachtens', tag: 'Bild', style: 'paper',
       text: 'Ein Deckblatt: „Gutachten zum Fund Berolinavis“. Die Seiten dahinter fehlen. Der Inhalt ist nicht lesbar.' },
     'x5': { title: 'Wandtafel', tag: 'Text', style: 'paper',
@@ -270,7 +275,9 @@ TRESOR.room({
       onSolve: { wall: [
           { id: 'w-v1', title: 'Vorhersage V1', tag: 'Ergebnis', kind: 'ergebnis', text: 'Wenn Tiere ein Organ stark trainieren, dann müssten ihre Jungen schon bei der Geburt ein kräftigeres Organ haben.' },
           { id: 'w-v2', title: 'Vorhersage V2', tag: 'Ergebnis', kind: 'ergebnis', text: 'Wenn Eltern eine Veränderung erwerben, dann müssten ihre Jungen diese Veränderung zeigen.' } ],
-        message: { from: 'kemal', text: 'Im Archiv liegen zwei Versuche. Vielleicht kann man eure Vorhersagen damit prüfen.' } } },
+        message: { from: 'kemal', text: 'Im Archiv liegen zwei Versuche. Vielleicht kann man eure Vorhersagen damit prüfen.' },
+        /* ENTWURF 15.11.: Schluss der Stunde 1A, Hallmann weiß von der Prüfung */
+        message2: { from: 'hallmann', text: 'Man berichtet mir, im Museum werde nachts an meinem Vortrag herumgeprüft. Nur zu.\n\nWer mir widerspricht, bringt bitte Belege mit. Meinungen habe ich selbst genug.' } } },
 
     'z1v3-giraffe': { id: 'z1v3-giraffe', type: 'freetext', minLength: 60, title: 'Beweist die Giraffe Lamarck? (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: Giraffenskelett', docs: ['x1'] },
@@ -463,7 +470,7 @@ TRESOR.room({
         fx: 'lock', fxTitle: 'Schloss 1 geöffnet', fxText: 'Aussage, Beleg und Reichweite halten. Eure Prüfung hat standgehalten.',
         evidence: { id: 'ev-1', title: 'Beweisakte Teil 1 · Erklärung von Angepasstheit', text: 'Hallmanns Erklärung hält der Prüfung an Beobachtungen nicht stand. Über die Echtheit des Berolinavis sagt das nichts.' },
         message: { from: 'wendt', text: 'Gut geprüft. Merkt euch: Über den Fund selbst wissen wir noch nichts. Aber ihr habt eine Erklärung geprüft und nicht bloß geglaubt.\n\n– J. W.' },
-        message2: { from: 'kemal', text: 'Hallmann verschickt eine neue Broschüre: ‚Er wollte fliegen, also wuchsen ihm Federn.‘ Ihr wisst jetzt, woran das scheitert.' } } },
+        message2: { from: 'kemal', text: 'Hallmann verschickt eine neue Broschüre: ‚Er wollte fliegen, also wuchsen ihm Federn.‘ Ihr wisst jetzt, woran das scheitert.\n\nEin Schloss am Tresor ist offen, fünf sind noch zu. Und den Berolinavis selbst hat noch niemand von uns geprüft. Er liegt in Dr. Wendts Fossilienkammer.' }   /* ENTWURF 15.11.: zweiter Absatz */ } },
 
     'z1v3-modellkritik': { id: 'z1v3-modellkritik', type: 'freetext', minLength: 60, title: 'Was Darwins Erklärung offenlässt (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: M2 · Darwin', docs: ['m2'] },

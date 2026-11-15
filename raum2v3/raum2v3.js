@@ -28,7 +28,7 @@ TRESOR.room({
     return t;
   },
 
-  end: { title: 'Raum 2 geschafft', text: 'Sichert jetzt euren Spielstand. Wie es weitergeht, erfahrt ihr in der nächsten Stunde.' },
+  end: { title: 'Raum 2 geschafft', text: 'Sichert jetzt euren Spielstand. Zwei Schlösser am Tresor sind offen. Der nächste Raum ist Dr. Wendts Labor.' },
 
   missions: [
     { id: 'm2v3.1', title: 'Stunde 2A · Teil 1: Ein Fossil ist ein Befund', unlock: 'dc4452298f7f8a1ac52918984d1a62c8220cb55e7167764109e385c8d210c1cc',
@@ -223,7 +223,7 @@ TRESOR.room({
         { id: 'a', label: 'Der Zettel ist falsch oder das Stück wurde vertauscht. Die Herkunft ist unklar.' },
         { id: 'b', label: 'Das Stück stammt sicher aus Schicht 3.' },
         { id: 'c', label: 'Das Stück ist eine Fälschung.' },
-        { id: 'd', label: 'Das Stück ist wertlos.' }
+        { id: 'd', label: 'Das Stück stammt aus einer anderen Grube.' }
       ],
       traps: [{ id: 'c', text: 'Vorsicht. Ein falscher Zettel macht die Herkunft unklar. Er sagt nicht, warum.' }],
       /* ENTWURF 15.11.: Aussage mit Beleg (Rateschutz) */
@@ -290,7 +290,9 @@ TRESOR.room({
           { id: 'w-m3', title: 'Merkmal: lange Schwanzwirbelsäule', tag: 'Urvogel', kind: 'ergebnis', text: 'Am Schwanz erkennbar.' },
           { id: 'w-m4', title: 'Merkmal: Schwungfedern', tag: 'Urvogel', kind: 'ergebnis', text: 'Als Abdrücke am Arm erkennbar.' },
           { id: 'w-m5', title: 'Merkmal: Brustbeinkamm', tag: 'Urvogel', kind: 'ergebnis', text: 'Am Fossil nicht erkennbar.' } ],
-        text: 'Die fünf Merkmale hängen als Karten an der Sammelwand.' } },
+        text: 'Die fünf Merkmale hängen als Karten an der Sammelwand.',
+        /* ENTWURF 15.11.: Schluss der Stunde 2A */
+        message: { from: 'kemal', text: 'Hinten in der Kammer steht noch eine Vitrine mit einem Tuch darüber. Den Schlüssel hat nur Dr. Wendt.\n\nIch suche bis zur nächsten Stunde nach dem Zweitschlüssel.' } } },
 
     'r2v3-2-tabelle': { id: 'r2v3-2-tabelle', type: 'tabelle', title: 'Vergleich protokollieren (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: Fotos in der Vitrine', docs: ['v1', 'v2', 'v3'] },
