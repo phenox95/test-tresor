@@ -1390,7 +1390,9 @@
   function intro(m) {
     if (S.seen['intro-' + m.id] || !m.intro || (m.requires || []).some(isSolved)) return;
     S.seen['intro-' + m.id] = true; persist();
-    message(m.intro.from, m.intro.text, function () { if (m.intro.next) { message(m.intro.next.from, m.intro.next.text, hint, true, m.intro.next.audio); } else hint(); }, true, m.intro.audio);
+    /* Ab 2.1 (15.11.): intro.before = Nachrichten vor dem Einstieg (Vorgeschichte), danach intro und intro.next wie bisher */
+    var chain = (m.intro.before || []).concat([m.intro]).concat(m.intro.next ? [m.intro.next] : []);
+    (function step(i) { var c = chain[i]; if (!c) { hint(); return; } message(c.from, c.text, function () { step(i + 1); }, true, c.audio); })(0);
     function hint() { toast(ROOM.flashlight ? 'Bewegt den Finger über den Bildschirm, um mit der Taschenlampe zu suchen.' : 'Tippt auf Dinge im Raum, um sie zu untersuchen.', 5000); }
   }
 
