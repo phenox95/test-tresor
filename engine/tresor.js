@@ -8,7 +8,7 @@
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 2.3 · 15.11.2026';
+  var ENGINE_BUILD = 'Engine 2.4 · 15.11.2026';
   var LEGACY_ROOMS = 'Raum 1 V2.2 · Raum 2 V1.1';   /* Räume ohne eigenes Feld version */   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
@@ -44,7 +44,9 @@
     'r2v3-4-untersuchen', 'r2v3-4-ausreden', 'r2v3-4-schloss',
     'z2v3-luecken', 'z2v3-passung', 'z2v3-kein-brueckentier', 'z2v3-verwerfung',
     /* ab Engine 2.1 und 2.2 (15.11.2026) */
-    'r1v3-3-datenwert', 's1v3-1a', 's1v3-1b', 's2v3-2a', 's2v3-2b'
+    'r1v3-3-datenwert', 's1v3-1a', 's1v3-1b', 's2v3-2a', 's2v3-2b',
+    /* ab Engine 2.4: Raum 3 */
+    'm3v3.1', 'm3v3.2', 'm3v3.3', 'r3v3-1-darstellung', 'r3v3-1-mittel', 'r3v3-1-interpretation', 'r3v3-1-herkunft', 's3v3-1', 'r3v3-1-ausreisser', 'r3v3-2-duerre', 'r3v3-2-deutung', 'e3v3', 'r3v3-2-insel', 'r3v3-2-schluss', 's3v3-2', 'r3v3-2-konkurrenz', 'r3v3-2-konkurrenz-text', 'r3v3-2-alternativ', 's3v3-3', 'r3v3-3-widersprueche', 'r3v3-3-kette', 'r3v3-3-schloss', 'r3v3-3-artbegriff', 'r3v3-3-brecht'
   ];
 
   /* ---------------- Hilfsfunktionen ---------------- */
@@ -167,6 +169,18 @@
     });
     if (!kids.length) return null;
     return el('details', { class: 'ref', open: p.type === 'freetext' ? 'open' : null }, [el('summary', { text: r.title || 'Zum Nachschlagen' })].concat(kids));
+  }
+  /* ab 2.4: einfaches Säulenbild als Text-Balken (Häufigkeit je Klasse), auch im Schwarzweißdruck lesbar */
+  function histEl(h) {
+    var mx = 1; h.rows.forEach(function (r) { if (r[1] > mx) mx = r[1]; });
+    var box = el('div', { class: 'hist', role: 'img', 'aria-label': h.title + ': ' + h.rows.map(function (r) { return r[0] + ' mm: ' + r[1]; }).join(', ') });
+    box.appendChild(el('strong', { class: 'hist-title', text: h.title }));
+    h.rows.forEach(function (r) {
+      box.appendChild(el('div', { class: 'hist-row' }, [el('span', { class: 'hist-lab', text: r[0] }),
+        el('span', { class: 'hist-track' }, [el('span', { class: 'hist-bar', style: 'width:' + Math.round(100 * r[1] / mx) + '%' })]), el('span', { class: 'hist-n', text: String(r[1]) })]));
+    });
+    if (h.note) box.appendChild(el('span', { class: 'muted small', text: h.note }));
+    return box;
   }
   function tableEl(t) {
     var head = el('tr', {}, t.head.map(function (h) { return el('th', { text: h }); }));
@@ -1164,6 +1178,7 @@
         last = { n: sv.count, setting: JSON.parse(JSON.stringify(setting)), label: 'Lauf ' + sv.count + ' (' + labelOf(setting) + ')', summary: res.summary, table: res.table, saved: false };
         logEvent('lauf ' + p.id + ' ' + sv.count + ' ' + JSON.stringify(setting)); persist();
         out.innerHTML = ''; out.appendChild(el('p', {}, [el('strong', { text: last.label })])); out.appendChild(tableEl(res.table));
+        if (res.hist) res.hist.forEach(function (h) { out.appendChild(histEl(h)); });
         if (p.predict) out.appendChild(el('p', { class: 'sim-pred-line' }, [el('strong', { text: 'Eure Vorhersage: ' }), predLabel()]));
         if (p.dataNote) out.appendChild(el('p', { class: 'muted small', text: p.dataNote }));
         saveBtn.disabled = false; fb.textContent = '';
@@ -1174,6 +1189,42 @@
           if (!needMet()) { wrong(fb, p.needText || 'Speichert zuerst genug Läufe.'); return; }
           d.close(); solve(p, {});
         } })]));
+    }
+    /* ---------- Zahleneingabe mit Toleranz (ab 2.4): je Feld eine Zahl. Gespeichert sind nur Hashes der erlaubten Werte (zwei Nachkommastellen). ---------- */
+    if (p.type === 'zahl') {
+      var zin = {};
+      var zbox = el('div', { class: 'zahl-felder' });
+      p.fields.forEach(function (f) {
+        var inp = el('input', { type: 'text', inputmode: 'decimal', autocomplete: 'off', class: 'zahl-in', 'aria-label': f.label, placeholder: f.placeholder || '' });
+        zin[f.id] = inp;
+        zbox.appendChild(el('label', { class: 'zahl-feld' }, [el('span', { text: f.label }), inp, f.unit ? el('span', { class: 'muted', text: ' ' + f.unit }) : null]));
+      });
+      body.push(zbox, el('div', { class: 'row end' }, [el('button', { class: 'btn', text: p.button || 'Prüfen', onclick: function () {
+        var bad = [], vals = {};
+        for (var zi = 0; zi < p.fields.length; zi++) {
+          var f = p.fields[zi], raw = String(zin[f.id].value).replace(',', '.').replace(/\s/g, ''), num = parseFloat(raw);
+          if (!raw || isNaN(num)) { wrong(fb, 'Tragt in jedes Feld eine Zahl ein, zum Beispiel 9,5.'); return; }
+          vals[f.id] = num.toFixed(2);
+          if (!check(p.id + '-' + f.id, vals[f.id], f.hash)) bad.push(f);
+        }
+        if (!bad.length) { d.close(); solve(p, {}); return; }
+        logEvent('fehlversuch ' + p.id); var nf = failCount() + 1; S.vars.fails[p.id] = nf; persist();
+        wrong(fb, nf >= 2 && bad.length < p.fields.length ? ('Nichts passiert. Bei „' + bad[0].label + '“ stimmt die Zahl noch nicht.' + (p.fields.length > 1 && bad.length > 1 ? ' Bei mindestens einem weiteren Feld auch nicht.' : '')) : p.wrongText);
+      } })]));
+    }
+    /* ---------- Entscheidung (ab 2.4): zwei Karten, beide Wege führen zum Ziel. Wirkung je Karte in options[i].onSolve (vars, message). ---------- */
+    if (p.type === 'entscheidung') {
+      var eRow = el('div', { class: 'entscheidung' });
+      p.options.forEach(function (o) {
+        eRow.appendChild(el('button', { class: 'opt', type: 'button', onclick: function () {
+          logEvent('entscheidung ' + p.id + ' ' + o.id);
+          var merged = {}; var a = p.onSolve || {}, b = o.onSolve || {};
+          Object.keys(a).forEach(function (k) { merged[k] = a[k]; }); Object.keys(b).forEach(function (k) { merged[k] = b[k]; });
+          var q = {}; Object.keys(p).forEach(function (k) { q[k] = p[k]; }); q.onSolve = merged;
+          d.close(); solve(q, {});
+        } }, [el('strong', { class: 'opt-tag', text: o.tag || '' }), el('span', { text: o.label })]));
+      });
+      body.push(eRow);
     }
     /* ---------- Schnellrunde mit Zeit (ab 2.2): einfache Abruf-Aufgaben, eine nach der anderen. Falsch = Karte kommt wieder und kostet Zeit.
        Zeit abgelaufen = kurze Szene, dann neuer Versuch. Nach drei abgelaufenen Versuchen darf ohne Zeit gespielt werden. ---------- */
