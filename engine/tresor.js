@@ -1,5 +1,6 @@
 /* =====================================================================
    TRESOR-ENGINE · Grundsystem für „Der Tresor der Zeit“
+   Version 2.2 (15.11.2026: Schnellrunde mit Zeit, Vorgeschichte über intro.before)
    Version 2.1 (15.11.2026: Auswahl mit Beleg, Schloss mit Wortbank, Teil-Rückmeldung erst ab dem zweiten Fehlversuch, Vorhersage und Etikett in der Simulation, Rollentausch beim Missionsstart)
    Version 2.0 (Raum 1 und 2 V3: Simulation, Sammelwand, Freitext mit Haken, Seed aus dem Teamnamen; Raum 2: Untersuchungsobjekt, Widerspruch markieren, Tabelle ausfüllen; Antworten werden gemischt, Schloss-Animation; Raum 1: Textkarten, Lückensatz mit Dreierprüfung, Einspruch, Markieren im Text, Nachfragen, Netz verbinden, Papier-Aufgabe, Notfall auf Papier, optionale Sprachaufnahmen) · für alle Räume gleich. Inhalte stehen in den Raumdateien.
    ===================================================================== */
@@ -7,7 +8,7 @@
   'use strict';
 
   var ENGINE_VERSION = 1;
-  var ENGINE_BUILD = 'Engine 2.1 · 15.11.2026';
+  var ENGINE_BUILD = 'Engine 2.2 · 15.11.2026';
   var LEGACY_ROOMS = 'Raum 1 V2.2 · Raum 2 V1.1';   /* Räume ohne eigenes Feld version */   /* im Menü sichtbar: zeigt, welche Fassung der Browser wirklich geladen hat */
   var STORE_KEY = 'tresor.v1';
 
@@ -41,7 +42,9 @@
     'r2v3-2-kriterium', 'r2v3-2-urvogel', 'r2v3-2-tabelle',
     'r2v3-3-mosaik', 'r2v3-3-deutung', 'r2v3-3-frage',
     'r2v3-4-untersuchen', 'r2v3-4-ausreden', 'r2v3-4-schloss',
-    'z2v3-luecken', 'z2v3-passung', 'z2v3-kein-brueckentier', 'z2v3-verwerfung'
+    'z2v3-luecken', 'z2v3-passung', 'z2v3-kein-brueckentier', 'z2v3-verwerfung',
+    /* ab Engine 2.1 und 2.2 (15.11.2026) */
+    'r1v3-3-datenwert', 's1v3-1a', 's1v3-1b', 's2v3-2a', 's2v3-2b'
   ];
 
   /* ---------------- Hilfsfunktionen ---------------- */
@@ -1169,6 +1172,71 @@
           if (!needMet()) { wrong(fb, p.needText || 'Speichert zuerst genug Läufe.'); return; }
           d.close(); solve(p, {});
         } })]));
+    }
+    /* ---------- Schnellrunde mit Zeit (ab 2.2): einfache Abruf-Aufgaben, eine nach der anderen. Falsch = Karte kommt wieder und kostet Zeit.
+       Zeit abgelaufen = kurze Szene, dann neuer Versuch. Nach drei abgelaufenen Versuchen darf ohne Zeit gespielt werden. ---------- */
+    if (p.type === 'schnell') {
+      S.vars.schnell = S.vars.schnell || {};
+      var qv = S.vars.schnell[p.id] = S.vars.schnell[p.id] || { tries: 0, timeouts: 0, wrong: 0 };
+      var stage = el('div', { class: 'schnell' });
+      var timerId = null, left = 0, queue = [], untimed = false;
+      var stopTimer = function () { if (timerId) { clearInterval(timerId); timerId = null; } };
+      var optLabelQ = function (it) { return it.options || p.options; };
+      var showStart = function (note) {
+        stopTimer(); stage.innerHTML = '';
+        if (note) stage.appendChild(figureBlock(p.from || 'kemal', note));
+        else if (p.story) stage.appendChild(figureBlock(p.from || 'kemal', p.story));
+        stage.appendChild(el('p', { class: 'muted small', text: p.items.length + ' Karten · ' + p.seconds + ' Sekunden · Eine falsche Antwort kostet ' + (p.penalty || 5) + ' Sekunden, die Karte kommt wieder.' }));
+        var row = el('div', { class: 'row' }, [el('button', { class: 'btn', type: 'button', text: qv.tries ? 'Noch einmal' : 'Los', onclick: function () { run(false); } })]);
+        if (qv.timeouts >= 3) row.appendChild(el('button', { class: 'btn ghost', type: 'button', text: 'Ohne Zeit spielen', onclick: function () { run(true); } }));
+        stage.appendChild(row);
+      };
+      var run = function (noTime) {
+        untimed = !!noTime; qv.tries++; persist(); logEvent('schnell-start ' + p.id + ' ' + qv.tries + (untimed ? ' ohne-zeit' : ''));
+        queue = seededShuffle(p.items, p.id + '|' + qv.tries); left = p.seconds;
+        stage.innerHTML = '';
+        var bar = el('div', { class: 'schnell-bar' }, [el('div', { class: 'schnell-fill' })]);
+        var clock = el('div', { class: 'schnell-clock', 'aria-live': 'off', text: untimed ? 'ohne Zeit' : left + ' s' });
+        var count = el('div', { class: 'schnell-count' });
+        var card = el('div', { class: 'schnell-card', 'aria-live': 'polite' });
+        var opts = el('div', { class: 'schnell-opts' });
+        var note = el('div', { class: 'schnell-note', role: 'status' });
+        stage.appendChild(el('div', { class: 'schnell-head' }, [clock, count])); if (!untimed) stage.appendChild(bar);
+        stage.appendChild(card); stage.appendChild(opts); stage.appendChild(note);
+        var paint = function () {
+          clock.textContent = untimed ? 'ohne Zeit' : Math.max(0, Math.ceil(left)) + ' s';
+          bar.firstChild.style.width = Math.max(0, left / p.seconds * 100) + '%';
+          bar.classList.toggle('low', left <= 15);
+        };
+        var show = function () {
+          if (!queue.length) { stopTimer(); logEvent('schnell-geschafft ' + p.id + ' rest ' + Math.ceil(left)); d.close(); solve(p, {}); return; }
+          var it = queue[0];
+          count.textContent = 'noch ' + queue.length + (queue.length === 1 ? ' Karte' : ' Karten');
+          card.textContent = it.text; opts.innerHTML = '';
+          optLabelQ(it).forEach(function (o) {
+            opts.appendChild(el('button', { class: 'pen schnell-opt', type: 'button', text: o.label, onclick: function () {
+              if (check(p.id + '-' + it.id, o.id, p.itemHash[it.id])) { queue.shift(); note.textContent = ''; note.className = 'schnell-note'; show(); }
+              else {
+                qv.wrong++; persist(); logEvent('schnell-falsch ' + p.id + ' ' + it.id);
+                queue.push(queue.shift()); if (!untimed) left -= (p.penalty || 5);
+                note.className = 'schnell-note no'; note.textContent = 'Passt nicht. Die Karte kommt wieder.' + (untimed ? '' : ' −' + (p.penalty || 5) + ' s');
+                paint(); if (!untimed && left <= 0) timeUp(); else show();
+              }
+            } }));
+          });
+        };
+        var timeUp = function () {
+          stopTimer(); qv.timeouts++; persist(); logEvent('zeit-abgelaufen ' + p.id + ' ' + qv.timeouts);
+          showStart(p.timeoutText || 'Die Zeit ist um. Atmet durch und versucht es noch einmal.');
+        };
+        paint(); show();
+        if (!untimed) timerId = setInterval(function () {
+          if (dialogStack.indexOf(d) === -1) { stopTimer(); return; }      // Fenster geschlossen: Zeit anhalten, Versuch verfällt
+          left -= 0.25; paint(); if (left <= 0) timeUp();
+        }, 250);
+      };
+      showStart();
+      body.push(stage);
     }
     if (p.type === 'freetext') {
       var ta = el('textarea', { rows: 5, placeholder: p.placeholder || 'Schreibt hier …' });
