@@ -34,7 +34,7 @@ TRESOR.room({
     { id: 'm2v3.1', title: 'Stunde 2A · Teil 1: Ein Fossil ist ein Befund', unlock: 'dc4452298f7f8a1ac52918984d1a62c8220cb55e7167764109e385c8d210c1cc',
       intro: { from: 'kemal', text: 'Das ist Dr. Wendts Fossilienkammer. Nehmt die Taschenlampe.\n\nHier lernt ihr, was ein Fossil überhaupt belegen kann. Fangt an der Profilwand an.',
         next: { from: 'wendt', audio: 'audio/a0-wendt.mp3', text: 'Bevor ihr den Berolinavis untersucht, müsst ihr wissen, was ein Fossil überhaupt belegen kann. Ein Fund ist nur so viel wert wie das, was wir über seine Herkunft wissen.' } },
-      requires: ['r2v3-1-schichten', 'r2v3-1-aussagekraft', 'r2v3-1-zettel', 'r2v3-1-folge'],
+      requires: ['r2v3-1-schichten', 's2v3-2a', 'r2v3-1-aussagekraft', 'r2v3-1-zettel', 'r2v3-1-folge'],
       doneTitle: 'Teil 1 abgeschlossen',
       doneText: 'Ihr wisst jetzt, was ein Fossil belegen kann und was nicht.\n\nSchreibt eure Fundkontext-Karte ins Logbuch: Fossil, Schicht, was daraus folgt, was nicht daraus folgt.' },
     { id: 'm2v3.2', title: 'Stunde 2A · Teil 2: Der Urvogel', unlock: 'bbec5cc76b085f6f49080346e2aa5f93f6fae3304121d30dce722284e9b9d9e6', sameLesson: true,
@@ -44,7 +44,7 @@ TRESOR.room({
       doneText: 'Ihr habt den Urvogel untersucht.\n\nIn der Präsenzstunde vergleicht ihr ihn mit einem Raubdinosaurier und einer Taube und schreibt das Vergleichsprotokoll ins Logbuch.' },   /* ENTWURF 15.11. */
     { id: 'm2v3.3', title: 'Stunde 2B · Teil 1: Merkmalsmosaik', unlock: 'f7a5bb352d5e61caeb0ffd350294a434973a7e4fe0b77505cadfbca3146a7b19',
       intro: { from: 'wendt', text: 'Man nennt ihn ein Brückentier. Prüft, was das wirklich bedeutet.\n\n– J. W.' },
-      requires: ['r2v3-3-mosaik', 'r2v3-3-deutung'],
+      requires: ['s2v3-2b', 'r2v3-3-mosaik', 'r2v3-3-deutung'],
       doneTitle: 'Teil 1 abgeschlossen',
       doneText: 'Ihr wisst jetzt, was ein Brückentier ist und was nicht.\n\nSchreibt eure Merkmalstabelle ins Logbuch: Merkmal, ursprünglich, abgeleitet oder keine Aussage, Begründung.' },
     { id: 'm2v3.4', title: 'Stunde 2B · Teil 2: Der Berolinavis und Schloss 2', unlock: '2ebfb60f70c77f5c47ef298e27a98a41e7a663c44c264defd9525e312f4a74cc', sameLesson: true,
@@ -61,6 +61,7 @@ TRESOR.room({
     { id: 'tuer', label: 'Tür der Kammer', rect: [29, 12, 6.5, 36], action: { type: 'doc', doc: 'a0' } },
     { id: 'gestein', label: 'Profilwand der Grube Nordhang', rect: [36, 15, 28.5, 33], states: [
       { if: { unlocked: 'm2v3.1', notSolved: 'r2v3-1-schichten' }, action: { type: 'puzzle', puzzle: 'r2v3-1-schichten' } },
+      { if: { unlocked: 'm2v3.1', notSolved: 's2v3-2a' }, action: { type: 'puzzle', puzzle: 's2v3-2a' } },
       { action: { type: 'doc', doc: 'p' } } ] },
     { id: 'schrank', label: 'Schubladenschrank', rect: [1, 8, 27.5, 86], states: [
       { if: { notSolved: 'r2v3-1-schichten' }, action: { type: 'text', text: 'Die Schubladen sind verschlossen. Auf den Schildchen stehen Schichtnummern.' } },
@@ -73,6 +74,7 @@ TRESOR.room({
     { id: 'vitrine', label: 'Vitrine', rect: [37.5, 49, 25.5, 41], states: [
       { if: { unlocked: 'm2v3.2', notSolved: 'r2v3-2-urvogel', notFound: 'v1' }, action: { type: 'docs', title: 'Vitrine', docs: ['v1', 'v2', 'v3'] } },
       { if: { unlocked: 'm2v3.2', notSolved: 'r2v3-2-urvogel' }, action: { type: 'puzzle', puzzle: 'r2v3-2-urvogel' } },
+      { if: { unlocked: 'm2v3.3', notSolved: 's2v3-2b' }, action: { type: 'puzzle', puzzle: 's2v3-2b' } },
       { if: { unlocked: 'm2v3.3', notSolved: 'r2v3-3-mosaik' }, action: { type: 'puzzle', puzzle: 'r2v3-3-mosaik' } },
       { if: { unlocked: 'm2v3.3', notSolved: 'r2v3-3-deutung' }, action: { type: 'puzzle', puzzle: 'r2v3-3-deutung' } },
       /* ab V3.1 Zusatzaufgaben: Kriterium und Tabelle (Pflicht ist das Protokoll auf Papier in der Präsenzstunde) */
@@ -173,7 +175,24 @@ TRESOR.room({
               'Was unten liegt, ist älter. Ein noch älteres Fossil müsste noch tiefer liegen.'],
       rescue: 'RGVyIMOkbHRlc3RlIEZ1bmQgbGllZ3QgaW4gU2NoaWNodCAzLCBkZXIgasO8bmdzdGUgaW4gU2NoaWNodCAxLiBFaW4gbm9jaCDDpGx0ZXJlcyBGb3NzaWwgbcO8c3N0ZSBub2NoIHRpZWZlciBsaWVnZW4sIGluIGRlciBHcnViZW5zb2hsZS4gV2FzIHVudGVuIGxpZWd0LCBpc3Qgw6RsdGVyLg==',
       rescueTask: 'Erklärt in eigenen Worten, warum tiefer liegende Schichten älter sind, und nennt eine Bedingung, unter der das nicht gilt.',
-      onSolve: { docs: ['p'], text: 'Die Profilwand leuchtet auf. Im Schrank klickt ein Schloss: Die Schubladen lassen sich öffnen.' } },
+      onSolve: { docs: ['p'], text: 'Die Profilwand leuchtet auf. Im Schrank klickt ein Schloss: Die Schubladen lassen sich öffnen.', then: 's2v3-2a' } },
+
+    /* ENTWURF 15.11.: Schnellrunde mit Zeit (Abrufen, keine Denkaufgabe) */
+    's2v3-2a': { id: 's2v3-2a', type: 'schnell', seconds: 90, title: 'Schnellrunde: 90 Sekunden Licht',
+      prompt: 'Entscheidet bei jeder Karte: älter, jünger oder nicht entscheidbar?',
+      story: 'Die Lampe über der Profilwand hängt an einer Zeitschaltuhr. Ihr habt 90 Sekunden Licht.\n\nDie Schichten liegen ungestört: 1 oben, 3 unten.',
+      timeoutText: 'Das Licht geht aus.\n\nIch drehe die Zeitschaltuhr neu auf. Noch einmal.',
+      options: [{ id: 'aelter', label: 'älter' }, { id: 'juenger', label: 'jünger' }, { id: 'offen', label: 'nicht entscheidbar' }],
+      items: [
+        { id: 'k1', text: 'Der Fischsaurier aus Schicht 3 ist … als der Urvogel aus Schicht 1.' },
+        { id: 'k2', text: 'Der Ammonit aus Schicht 2 ist … als der Fischsaurier aus Schicht 3.' },
+        { id: 'k3', text: 'Der Urvogel aus Schicht 1 ist … als der Ammonit aus Schicht 2.' },
+        { id: 'k4', text: 'Ein loser Stein von der Abraumhalde ist … als der Ammonit aus Schicht 2.' },
+        { id: 'k5', text: 'Ein Fossil aus der Grubensohle unter Schicht 3 wäre … als der Fischsaurier.' },
+        { id: 'k6', text: 'Ein Ammonit ohne Fundzettel ist … als der Urvogel aus Schicht 1.' }
+      ],
+      itemHash: { k1: '13ab2337ba8e811da92676040536ef9d3f8009fa2ca8e15cd054961749b64b10', k2: '43c9505f13b58e5f729a5fb83be149bb3dd1f24722b6b91ceefc36626ea86df5', k3: '49569308e8f25195e116faf1f43ba30656807535241602bf87b44e5aed90e513', k4: 'c9101d377595a8c4756f7bab0951440e1d47286aaa6022c5ac8f13ad0b492f74', k5: 'ec86646dd80496e21a20426daa2da7f24ee2458f09c56edaf41903cd852de035', k6: '4882c7f471f4b0416164c0e2f31daeb20e280ae62377e26f7a80414dce5bc016' },
+      onSolve: { message: { from: 'kemal', text: 'Geschafft, bevor es dunkel wurde.\\n\\nZwei Karten ließen sich nicht entscheiden. Überlegt, was ihnen fehlt.' } } },
 
     'r2v3-1-aussagekraft': { id: 'r2v3-1-aussagekraft', type: 'assign', title: 'Folgt das aus dem Fund?',
       ref: { title: 'Zum Nachschlagen: zwei Ammoniten, Profilwand', docs: ['s2', 'p'] },
@@ -290,9 +309,8 @@ TRESOR.room({
           { id: 'w-m3', title: 'Merkmal: lange Schwanzwirbelsäule', tag: 'Urvogel', kind: 'ergebnis', text: 'Am Schwanz erkennbar.' },
           { id: 'w-m4', title: 'Merkmal: Schwungfedern', tag: 'Urvogel', kind: 'ergebnis', text: 'Als Abdrücke am Arm erkennbar.' },
           { id: 'w-m5', title: 'Merkmal: Brustbeinkamm', tag: 'Urvogel', kind: 'ergebnis', text: 'Am Fossil nicht erkennbar.' } ],
-        text: 'Die fünf Merkmale hängen als Karten an der Sammelwand.',
         /* ENTWURF 15.11.: Schluss der Stunde 2A */
-        message: { from: 'kemal', text: 'Hinten in der Kammer steht noch eine Vitrine mit einem Tuch darüber. Den Schlüssel hat nur Dr. Wendt.\n\nIch suche bis zur nächsten Stunde nach dem Zweitschlüssel.' } } },
+        message: { from: 'kemal', text: 'Die fünf Merkmale hängen als Karten an der Sammelwand.\n\nHinten in der Kammer steht noch eine Vitrine mit einem Tuch darüber. Den Schlüssel hat nur Dr. Wendt.\n\nIch suche bis zur nächsten Stunde nach dem Zweitschlüssel.' } } },
 
     'r2v3-2-tabelle': { id: 'r2v3-2-tabelle', type: 'tabelle', title: 'Vergleich protokollieren (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: Fotos in der Vitrine', docs: ['v1', 'v2', 'v3'] },
@@ -319,6 +337,24 @@ TRESOR.room({
       hints: ['Der Vergleich nach Merkmalen sagt nichts über die Zusammengehörigkeit.', 'Welche Maße müssten an einer Nahtstelle zusammenpassen?', 'Die Breite benachbarter Wirbel.'] },
 
     /* ---------------- Mission 2.3 ---------------- */
+    /* ENTWURF 15.11.: Schnellrunde mit Zeit (Abrufen, keine Denkaufgabe) */
+    's2v3-2b': { id: 's2v3-2b', type: 'schnell', seconds: 90, title: 'Schnellrunde: Die Glashaube',
+      prompt: 'Ruft euer Vergleichsprotokoll ab: ja, nein oder nicht nachgewiesen?',
+      story: 'Die Glashaube der Vitrine schließt nach 90 Sekunden wieder.\n\nIhr habt die drei Tiere in der Präsenzstunde verglichen. Ruft euer Protokoll ab, solange die Haube offen ist.',
+      timeoutText: 'Die Haube senkt sich.\n\nIch stemme sie wieder hoch. Schaut vorher ins Logbuch, dann noch einmal.',
+      options: [{ id: 'j', label: 'ja' }, { id: 'n', label: 'nein' }, { id: 'x', label: 'nicht nachgewiesen' }],
+      items: [
+        { id: 'k1', text: 'Archaeopteryx: Zähne' },
+        { id: 'k2', text: 'Taube: Zähne' },
+        { id: 'k3', text: 'Compsognathus: Schwungfedern' },
+        { id: 'k4', text: 'Archaeopteryx: Brustbeinkamm' },
+        { id: 'k5', text: 'Taube: Brustbeinkamm' },
+        { id: 'k6', text: 'Compsognathus: lange knöcherne Schwanzwirbelsäule' },
+        { id: 'k7', text: 'Taube: Krallen an den Fingern' }
+      ],
+      itemHash: { k1: '44d22aea7aed8a769520afbf08341151672dc2eebb3bdbb05be264206f6db481', k2: '8179ea62dd9730d89184a551294e59bf030e0cc1aaab0ea0a1bae9cbdca001f5', k3: 'a10e573700c944d4f88132f6f2ce5130c812c7b9fe946a2c509ffd8f580458fc', k4: 'f2671b28dab08d2579e4e435edbf72b5a218a7836e19e0fe9c906275a8860d6d', k5: '2ceea70f7a56be879cf05d0bde5d1cb95c4ca2c3d7852984452a443085c419f3', k6: '85611188dbb94c2fb32d7ca76d441722f7af8fde8867c1e5af8237200fd35456', k7: '23f0f629edbc6dda3bdbcd32c1581e2aeb8ab396c14618530ba2fcb2a16deb21' },
+      onSolve: { docs: ['vp'], text: 'Die Haube bleibt offen. Das Vergleichsprotokoll hängt jetzt an der Sammelwand.', then: 'r2v3-3-mosaik' } },
+
     'r2v3-3-mosaik': { id: 'r2v3-3-mosaik', type: 'assign', title: 'Merkmale einordnen',
       ref: { title: 'Zum Nachschlagen: Vergleichsprotokoll', docs: ['vp'] },
       prompt: 'Ordnet die fünf Merkmale des Urvogels zu: ursprünglich (auch beim Raubdinosaurier), abgeleitet (typisch für heutige Vögel) oder keine Aussage möglich.\n\nNutzt euer Vergleichsprotokoll aus dem Logbuch. Zum Nachschlagen liegt es auch hier bereit.',

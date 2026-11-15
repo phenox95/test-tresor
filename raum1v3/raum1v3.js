@@ -52,7 +52,7 @@ TRESOR.room({
           { from: 'wendt', text: 'Ich kann zurzeit nicht ins Museum kommen. Fragt nicht, warum. Ich weiß nicht, wem ich dort trauen kann.\n\nMeine Unterlagen liegen in meinem Tresor. Er hat sechs Schlösser. Jedes öffnet sich nur mit einem Satz, den ihr belegen könnt. Wer den Tresor öffnet, soll geprüft haben und nicht geglaubt.\n\n– J. W.' },
           { from: 'kemal', text: 'Kemal Aydın hier, Präparator. Dr. Wendt hat mir geschrieben.\n\nKommt heute nach Schließung zum Seiteneingang. Ich lasse euch hinein.' } ],
         from: 'kemal', audio: 'audio/a0-kemal.mp3', text: 'Ich habe euch in den Streitsaal gelassen. Gestern Abend hat Hallmann hier vor Sammlern gesprochen. Die Saalanlage hat alles aufgezeichnet. Hört zu, aber glaubt nicht alles, was ihr hört.' },
-      requires: ['r1v3-1-hoeren', 'r1v3-1-frage', 'r1v3-1-pruefen'],
+      requires: ['r1v3-1-hoeren', 'r1v3-1-frage', 'r1v3-1-pruefen', 's1v3-1a'],
       doneTitle: 'Teil 1 abgeschlossen',
       doneText: 'Ihr habt geklärt, was Hallmann behauptet, und daraus eine Frage gemacht, die man prüfen kann.\n\nSchreibt „Hallmann behauptet, dass …“ und eure Untersuchungsfrage ins Logbuch.' },
     { id: 'm1v3.2', title: 'Stunde 1A · Teil 2: Das Modell', unlock: '6e1a4d45bacc392e447404bc19f848bb5b56176f525ce981b06f72cd98346e58', sameLesson: true,
@@ -63,7 +63,7 @@ TRESOR.room({
     { id: 'm1v3.3', title: 'Stunde 1B · Die Prüfung', unlock: 'a28f8ac7bfef61dbc9eca668dfd436d657e8fc23e8d43c23f1af73a999a2c808',
       /* ENTWURF: Einstieg 1.3 (V2-Text an das Laufrad angepasst) */
       intro: { from: 'kemal', text: 'Heute prüft ihr Hallmanns Erklärung. Auf dem Tisch steht ein Laufrad-Experiment aus dem Universitätsarchiv. Stellt den Versuch nach. Danach könnt ihr am Prüfpult Einspruch einlegen.\n\nHallmann hat auf jeden Beleg eine Antwort. Rechnet damit.' },
-      requires: ['r1v3-3-laufrad', 'r1v3-3-laufrad-aussage', 'r1v3-3-datenwert', 'r1v3-3-einspruch', 'r1v3-3-schloss'],
+      requires: ['s1v3-1b', 'r1v3-3-laufrad', 'r1v3-3-laufrad-aussage', 'r1v3-3-datenwert', 'r1v3-3-einspruch', 'r1v3-3-schloss'],
       doneTitle: 'Stunde 1B abgeschlossen · Schloss 1 geöffnet',
       doneText: 'Hallmanns Erklärung hält der Prüfung an Beobachtungen nicht stand. Über den Fund selbst wisst ihr damit noch nichts.\n\nSchreibt die Mittelwerte eurer Läufe und Aussage, Beleg und Reichweite in euer Logbuch. Darwins Erklärung am Pult rechts ist Thema der Präsenzstunde.' }
   ],
@@ -83,6 +83,7 @@ TRESOR.room({
       { if: { solved: 'r1v3-2-vorhersage' }, action: { type: 'docs', title: 'Archivregal', docs: ['b1', 'b3', 'b4', 'x4'] } },
       { action: { type: 'text', text: 'Ein Regal mit Archivmappen. Noch findet ihr nichts, was ihr für eure Untersuchung braucht.' } } ] },
     { id: 'laufrad', label: 'Tisch mit Laufrad', rect: [64.6, 60, 6.8, 16], states: [
+      { if: { unlocked: 'm1v3.3', notSolved: 's1v3-1b' }, action: { type: 'puzzle', puzzle: 's1v3-1b' } },
       { if: { unlocked: 'm1v3.3', notSolved: 'r1v3-3-laufrad' }, action: { type: 'puzzle', puzzle: 'r1v3-3-laufrad' } },
       { if: { unlocked: 'm1v3.3', notSolved: 'r1v3-3-laufrad-aussage' }, action: { type: 'puzzle', puzzle: 'r1v3-3-laufrad-aussage' } },
       { if: { unlocked: 'm1v3.3', notSolved: 'r1v3-3-datenwert' }, action: { type: 'puzzle', puzzle: 'r1v3-3-datenwert' } },
@@ -98,6 +99,7 @@ TRESOR.room({
       { if: { unlocked: 'm1v3.1', notSolved: 'r1v3-1-hoeren' }, action: { type: 'puzzle', puzzle: 'r1v3-1-hoeren' } },
       { if: { unlocked: 'm1v3.1', notSolved: 'r1v3-1-frage' }, action: { type: 'puzzle', puzzle: 'r1v3-1-frage' } },
       { if: { unlocked: 'm1v3.1', notSolved: 'r1v3-1-pruefen' }, action: { type: 'puzzle', puzzle: 'r1v3-1-pruefen' } },
+      { if: { unlocked: 'm1v3.1', notSolved: 's1v3-1a' }, action: { type: 'puzzle', puzzle: 's1v3-1a' } },
       { if: { unlocked: 'm1v3.3', solved: 'r1v3-3-datenwert', notSolved: 'r1v3-3-einspruch' }, action: { type: 'puzzle', puzzle: 'r1v3-3-einspruch' } },
       { if: { unlocked: 'm1v3.3', solved: 'r1v3-3-einspruch', notSolved: 'r1v3-3-schloss' }, action: { type: 'puzzle', puzzle: 'r1v3-3-schloss' } },
       { if: { missionDone: 'm1v3.1', notSolved: 'z1v3-quelle' }, action: { type: 'puzzle', puzzle: 'z1v3-quelle' } },
@@ -199,7 +201,24 @@ TRESOR.room({
       rescue: 'RGllIEZyYWdlbiBGMiB1bmQgRjUgZ2Vow7ZyZW4genVyIEVya2zDpHJ1bmcgdW5kIGxhc3NlbiBzaWNoIHByw7xmZW4uIEYxIHVuZCBGMyBzaW5kIG5pY2h0IG1lc3NiYXIuIEY0IGlzdCBwcsO8ZmJhciwgYmV0cmlmZnQgYWJlciBkYXMgQWx0ZXIgdW5kIG5pY2h0IGRpZSBFcmtsw6RydW5nLg==',
       rescueTask: 'Schreibt in eigenen Worten, warum ‚Wie alt ist der Berolinavis?‘ eine gute Frage ist, aber nicht zu Hallmanns Erklärung passt.',
       onSolve: { message: { from: 'wendt', text: 'Gut. Eine Frage ist der Anfang jeder Untersuchung. Jetzt braucht ihr das Modell dahinter.\n\n– J. W.' },
-        message2: { from: 'kemal', text: 'Vergleicht eure eigene Frage mit F2 und F5.\n\nÜberarbeitet sie im Logbuch, bis sie sich mit Beobachtungen oder Versuchen prüfen lässt und zu T3 bis T5 gehört.' }   /* ENTWURF 15.11. */ } },
+        message2: { from: 'kemal', text: 'Vergleicht eure eigene Frage mit F2 und F5.\n\nÜberarbeitet sie im Logbuch, bis sie sich mit Beobachtungen oder Versuchen prüfen lässt und zu T3 bis T5 gehört.' }, then: 's1v3-1a'   /* ENTWURF 15.11. */ } },
+
+    /* ENTWURF 15.11.: Schnellrunde mit Zeit (Abrufen, keine Denkaufgabe) */
+    's1v3-1a': { id: 's1v3-1a', type: 'schnell', seconds: 90, title: 'Schnellrunde: Der Wachdienst kommt',
+      prompt: 'Stuft jede Karte ein: Beobachtung, Deutung oder Behauptung ohne Beleg.',
+      story: 'Schritte auf dem Gang. Der Wachdienst kommt in 90 Sekunden durch den Saal.\n\nAuf dem Pult liegen noch sechs Zettel. Sortiert sie, bevor ich das Licht lösche.',
+      timeoutText: 'Licht aus. Der Wachmann geht vorbei, bleibt kurz stehen, geht weiter.\n\nJetzt. Noch einmal.',
+      options: [{ id: 'beo', label: 'Beobachtung' }, { id: 'deu', label: 'Deutung' }, { id: 'beh', label: 'Behauptung ohne Beleg' }],
+      items: [
+        { id: 'k1', text: '„Der Kaktus hat Dornen.“' },
+        { id: 'k2', text: '„Der Kaktus hat Dornen, weil er Schutz brauchte.“' },
+        { id: 'k3', text: '„Das ist der schönste Kaktus der Welt.“' },
+        { id: 'k4', text: '„Die Maus hat helles Fell.“' },
+        { id: 'k5', text: '„Helle Mäuse werden seltener gefressen. Deshalb gibt es hier so viele.“' },
+        { id: 'k6', text: '„Ein Experte hat das bestätigt.“' }
+      ],
+      itemHash: { k1: '2b249bcba147b424b205d14b768742bf336e6a720047d36d88339022dbd1578f', k2: 'ea07e8bdc1e10c90eecd3fea930155efa71cd0d48002fd0323eb54becc495a0f', k3: 'adac291cdaddd5a6021b87dbaa3f3d6e22a65f619040b83484a782f220ff3dd9', k4: 'c5ef72266d7b6e01e4617c8ac3379c50a60b519b78ea90ff98d69c90403d1534', k5: '44e563ef9ac69f898903db6171f813b0d0d4889254aaf9f9a65fb6b43dfccf03', k6: 'ff91cddc4367f024b8ba4e376a2a439277ed70076749d86f683ea1a40badc0fa' },
+      onSolve: { message: { from: 'kemal', text: 'Er ist vorbei. Das ging knapp.\\n\\nMerkt euch die drei Sorten. Ihr braucht sie in jedem Raum.' } } },
 
     'z1v3-quelle': { id: 'z1v3-quelle', type: 'freetext', minLength: 60, title: 'Stimmt T8? (Zusatzaufgabe)',
       ref: { title: 'Zum Nachschlagen: T8, Wendts Nachricht, Deckblatt des Gutachtens', docs: ['a1', 'a2', 'x4'] },
@@ -287,6 +306,24 @@ TRESOR.room({
       hints: ['Lest den Text am Skelett.', 'Was braucht ein Beleg, was ein Beispiel nicht hat?', 'Eine ungeklärte Frage kann kein Beweis sein.'] },
 
     /* ---------------- Mission 1.3 ---------------- */
+    /* ENTWURF 15.11.: Schnellrunde mit Zeit (Abrufen, keine Denkaufgabe) */
+    's1v3-1b': { id: 's1v3-1b', type: 'schnell', seconds: 100, title: 'Schnellrunde: Das Zeitschloss',
+      prompt: 'Entscheidet bei jeder Karte: Steht das in Lamarcks Modell oder nicht?',
+      story: 'Dr. Wendt hat den Versuchstisch gesichert. Das Zeitschloss gibt ihn nur frei, wenn jemand Lamarcks Modell sicher kennt.\n\nIhr habt 100 Sekunden.',
+      timeoutText: 'Das Schloss rastet wieder ein.\n\nRuhig. Schaut noch einmal ins Logbuch, dann von vorn.',
+      options: [{ id: 'ja', label: 'steht im Modell' }, { id: 'nein', label: 'steht nicht im Modell' }],
+      items: [
+        { id: 'k1', text: 'Organe, die oft gebraucht werden, werden stärker.' },
+        { id: 'k2', text: 'Was ein Tier im Leben erwirbt, erben seine Jungen.' },
+        { id: 'k3', text: 'Es werden mehr Junge geboren, als überleben können.' },
+        { id: 'k4', text: 'Neue Bedürfnisse führen zu neuen Gewohnheiten.' },
+        { id: 'k5', text: 'Tiere einer Art unterscheiden sich schon von Geburt an.' },
+        { id: 'k6', text: 'Organe, die nicht gebraucht werden, bilden sich zurück.' },
+        { id: 'k7', text: 'Tiere mit vorteilhaften Merkmalen haben mehr Nachkommen.' }
+      ],
+      itemHash: { k1: '86bb7ec74b2dfd9148d648c1508a83f3f16c3c380f6d40ffb66aba163064c4b5', k2: 'eb2a5a22978118f49de7896fd9713aa1df7b1eec288e1f67d24d5b80b7aff3ff', k3: '92e9a32bd433735c052da679305ec0e1b093daa27b66223453edca0058afc691', k4: '767c094deaee3ee92e3e200a0f5bb83d0c3d229012ba4b1d392c139737016a94', k5: 'e25aaf9eb0eaa77b19564658bd67ad5735ce84d174b5dcadf17080a98125e9e3', k6: '9d01c056c6dacb1cd718982b3ffb8418e62e6b3903beb45d265057b02cd42dac', k7: 'a82c46e48aac13f0ba5784e055f77a6a81530db8955be79f7ad3b972b3df6ffa' },
+      onSolve: { text: 'Das Zeitschloss klickt. Der Versuchstisch ist frei.', then: 'r1v3-3-laufrad' } },
+
     'r1v3-3-laufrad': { id: 'r1v3-3-laufrad', type: 'sim', model: 'laufrad', title: 'Archivversuch nachstellen: das Laufrad',
       /* ENTWURF 15.11.: Rahmen „Archivversuch nachstellen“, Vorhersage, Etikett */
       prompt: 'Stellt den Versuch mit und ohne Training der Eltern nach, je Bedingung mindestens zwei Läufe. Legt vorher eure Vorhersage fest.\n\nDas Laufrad-Experiment aus dem Universitätsarchiv steht auf dem Tisch.',

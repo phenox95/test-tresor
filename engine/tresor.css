@@ -405,3 +405,16 @@ table.tb-fill td { padding: 4px; }
 .sim-badge { display: inline-block; margin: 0 0 10px; padding: 3px 12px; border-radius: 999px; border: 1px solid var(--line); font-size: .85rem; letter-spacing: .04em; text-transform: none; color: var(--muted); }
 .sim-pred-line { margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line); }
 .beleg-prompt { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+
+/* Ab 2.2: Schnellrunde mit Zeit */
+.schnell-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.schnell-clock { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.schnell-count { color: var(--muted); }
+.schnell-bar { height: 10px; border-radius: 999px; background: #182224; border: 1px solid var(--line); overflow: hidden; margin-bottom: 14px; }
+.schnell-fill { height: 100%; width: 100%; background: var(--brass-hi); transition: width .25s linear; }
+.schnell-bar.low .schnell-fill { background: #D98A82; }
+.schnell-card { min-height: 96px; display: flex; align-items: center; padding: 16px 18px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255, 255, 255, .04); font-size: 1.15rem; line-height: 1.4; }
+.schnell-opts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.schnell-opt { flex: 1 1 30%; min-height: 56px; justify-content: center; align-items: center; text-align: center; font-weight: 700; }
+.schnell-note { min-height: 1.6em; margin-top: 10px; color: var(--muted); }
+.schnell-note.no { color: #E8A9A2; }
